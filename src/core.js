@@ -203,3 +203,6 @@ var Create = (function() {
 		return k;
 	};
 })();
+
+// Provide a global reference and a functionalized reference
+Classify.Create = Create;

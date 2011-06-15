@@ -1,2 +1,3 @@
 
-})(typeof window === "undefined" ? exports : window);
+// Establish the root object, "window" in the browser, or "global" on the server.
+})(this);

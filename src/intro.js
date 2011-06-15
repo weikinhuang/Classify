@@ -7,5 +7,5 @@
  *
  * Date: @DATE
  */
-(function( window, undefined ) {
+(function( root, undefined ) {
 

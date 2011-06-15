@@ -9,7 +9,9 @@ JS_ENGINE ?= `which node nodejs 2>/dev/null`
 COMPILER = ${JS_ENGINE} ${BUILD_DIR}/uglify.js --unsafe
 POST_COMPILER = ${JS_ENGINE} ${BUILD_DIR}/post-compile.js
 
-BASE_FILES = ${SRC_DIR}/core.js
+BASE_FILES = ${SRC_DIR}/export.js\
+			${SRC_DIR}/core.js\
+			${SRC_DIR}/namespace.js
 
 MODULES = ${SRC_DIR}/intro.js\
 	${BASE_FILES}\
@@ -25,7 +27,7 @@ DATE= `date`
 
 all: core
 
-core: classify lint min
+core: classify unit lint min
 	@@echo "Classify build complete."
 
 ${DIST_DIR}:
@@ -42,6 +44,14 @@ ${CL}: ${MODULES} | ${DIST_DIR}
 		sed 's/@DATE/'"${DATE}"'/' | \
 		${VER} > ${CL};
 
+unit : classify
+	@@if test ! -z ${JS_ENGINE}; then \
+		echo "Running unit tests against Classify"; \
+		${JS_ENGINE} build/qunit-check.js -q; \
+	else \
+		echo "You must have NodeJS installed in order to unit test Classify."; \
+	fi
+		
 lint: classify
 	@@if test ! -z ${JS_ENGINE}; then \
 		echo "Checking Classify against JSLint..."; \
@@ -61,7 +71,6 @@ ${CL_MIN}: ${CL}
 	else \
 		echo "You must have NodeJS installed in order to minify Classify."; \
 	fi
-	
 
 clean:
 	@@echo "Removing Distribution directory:" ${DIST_DIR}
