@@ -11,6 +11,7 @@ POST_COMPILER = ${JS_ENGINE} ${BUILD_DIR}/post-compile.js
 
 BASE_FILES = ${SRC_DIR}/export.js\
 			${SRC_DIR}/core.js\
+			${SRC_DIR}/create.js\
 			${SRC_DIR}/namespace.js
 
 MODULES = ${SRC_DIR}/intro.js\
