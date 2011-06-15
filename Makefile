@@ -9,10 +9,10 @@ JS_ENGINE ?= `which node nodejs 2>/dev/null`
 COMPILER = ${JS_ENGINE} ${BUILD_DIR}/uglify.js --unsafe
 POST_COMPILER = ${JS_ENGINE} ${BUILD_DIR}/post-compile.js
 
-BASE_FILES = ${SRC_DIR}/export.js\
-			${SRC_DIR}/core.js\
+BASE_FILES = ${SRC_DIR}/core.js\
 			${SRC_DIR}/create.js\
-			${SRC_DIR}/namespace.js
+			${SRC_DIR}/namespace.js\
+			${SRC_DIR}/export.js
 
 MODULES = ${SRC_DIR}/intro.js\
 	${BASE_FILES}\

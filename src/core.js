@@ -31,9 +31,17 @@ keys = function(o) {
 	}
 	return k;
 },
+// quick test for isArray
+isArray = function(o) {
+	return toString.call(o) === "[object Array]";
+},
 // force an object to be an array
 toArray = function(o) {
-	return toString.call(o) === "[object Array]" ? o : [ o ];
+	return isArray(o) ? o : [ o ];
+},
+// create ability to convert the arguments object to an array
+argsToArray = function(o) {
+	return Array.prototype.slice.call(o, 0);
 },
 // ability to store the original definition into the new function definition
 store = function(fn, base) {
@@ -60,7 +68,17 @@ each = function(o, iterator, context) {
 		}
 	}
 	return o;
-}, filter = function(arr, item) {
+},
+// simple mapping function
+map = function(o, iterator) {
+	var temp = [];
+	each(o, function(v, i) {
+		temp[temp.length] = iterator(v, i, o);
+	});
+	return temp;
+},
+// simple filter function
+filter = function(arr, item) {
 	var out = [];
 	each(arr, function(v) {
 		if (v !== item) {

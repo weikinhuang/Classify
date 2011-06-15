@@ -1,6 +1,6 @@
 // Create a wrapped reference to the Classify object.
 var Classify = function() {
-	return Classify.Create.apply(null, arguments);
+	return Create.apply(null, arguments);
 };
 
 // Export the Underscore object for **CommonJS**, with backwards-compatibility for the
