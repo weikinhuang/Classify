@@ -10,8 +10,10 @@ var IS_ENUMERATION_BUGGY = (function() {
 	}
 	return true;
 })(),
-// gets the enumerated keys if necessary
+// gets the enumerated keys if necessary (bug in older ie < 9)
 ENUMERATED_KEYS = IS_ENUMERATION_BUGGY ? "hasOwnProperty,valueOf,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,constructor".split(",") : [],
+// quick reference to the enumerated items length
+ENUMERATION_LENGTH = ENUMERATED_KEYS.length,
 // quick reference to object prototype
 objectPrototype = Object.prototype,
 // quick reference to the toString prototype
@@ -20,6 +22,10 @@ toString = objectPrototype.toString,
 isFunction = function(o) {
 	return typeof o === "function";
 },
+// quick test for isArray
+isArray = function(o) {
+	return toString.call(o) === "[object Array]";
+},
 // quickly be able to get all the keys of an object
 keys = function(o) {
 	var k = [], i;
@@ -27,13 +33,14 @@ keys = function(o) {
 		k.push(i);
 	}
 	if (IS_ENUMERATION_BUGGY) {
-		k = k.concat(ENUMERATED_KEYS);
+		// only add buggy enumerated values if it's not the Object.prototype's
+		for (i = 0; i < ENUMERATION_LENGTH; i++) {
+			if (o.hasOwnProperty(ENUMERATED_KEYS[i])) {
+				k.push(ENUMERATED_KEYS[i]);
+			}
+		}
 	}
 	return k;
-},
-// quick test for isArray
-isArray = function(o) {
-	return toString.call(o) === "[object Array]";
 },
 // force an object to be an array
 toArray = function(o) {

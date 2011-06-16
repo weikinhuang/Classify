@@ -28,7 +28,7 @@ for ( var i = 0; i < e.length; i++ ) {
 
 if ( found > 0 ) {
 	print( "\n" + found + " Error(s) found.\n" );
-
+	throw "JSLint check failed";
 } else {
 	print( "JSLint check passed.\n" );
 }

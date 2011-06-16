@@ -40,9 +40,9 @@ var Namespace = Create({
 		namespace = fullname.split("."),
 		// Get the actual name of this class to be created
 		name = namespace.pop(),
-		// Create a reference to the master classes array
+		// Retrieve the namespaced container
 		ref = provide(namespace, this),
-		// Quick referece to this.ref
+		// Create a reference to the master classes array
 		deref = this.ref,
 
 		// fix the arguments & Create the class
@@ -62,30 +62,49 @@ var Namespace = Create({
 		return c;
 	},
 	destroy : function(classname) {
-		var c, parts = classname.split("."), name = parts.pop(), base = this, parent_reference = null;
+		// initializing the placeholder
+		var c,
+		// Get the namespace we are creating this class in
+		namespace = classname.split("."),
+		// Get the actual name of this class to be created
+		name = namespace.pop(),
+		// create a quick reference to this
+		self = this, ref = this,
+		// Create a reference to the master classes array
+		deref = this.ref;
+
 		// remove it from this namespace
 		each(namespace, function(ns) {
 			// if it doesn't go that far, then forget deleting it
-			if (!base[ns]) {
-				base = null;
-				return false;
+			if (!ref[ns]) {
+				ref = null;
+				return this;
 			}
-			base = base[ns];
+			ref = ref[ns];
 		});
-		// delete the reference if we can find it
-		if (base) {
-			// TODO: we also need to delete the reference to this object from the parent!
-			parent_reference = base[name].superclass.subclass;
-			// let's remove it from this object!
-			delete base[name];
+		// delete the reference only if we can find it
+		if (!ref) {
+			return this;
 		}
-		// remove it from the named reference array, and all children associated with it,
-		// we're assuming all namespaced items are extensions of this base
-		for (c in this.ref) {
-			if (c.indexOf(classname) === 0) {
-				delete this.ref[c];
+		// create a quick reference
+		c = ref[name];
+		// recursively remove all inherited classes
+		each(c.subclass, function(v) {
+			self.destroy(v._namespace_);
+		});
+		// TODO: we also need to delete the reference to this object from the parent!
+		c.superclass.subclass = filter(c.superclass.subclass, c);
+		// now we remove all non inherited classes, but fall under this namespace
+		each(deref, function(v, k) {
+			if (k !== classname && k.indexOf(classname) === 0) {
+				self.destroy(v._namespace_);
 			}
-		}
+		});
+		// let's remove it from this object!
+		delete ref[name];
+		// let's remove the textual reference to this class as well
+		delete deref[classname];
+		// return this for chaining
 		return this;
 	},
 	exists : function(classname) {
