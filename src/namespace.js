@@ -1,6 +1,6 @@
 // global container containing all the namespace references
 var namespaces = {},
-// crete a function that create namespaces in an object
+// create a function that create namespaces in an object
 provide = function(namespace, base) {
 	// Drill down the namespace array
 	each(namespace, function(ns) {
@@ -20,6 +20,8 @@ dereference = function(base, arg) {
 		}
 		return base[arg];
 	}
+	// if we have an object, then that's what we want, otherwise arrays
+	// we need to loop through and convert them to the proper objects
 	return !isArray(arg) ? arg : map(arg, function(prop) {
 		return dereference(base, prop);
 	});
@@ -116,11 +118,15 @@ var Namespace = Create({
 	},
 	getName : function() {
 		return this.name;
+	},
+	toString : function() {
+		return "[namespace " + this.name + "]";
 	}
 });
 
 // get a namespace
 var getNamespace = function(namespace) {
+	// if the namespace doesn't exist, just create it
 	if (!namespaces[namespace]) {
 		namespaces[namespace] = new Namespace(namespace);
 	}
@@ -129,5 +135,6 @@ var getNamespace = function(namespace) {
 
 // remove a namespace
 var destroyNamespace = function(namespace) {
+	// TODO: more advanced cleanup?
 	delete namespaces[namespace];
 };

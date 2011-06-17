@@ -1,9 +1,11 @@
 // Create a wrapped reference to the Classify object.
-var Classify = function() {
-	return Create.apply(null, arguments);
-};
+var Classify = Create({
+	_invoke_ : function() {
+		return Create.apply(null, arguments);
+	}
+});
 
-// Export the Underscore object for **CommonJS**, with backwards-compatibility for the
+// Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.
 if (typeof module !== "undefined" && module.exports) {
 	module.exports = Classify;
