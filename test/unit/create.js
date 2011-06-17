@@ -245,6 +245,40 @@ test("extending classes using inheritance", function() {
 	equals((new subsubclass()).e(), subsubclass, "parent method's 'this' is still referencing proper object");
 
 	// testing inherited properties
+	test_a = Create({
+		a : 1,
+		b : 2,
+		c : []
+	});
+	subclass_a = Create(test_a, {
+		b : 3,
+		d : {}
+	});
+	subsubclass_a = Create(subclass_a, {
+		e : function() {
+			this.c.push(1);
+			return this.c;
+		}
+	});
+	var x = new test_a(), y = new subclass_a(), z = new subsubclass_a();
+	equals(y.a, 1, "Reusing a property from an inherited function");
+	equals(y.b, 3, "Overriding a existing property from a parent class");
+	equals(z.e(), x.c, "Using a object as a property causes property to be a pointer");
+
+	// testing parent calling functions in newly added methods
+	subsubclass.addProperty("f", function() {
+		// function with parent version
+		equals(typeof this._parent_, "function", "method with override has a parent method");
+		equals(this._parent_(), this.constructor, "parent method context is current class' context");
+	});
+	subsubclass.addProperty("g", function() {
+		// function without parent version
+		equals(typeof this._parent_, "undefined", "method with no override has no parent method");
+	});
+	(new subsubclass()).f();
+	(new subsubclass()).g();
 });
 
-// implements
+test("implementing methods in classes from other objects", function() {
+
+});
