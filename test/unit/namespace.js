@@ -82,3 +82,29 @@ test("class extension and implementation using named references", function() {
 	equals(g.implement[0], c, "implement class reference stored internally");
 	equals(g.implement[1], f, "implement object reference stored internally");
 });
+
+test("removing named classes", function() {
+	var ns = getNamespace("Test3");
+	var ca = ns.create("A", {});
+	var cb = ns.create("B", {});
+	var cc = ns.create("A.C", {});
+	var cd = ns.create("D", "A", {});
+	var ce = ns.create("A.E", "A", {});
+	var cf = ns.create("F", "A", {});
+
+	// destroy an individual class
+	ns.destroy("B");
+	equals(typeof ns.B, "undefined", "removing a named class from the namespace");
+
+	// destroy a class that is inherited from another class
+	ns.destroy("D");
+	equals(typeof ns.D, "undefined", "removing a named class from the namespace");
+	equals(ns.A.subclass.indexOf(cd), -1, "remove class from the list of subclasses in the parent");
+
+	// destroy a class namespace
+	ns.destroy("A");
+	equals(typeof ns.A, "undefined", "removing a named class from the namespace");
+	equals(ns.get("A.C"), null, "removed leaf classes from branch namespace");
+	equals(typeof ns.F, "undefined", "removed class that extended a destroyed class");
+	equals(ns.get("F"), null, "removed branch namespace that inherited from a removed branch");
+});
