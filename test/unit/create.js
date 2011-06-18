@@ -280,5 +280,88 @@ test("extending classes using inheritance", function() {
 });
 
 test("implementing methods in classes from other objects", function() {
+	var inf = {
+		a : function() {
+			return this;
+		},
+		b : function() {
+			return 1;
+		}
+	};
+	var test = Create([ inf ], {
+		c : function() {
+			return 2;
+		}
+	});
 
+	// implementing plain objects
+	equals(test.prototype.a, inf.a, "method implemented through a plain object into prototype of class");
+	var x = new test();
+	equals(x.a(), x, "implemented reference to 'this' is the calling object");
+	ok(typeof test.implement, "implemented objects reference is an array");
+	equals(test.implement.length, 1, "implemented objects reference is stored");
+	equals(test.implement[0], inf, "implemented objects reference is stored");
+
+	// implementing class objects
+	var inf_class = Create({
+		c : function() {
+			return this;
+		},
+		d : function() {
+			return 1;
+		},
+		e : function() {
+			return 2;
+		}
+	});
+	var test_i = Create([ inf_class ], {
+		f : function() {
+			return this.d();
+		}
+	});
+	equals(test_i.prototype.c, inf_class.prototype.c, "method implemented through a class object into prototype of class");
+	equals((new test_i()).f(), 1, "method implemented through a class object can be called from main class");
+	equals((new test_i()).c().constructor, test_i, "method implemented through a class object's 'this' reference is the calling object");
+	equals(test_i.implement[0], inf_class, "implemented class' reference is stored");
+
+	// implementing subclasses
+	var inf_subclass = Create(inf_class, {
+		d : function() {
+			return this._parent_();
+		},
+		e : function() {
+			return this._parent_();
+		},
+		g : function() {
+			return this;
+		}
+	});
+	var test_is = Create([ inf_subclass ], {
+		f : function() {
+			return this.d();
+		}
+	});
+	equals(test_is.prototype.d, inf_subclass.prototype.d, "method implemented through a subclass object into prototype of class");
+	equals((new test_is()).f(), 1, "method implemented through a subclass object can be called from main class");
+	equals((new test_is()).c().constructor, test_is, "method implemented through a subclass object's 'this' reference is the calling object");
+	equals(test_is.implement[0], inf_subclass, "implemented subclass' reference is stored");
+
+	// implementing objects and inheriting subclass
+	var extens = Create({
+		e : function() {
+			return 3;
+		}
+	});
+	var test_ei = Create(extens, [ inf_subclass ], {
+		c : function() {
+			return 2;
+		}
+	});
+	equals(test_ei.prototype.d, inf_subclass.prototype.d, "method implemented through a subclass & extension object into prototype of class");
+	equals(test_ei.prototype.e, extens.prototype.e, "method implemented through extension takes priority over implemented class");
+	equals((new test_ei()).e(), 3, "method implemented through a extended object can be called from main class");
+	equals((new test_ei()).d(), 1, "method implemented through a subclass object can be called from main class and is able to call the parent function of the implemented class");
+	equals((new test_ei()).g().constructor, test_ei, "method implemented through a subclass object's 'this' reference is the calling object");
+	equals(test_ei.superclass, extens, "implemented subclass' reference is stored");
+	equals(test_ei.implement[0], inf_subclass, "implemented subclass' reference is stored");
 });
