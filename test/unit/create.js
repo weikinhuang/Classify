@@ -245,16 +245,16 @@ test("extending classes using inheritance", function() {
 	equals((new subsubclass()).e(), subsubclass, "parent method's 'this' is still referencing proper object");
 
 	// testing inherited properties
-	test_a = Create({
+	var test_a = Create({
 		a : 1,
 		b : 2,
 		c : []
 	});
-	subclass_a = Create(test_a, {
+	var subclass_a = Create(test_a, {
 		b : 3,
 		d : {}
 	});
-	subsubclass_a = Create(subclass_a, {
+	var subsubclass_a = Create(subclass_a, {
 		e : function() {
 			this.c.push(1);
 			return this.c;

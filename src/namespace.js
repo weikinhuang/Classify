@@ -42,10 +42,12 @@ var Namespace = Create({
 		namespace = fullname.split("."),
 		// Get the actual name of this class to be created
 		name = namespace.pop(),
+		// quick reference to this namespace
+		self = this,
 		// Retrieve the namespaced container
-		ref = provide(namespace, this),
+		ref = provide(namespace, self),
 		// Create a reference to the master classes array
-		deref = this.ref,
+		deref = self.ref,
 
 		// fix the arguments & Create the class
 		c = Create.apply(null, map(args, function(v) {
@@ -54,6 +56,10 @@ var Namespace = Create({
 		// Assign the magic properties of the class's name and namespace
 		c._name_ = name;
 		c._namespace_ = fullname;
+		// give classes the ability to always store the namespace for chaining
+		c.getNamespace = function() {
+			return self;
+		};
 		c.toString = function() {
 			return "[object " + fullname + "]";
 		};

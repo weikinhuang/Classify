@@ -110,7 +110,7 @@ var QUnit = require(root + "/test/qunit/qunit.js").QUnit;
 
 // include the source files and the tests
 var source = [ "src/core.js", "src/create.js", "src/namespace.js", "src/export.js" ];
-var tests = [ "unit/core.js", "unit/create.js" ];
+var tests = [ "unit/core.js", "unit/create.js", "unit/namespace.js" ];
 var si = 0, sl = source.length, ti = 0, tl = tests.length;
 
 fs = require("fs");
