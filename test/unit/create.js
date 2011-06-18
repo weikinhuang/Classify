@@ -177,6 +177,20 @@ test("adding new properties", function() {
 		return 1;
 	});
 	test.c();
+
+	// test adding multiple properties
+	test.addProperty({
+		e : function(){
+			return 1;
+		}
+	});
+	equals((new test()).e(), 1, "adding multiple properties to the class with add property");
+	test.addStaticProperty({
+		f : function(){
+			return 2;
+		}
+	});
+	equals(test.f(), 2, "adding multiple static properties to the class with addStaticProperty");
 });
 
 test("extending classes using inheritance", function() {

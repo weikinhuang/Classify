@@ -116,10 +116,11 @@ var Create = function() {
 	};
 	// Bind the special add property function
 	k.addProperty = function(name, property, prefix) {
+		// the prefix parameter is for internal use only
 		prefix = prefix || "";
 		if (property === undefined) {
-			each(keys(methods), function(n) {
-				addProperty(k, subclass, prefix + n, methods[n]);
+			each(keys(name), function(n) {
+				addProperty(k, subclass, prefix + n, name[n]);
 			});
 		} else {
 			addProperty(k, subclass, prefix + name, property);
