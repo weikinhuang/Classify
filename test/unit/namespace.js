@@ -108,3 +108,19 @@ test("removing named classes", function() {
 	equals(typeof ns.F, "undefined", "removed class that extended a destroyed class");
 	equals(ns.get("F"), null, "removed branch namespace that inherited from a removed branch");
 });
+
+test("removing namespaces", function() {
+	var ns = getNamespace("Test4");
+	var ca = ns.create("A", {});
+	var cb = ns.create("B", {});
+	var cc = ns.create("A.C", {});
+	var cd = ns.create("D", "A", {});
+	var ce = ns.create("A.E", "A", {});
+	var cf = ns.create("F", "A", {});
+
+	destroyNamespace("Test4");
+
+	// try to retrieve another instance of the "Test4" namespace
+	var ns2 = getNamespace("Test4");
+	ok(ns2 !== ns, "new instance of namespace is created");
+});

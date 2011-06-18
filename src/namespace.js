@@ -119,7 +119,7 @@ var Namespace = Create({
 		return !!this.ref[classname];
 	},
 	get : function(name) {
-		// TODO: be able to override this function to provide better autoloading and such
+		// TODO: be able to override this function to provide autoloading and such
 		return this.ref[name] || null;
 	},
 	getName : function() {
@@ -141,6 +141,6 @@ var getNamespace = function(namespace) {
 
 // remove a namespace
 var destroyNamespace = function(namespace) {
-	// TODO: more advanced cleanup?
+	// TODO: more advanced cleanup
 	delete namespaces[namespace];
 };

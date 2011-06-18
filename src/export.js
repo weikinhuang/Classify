@@ -2,8 +2,15 @@
 var Classify = Create({
 	_invoke_ : function() {
 		return Create.apply(null, arguments);
+	},
+	_construct_ : function() {
+		throw "Classify object cannot be instantiated!";
 	}
 });
+// store clean references to these methods
+Classify.Create = Create;
+Classify.GetNamespace = getNamespace;
+Classify.DestroyNamespace = destroyNamespace;
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.
