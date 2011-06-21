@@ -6,13 +6,16 @@ test("retrieval and creation", function() {
 	ok(ns instanceof Namespace, "getNamespace returned a namespace");
 	equals(ns, getNamespace("Test"), "multiple calls to getNamespace returns the same object");
 	equals(ns.getName(), "Test", "the name of the current namespace is stored");
+	equals(ns.get("A"), ns, "get class returns the namespace for chaining");
 });
 
 test("class creation", function() {
 	var ns = getNamespace("Test1");
 
 	ok(!ns.exists("A"), "checking for existience of undefined class");
-	equals(ns.get("A"), null, "attempting to retieve a undefined class");
+	ns.get("A", function(k) {
+		equals(k, null, "attempting to retieve a undefined class");
+	});
 
 	// creating a single class
 	var c = ns.create("A", {
@@ -23,7 +26,9 @@ test("class creation", function() {
 	ok(!!c.__isclass_, "class created is a class object");
 	ok(new c() instanceof base, "class creation created by extending the base class");
 	equals(ns.A, c, "class reference is stored directly within namespace object");
-	equals(ns.get("A"), c, "class reference is stored in internal reference array");
+	ns.get("A", function(k) {
+		equals(k, c, "class reference is stored in internal reference array");
+	});
 	equals(c.getNamespace(), ns, "namespaced class has a getter for the current namespace");
 
 	// creating nested classes
@@ -35,7 +40,9 @@ test("class creation", function() {
 	equals(typeof ns.B, "object", "an intermediate container object is created by the namespace");
 	ok(new d() instanceof base, "class creation created by extending the base class");
 	equals(ns.B.C, d, "class reference is stored directly within namespace object (nested)");
-	equals(ns.get("B.C"), d, "class reference is stored in internal reference array (nested)");
+	ns.get("B.C", function(k) {
+		equals(k, d, "class reference is stored in internal reference array (nested)");
+	});
 });
 
 test("class extension and implementation using named references", function() {
@@ -104,9 +111,13 @@ test("removing named classes", function() {
 	// destroy a class namespace
 	ns.destroy("A");
 	equals(typeof ns.A, "undefined", "removing a named class from the namespace");
-	equals(ns.get("A.C"), null, "removed leaf classes from branch namespace");
+	ns.get("A.C", function(k) {
+		equals(k, null, "removed leaf classes from branch namespace");
+	});
 	equals(typeof ns.F, "undefined", "removed class that extended a destroyed class");
-	equals(ns.get("F"), null, "removed branch namespace that inherited from a removed branch");
+	ns.get("F", function(k) {
+		equals(k, null, "removed branch namespace that inherited from a removed branch");
+	});
 });
 
 test("removing namespaces", function() {

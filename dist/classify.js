@@ -5,7 +5,7 @@
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Sat Jun 18 14:22:42 EDT 2011
+ * Date: Mon Jun 20 20:33:44 EDT 2011
  */
 (function( root, undefined ) {
 
@@ -374,9 +374,10 @@ var Namespace = Create({
 	exists : function(classname) {
 		return !!this.ref[classname];
 	},
-	get : function(name) {
+	get : function(name, callback) {
 		// TODO: be able to override this function to provide autoloading and such
-		return this.ref[name] || null;
+		callback && callback(this.ref[name] || null);
+		return this;
 	},
 	getName : function() {
 		return this.name;

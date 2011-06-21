@@ -118,9 +118,10 @@ var Namespace = Create({
 	exists : function(classname) {
 		return !!this.ref[classname];
 	},
-	get : function(name) {
+	get : function(name, callback) {
 		// TODO: be able to override this function to provide autoloading and such
-		return this.ref[name] || null;
+		callback && callback(this.ref[name] || null);
+		return this;
 	},
 	getName : function() {
 		return this.name;
