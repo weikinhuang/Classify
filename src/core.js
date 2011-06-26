@@ -58,7 +58,7 @@ store = function(fn, base) {
 // simple iteration function
 each = function(o, iterator, context) {
 	// we must account for null, otherwise it will throw the error "Unable to get value of the property 'length': object is null or undefined"
-	if (o == null) {
+	if (!o) {
 		return o;
 	}
 	var n, i = 0, l = o.length;
@@ -71,7 +71,10 @@ each = function(o, iterator, context) {
 		}
 	} else {
 		// loops are iterated with the for i statement
-		for (n = o[0]; i < l && iterator.call(context || n, n, i, o) !== false; n = o[++i]) {
+		for (n = o[0]; i < l; n = o[++i]) {
+			if (iterator.call(context || n, n, i, o) === false) {
+				break;
+			}
 		}
 	}
 	return o;

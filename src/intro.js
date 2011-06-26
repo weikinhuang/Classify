@@ -8,4 +8,4 @@
  * Date: @DATE
  */
 (function( root, undefined ) {
-
+	"use strict";

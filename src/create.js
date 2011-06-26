@@ -71,18 +71,19 @@ var Create = function() {
 	// Constructor function
 	var k = function() {
 		// We're not creating a instantiated object so we want to force a instantiation or call the invoke function
-		if (!this._construct_) {
+		// we need to test for !this when in "use strict" mode
+		if (!this || !this._construct_) {
 			return k._invoke_.apply(k, arguments);
 		}
 		this._construct_.apply(this, arguments);
 	};
 	// Use the defined invoke method if possible, otherwise use the default one
 	k._invoke_ = methods._invoke_ || function() {
-		var a = arguments, c = function() {
+		var a = arguments, TempClass = function() {
 			return k.apply(this, a);
 		};
-		c.prototype = k.prototype;
-		return new c();
+		TempClass.prototype = k.prototype;
+		return new TempClass();
 	};
 	// Remove the invoke method from the prototype chain
 	delete methods._invoke_;
@@ -92,15 +93,15 @@ var Create = function() {
 	k.implement = parent.implement.concat(implement);
 	// Give this class the ability to create sub classes
 	k.Extend = k.prototype.Extend = function(p) {
-		return Class(k, p);
+		return Create(k, p);
 	};
 
 	// This method allows for the constructor to not be called when making a new subclass
-	var subclass = function() {
+	var SubClass = function() {
 	};
-	subclass.prototype = parent.prototype;
-	var subclass_prototype = subclass.prototype;
-	k.prototype = new subclass();
+	SubClass.prototype = parent.prototype;
+	var subclass_prototype = SubClass.prototype;
+	k.prototype = new SubClass();
 	// Add this class to the list of subclasses of the parent
 	parent.subclass.push(k);
 	// Create a magic method that can invoke any of the parent methods
@@ -120,10 +121,10 @@ var Create = function() {
 		prefix = prefix || "";
 		if (property === undefined) {
 			each(keys(name), function(n) {
-				addProperty(k, subclass, prefix + n, name[n]);
+				addProperty(k, SubClass, prefix + n, name[n]);
 			});
 		} else {
-			addProperty(k, subclass, prefix + name, property);
+			addProperty(k, SubClass, prefix + name, property);
 		}
 		return k;
 	};
