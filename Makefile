@@ -7,7 +7,9 @@ DIST_DIR = ${PREFIX}/dist
 
 JS_ENGINE ?= `which node nodejs 2>/dev/null`
 COMPILER = ${JS_ENGINE} ${BUILD_DIR}/uglify.js --unsafe
+PRE_COMPILER = ${JS_ENGINE} ${BUILD_DIR}/pre-compile.js
 POST_COMPILER = ${JS_ENGINE} ${BUILD_DIR}/post-compile.js
+POST_MINIFY_STAT = ${JS_ENGINE} ${BUILD_DIR}/post-minify-stat.js
 
 BASE_FILES = ${SRC_DIR}/core.js\
 			${SRC_DIR}/create.js\
@@ -28,7 +30,7 @@ DATE= `date`
 
 all: core
 
-core: classify unit lint min
+core: clean classify unit lint min
 	@@echo "Classify build complete."
 
 ${DIST_DIR}:
@@ -37,13 +39,13 @@ ${DIST_DIR}:
 classify: ${CL}
 
 ${CL}: ${MODULES} | ${DIST_DIR}
-	@@echo "Building" ${CL}
+	@@echo "Building Classify" ${CL}
 
 	@@cat ${MODULES} | \
 		sed 's/.function..Classify...{//' | \
 		sed 's/}...Classify..;//' | \
 		sed 's/@DATE/'"${DATE}"'/' | \
-		${VER} > ${CL};
+		${VER} | ${PRE_COMPILER} > ${CL};
 
 unit : classify
 	@@if test ! -z ${JS_ENGINE}; then \
@@ -69,10 +71,11 @@ ${CL_MIN}: ${CL}
 		${COMPILER} ${CL} > ${CL_MIN}.tmp; \
 		${POST_COMPILER} ${CL_MIN}.tmp > ${CL_MIN}; \
 		rm -f ${CL_MIN}.tmp; \
+		${POST_MINIFY_STAT} ${CL} ${CL_MIN} \
 	else \
 		echo "You must have NodeJS installed in order to minify Classify."; \
 	fi
 
 clean:
 	@@echo "Removing Distribution directory:" ${DIST_DIR}
-	@@rm -rf ${DIST_DIR}
+	@@rm -f ${CL} ${CL_MIN}

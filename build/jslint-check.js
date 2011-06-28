@@ -64,7 +64,6 @@ var ok = {
 	"Expected a 'break' statement before 'case'." : true,
 	"Move the invocation into the parens that contain the function." : true,
 	"Use the array literal notation []." : true,
-	"Missing 'new'." : true,
 	"Unexpected 'in'. Compare with undefined, or use the hasOwnProperty method instead." : true
 };
 

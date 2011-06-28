@@ -28,7 +28,7 @@ dereference = function(base, arg) {
 };
 
 // Namespacing class to create and handle namespaces
-var Namespace = Create({
+var Namespace = create({
 	_construct_ : function(name) {
 		this.ref = {};
 		this.name = name;
@@ -49,8 +49,8 @@ var Namespace = Create({
 		// Create a reference to the master classes array
 		deref = self.ref,
 
-		// fix the arguments & Create the class
-		c = Create.apply(null, map(args, function(v) {
+		// fix the arguments & create the class
+		c = create.apply(null, map(args, function(v) {
 			return dereference(deref, v);
 		}));
 		// Assign the magic properties of the class's name and namespace

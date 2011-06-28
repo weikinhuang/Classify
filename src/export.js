@@ -1,5 +1,5 @@
 // Create a wrapped reference to the Classify object.
-var Classify = Create({
+var Classify = create({
 	_invoke_ : function() {
 		var args = argsToArray(arguments), ns, name;
 		// if the first parameter is a string
@@ -17,16 +17,16 @@ var Classify = Create({
 			args[0] = name.join(".");
 			return ns.create.apply(ns, args);
 		}
-		return Create.apply(null, args);
+		return create.apply(null, args);
 	},
 	_construct_ : function() {
 		throw "Classify object cannot be instantiated!";
 	}
 });
 // store clean references to these methods
-Classify.Create = Create;
-Classify.GetNamespace = getNamespace;
-Classify.DestroyNamespace = destroyNamespace;
+Classify.create = create;
+Classify.getNamespace = getNamespace;
+Classify.destroyNamespace = destroyNamespace;
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.

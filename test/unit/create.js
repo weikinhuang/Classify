@@ -1,7 +1,7 @@
 module("create");
 
 test("simple class creation", function() {
-	var test = Create({
+	var test = create({
 		a : 1,
 		b : function() {
 			return this.a;
@@ -32,7 +32,7 @@ test("simple class creation", function() {
 
 test("invocation and constructors", function() {
 	// testing class creation without a constructor
-	var test = Create({
+	var test = create({
 		a : 1,
 		b : function() {
 			return this.a;
@@ -43,7 +43,7 @@ test("invocation and constructors", function() {
 	equals(new test().b(), 1, "call to member variable within context with no constructor");
 
 	// testing class creation with a basic constructor
-	test = Create({
+	test = create({
 		a : 1,
 		_construct_ : function() {
 			this.a = 2;
@@ -58,7 +58,7 @@ test("invocation and constructors", function() {
 	equals(new test().b(), 2, "call to member variable within context with basic constructor");
 
 	// test creating a constructor with parameters
-	test = Create({
+	test = create({
 		a : 1,
 		_construct_ : function(a) {
 			this.a = a;
@@ -73,7 +73,7 @@ test("invocation and constructors", function() {
 	equals(new test(3).b(), 3, "call to member variable within context with simple constructor");
 
 	// test creating a instances with invocation
-	test = Create({
+	test = create({
 		a : 1,
 		_construct_ : function(a) {
 			this.a = a;
@@ -88,7 +88,7 @@ test("invocation and constructors", function() {
 	equals(test(3).b(), 3, "call to member variable within context with invocation");
 
 	// test overriding invocation function to not generate a class instance
-	test = Create({
+	test = create({
 		a : 1,
 		_invoke_ : function() {
 			return "x";
@@ -102,9 +102,9 @@ test("invocation and constructors", function() {
 
 test("known properties", function() {
 	// testing class for known properties in every defined class
-	var test = Create({});
+	var test = create({});
 
-	equals(test.__isclass_, true, "flag indicating this object was created using the Create method");
+	equals(test.__isclass_, true, "flag indicating this object was created using the create method");
 	equals((new test()).constructor, test, "assert that we have a internal reference to the constructor via 'constructor'");
 	equals((new test())._self_, test, "assert that we have a internal reference to the constructor via '_self_'");
 	equals(typeof test.superclass, "function", "assert that there is an internal reference to the parent class");
@@ -117,7 +117,7 @@ test("known properties", function() {
 
 test("static properties", function() {
 	// testing class creation with static properties
-	var test = Create({
+	var test = create({
 		a : 1,
 		__static_a : 2,
 		b : function() {
@@ -149,7 +149,7 @@ test("static properties", function() {
 
 test("adding new properties", function() {
 	// testing class for known properties in every defined class
-	var test = Create({});
+	var test = create({});
 
 	// adding properties to the prototype
 	test.prototype.b = function() {
@@ -195,7 +195,7 @@ test("adding new properties", function() {
 
 test("extending classes using inheritance", function() {
 	// testing class for known properties in every defined class
-	var test = Create({
+	var test = create({
 		a : function() {
 			return 1;
 		},
@@ -209,7 +209,7 @@ test("extending classes using inheritance", function() {
 			return this.constructor;
 		}
 	});
-	var subclass = Create(test, {
+	var subclass = create(test, {
 		c : function() {
 			return 3;
 		},
@@ -220,13 +220,13 @@ test("extending classes using inheritance", function() {
 			return this.constructor;
 		}
 	});
-	var subclass_a = Create(test, {
+	var subclass_a = create(test, {
 		b : function() {
 			// invoking the parent version of this function
 			return this._parent_() + 4;
 		}
 	});
-	var subsubclass = Create(subclass, {
+	var subsubclass = create(subclass, {
 		c : function() {
 			return 4;
 		},
@@ -259,16 +259,16 @@ test("extending classes using inheritance", function() {
 	equals((new subsubclass()).e(), subsubclass, "parent method's 'this' is still referencing proper object");
 
 	// testing inherited properties
-	var test_a = Create({
+	var test_a = create({
 		a : 1,
 		b : 2,
 		c : []
 	});
-	var subclass_a = Create(test_a, {
+	var subclass_a = create(test_a, {
 		b : 3,
 		d : {}
 	});
-	var subsubclass_a = Create(subclass_a, {
+	var subsubclass_a = create(subclass_a, {
 		e : function() {
 			this.c.push(1);
 			return this.c;
@@ -302,7 +302,7 @@ test("implementing methods in classes from other objects", function() {
 			return 1;
 		}
 	};
-	var test = Create([ inf ], {
+	var test = create([ inf ], {
 		c : function() {
 			return 2;
 		}
@@ -317,7 +317,7 @@ test("implementing methods in classes from other objects", function() {
 	equals(test.implement[0], inf, "implemented objects reference is stored");
 
 	// implementing class objects
-	var inf_class = Create({
+	var inf_class = create({
 		c : function() {
 			return this;
 		},
@@ -328,7 +328,7 @@ test("implementing methods in classes from other objects", function() {
 			return 2;
 		}
 	});
-	var test_i = Create([ inf_class ], {
+	var test_i = create([ inf_class ], {
 		f : function() {
 			return this.d();
 		}
@@ -339,7 +339,7 @@ test("implementing methods in classes from other objects", function() {
 	equals(test_i.implement[0], inf_class, "implemented class' reference is stored");
 
 	// implementing subclasses
-	var inf_subclass = Create(inf_class, {
+	var inf_subclass = create(inf_class, {
 		d : function() {
 			return this._parent_();
 		},
@@ -350,7 +350,7 @@ test("implementing methods in classes from other objects", function() {
 			return this;
 		}
 	});
-	var test_is = Create([ inf_subclass ], {
+	var test_is = create([ inf_subclass ], {
 		f : function() {
 			return this.d();
 		}
@@ -361,12 +361,12 @@ test("implementing methods in classes from other objects", function() {
 	equals(test_is.implement[0], inf_subclass, "implemented subclass' reference is stored");
 
 	// implementing objects and inheriting subclass
-	var extens = Create({
+	var extens = create({
 		e : function() {
 			return 3;
 		}
 	});
-	var test_ei = Create(extens, [ inf_subclass ], {
+	var test_ei = create(extens, [ inf_subclass ], {
 		c : function() {
 			return 2;
 		}

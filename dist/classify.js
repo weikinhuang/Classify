@@ -5,12 +5,14 @@
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Sat Jun 25 13:34:14 EDT 2011
+ * Date: Mon Jun 27 22:32:32 EDT 2011
  */
 (function( root, undefined ) {
 	"use strict";
+// shortcut for minification compaction
+var prototype = "prototype",
 // For IE, check if looping through objects works with toString & valueOf
-var IS_ENUMERATION_BUGGY = (function() {
+IS_ENUMERATION_BUGGY = (function() {
 	var p;
 	for (p in {
 		toString : 1
@@ -26,7 +28,7 @@ ENUMERATED_KEYS = IS_ENUMERATION_BUGGY ? "hasOwnProperty,valueOf,isPrototypeOf,p
 // quick reference to the enumerated items length
 ENUMERATION_LENGTH = ENUMERATED_KEYS.length,
 // quick reference to object prototype
-objectPrototype = Object.prototype,
+objectPrototype = Object[prototype],
 // quick reference to the toString prototype
 toString = objectPrototype.toString,
 // test if object is a function
@@ -44,7 +46,7 @@ keys = function(o) {
 		k.push(i);
 	}
 	if (IS_ENUMERATION_BUGGY) {
-		// only add buggy enumerated values if it's not the Object.prototype's
+		// only add buggy enumerated values if it's not the Object[prototype]'s
 		for (i = 0; i < ENUMERATION_LENGTH; i++) {
 			if (o.hasOwnProperty(ENUMERATED_KEYS[i])) {
 				k.push(ENUMERATED_KEYS[i]);
@@ -59,7 +61,7 @@ toArray = function(o) {
 },
 // create ability to convert the arguments object to an array
 argsToArray = function(o) {
-	return Array.prototype.slice.call(o, 0);
+	return Array[prototype].slice.call(o, 0);
 },
 // ability to store the original definition into the new function definition
 store = function(fn, base) {
@@ -114,13 +116,13 @@ base = (function() {
 	var fn = function() {
 	};
 	// Make sure we always have a constructor
-	fn.prototype._construct_ = function() {
+	fn[prototype]._construct_ = function() {
 	};
 	fn.superclass = null;
 	fn.subclass = [];
 	fn.implement = [];
-	fn.prototype.constructor = base;
-	fn.prototype._self_ = base;
+	fn[prototype].constructor = base;
+	fn[prototype]._self_ = base;
 	fn.__isclass_ = true;
 	return fn;
 })(),
@@ -137,9 +139,9 @@ addProperty = function(k, parent, name, property) {
 			return property.apply(k, arguments);
 		}, property) : property;
 	} else {
-		var parent_prototype = parent.prototype[name];
+		var parent_prototype = parent[prototype][name];
 		// Else this is not a prefixed static property, so we're assigning it to the prototype
-		k.prototype[name] = isFunction(property) && isFunction(parent_prototype) ? store(function() {
+		k[prototype][name] = isFunction(property) && isFunction(parent_prototype) ? store(function() {
 			var tmp = this._parent_, ret;
 			this._parent_ = parent_prototype;
 			ret = property.apply(this, arguments);
@@ -154,7 +156,7 @@ addProperty = function(k, parent, name, property) {
 };
 
 // Master inheritance based class system creation
-var Create = function() {
+var create = function() {
 	var parent = base,
 	// a hash of methods and properties to be inserted into the new class
 	methods = {},
@@ -191,7 +193,7 @@ var Create = function() {
 		var a = arguments, TempClass = function() {
 			return k.apply(this, a);
 		};
-		TempClass.prototype = k.prototype;
+		TempClass[prototype] = k[prototype];
 		return new TempClass();
 	};
 	// Remove the invoke method from the prototype chain
@@ -201,16 +203,16 @@ var Create = function() {
 	k.subclass = [];
 	k.implement = parent.implement.concat(implement);
 	// Give this class the ability to create sub classes
-	k.Extend = k.prototype.Extend = function(p) {
-		return Create(k, p);
+	k.Extend = k[prototype].Extend = function(p) {
+		return create(k, p);
 	};
 
 	// This method allows for the constructor to not be called when making a new subclass
 	var SubClass = function() {
 	};
-	SubClass.prototype = parent.prototype;
-	var subclass_prototype = SubClass.prototype;
-	k.prototype = new SubClass();
+	SubClass[prototype] = parent[prototype];
+	var subclass_prototype = SubClass[prototype];
+	k[prototype] = new SubClass();
 	// Add this class to the list of subclasses of the parent
 	parent.subclass.push(k);
 	// Create a magic method that can invoke any of the parent methods
@@ -243,9 +245,9 @@ var Create = function() {
 	// Now implement each of the implemented objects before extending
 	if (implement.length !== 0) {
 		each(implement, function(impl) {
-			var props = impl.__isclass_ ? impl.prototype : impl;
+			var props = impl.__isclass_ ? impl[prototype] : impl;
 			each(keys(props), function(name) {
-				if (k.prototype[name] === undefined && methods[name] === undefined) {
+				if (k[prototype][name] === undefined && methods[name] === undefined) {
 					k.addProperty(name, props[name]);
 				}
 			});
@@ -254,8 +256,8 @@ var Create = function() {
 
 	// Now extend each of those methods and allow for a parent accessor
 	k.addProperty(methods);
-	k.prototype.constructor = k;
-	k.prototype._self_ = k;
+	k[prototype].constructor = k;
+	k[prototype]._self_ = k;
 	k.__isclass_ = true;
 	return k;
 };// global container containing all the namespace references
@@ -288,7 +290,7 @@ dereference = function(base, arg) {
 };
 
 // Namespacing class to create and handle namespaces
-var Namespace = Create({
+var Namespace = create({
 	_construct_ : function(name) {
 		this.ref = {};
 		this.name = name;
@@ -309,8 +311,8 @@ var Namespace = Create({
 		// Create a reference to the master classes array
 		deref = self.ref,
 
-		// fix the arguments & Create the class
-		c = Create.apply(null, map(args, function(v) {
+		// fix the arguments & create the class
+		c = create.apply(null, map(args, function(v) {
 			return dereference(deref, v);
 		}));
 		// Assign the magic properties of the class's name and namespace
@@ -405,7 +407,7 @@ var destroyNamespace = function(namespace) {
 	// TODO: more advanced cleanup
 	delete namespaces[namespace];
 };// Create a wrapped reference to the Classify object.
-var Classify = Create({
+var Classify = create({
 	_invoke_ : function() {
 		var args = argsToArray(arguments), ns, name;
 		// if the first parameter is a string
@@ -423,16 +425,16 @@ var Classify = Create({
 			args[0] = name.join(".");
 			return ns.create.apply(ns, args);
 		}
-		return Create.apply(null, args);
+		return create.apply(null, args);
 	},
 	_construct_ : function() {
 		throw "Classify object cannot be instantiated!";
 	}
 });
 // store clean references to these methods
-Classify.Create = Create;
-Classify.GetNamespace = getNamespace;
-Classify.DestroyNamespace = destroyNamespace;
+Classify.create = create;
+Classify.getNamespace = getNamespace;
+Classify.destroyNamespace = destroyNamespace;
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.

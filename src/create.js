@@ -45,7 +45,7 @@ addProperty = function(k, parent, name, property) {
 };
 
 // Master inheritance based class system creation
-var Create = function() {
+var create = function() {
 	var parent = base,
 	// a hash of methods and properties to be inserted into the new class
 	methods = {},
@@ -93,7 +93,7 @@ var Create = function() {
 	k.implement = parent.implement.concat(implement);
 	// Give this class the ability to create sub classes
 	k.Extend = k.prototype.Extend = function(p) {
-		return Create(k, p);
+		return create(k, p);
 	};
 
 	// This method allows for the constructor to not be called when making a new subclass
