@@ -67,7 +67,7 @@ var ok = {
 	"Unexpected 'in'. Compare with undefined, or use the hasOwnProperty method instead." : true
 };
 
-var e = JSLINT.errors, found = 0, w;
+var e = JSLINT.errors, found = 0, w, d = JSLINT.data();
 
 for ( var i = 0; i < e.length; i++) {
 	w = e[i];
@@ -84,4 +84,10 @@ if (found > 0) {
 	throw "JSLint check failed";
 } else {
 	print("JSLint check passed.\n");
+	if(d.globals.length > 0) {
+		print("    Globals: " + d.globals.join(", ") + "\n");
+	}
+	for ( var i = 0; i < d.unused.length; i++) {
+		print("    Unused variable: \"" + d.unused[i].name+ "\" at line " + d.unused[i].line + " in " + d.unused[i]["function"] + "\n");
+	}
 }

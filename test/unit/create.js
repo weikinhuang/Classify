@@ -98,6 +98,16 @@ test("invocation and constructors", function() {
 		}
 	});
 	equals(test(), "x", "override invocation functionality to execute functionality");
+
+	// calling apply on a class to generate an instance
+	test = create({
+		a : 1,
+		_construct_ : function(a) {
+			this.a = a;
+		}
+	});
+	ok(test._apply_([ 2 ]) instanceof test, "assuring creating a new instance of a class by passing an array of parameters is of type class");
+	equals(test._apply_([ 2 ]).a, 2, "creating a new instance of a class by passing an array of parameters");
 });
 
 test("known properties", function() {
@@ -180,13 +190,13 @@ test("adding new properties", function() {
 
 	// test adding multiple properties
 	test.addProperty({
-		e : function(){
+		e : function() {
 			return 1;
 		}
 	});
 	equals((new test()).e(), 1, "adding multiple properties to the class with add property");
 	test.addStaticProperty({
-		f : function(){
+		f : function() {
 			return 2;
 		}
 	});

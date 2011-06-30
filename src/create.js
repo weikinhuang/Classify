@@ -16,21 +16,21 @@ base = (function() {
 	return fn;
 })(),
 // adds a property to an existing class taking into account parent
-addProperty = function(k, parent, name, property) {
+addProperty = function(klass, parent, name, property) {
 	// we don't want to re-add the core javascript properties, it's redundant
 	if (property === objectPrototype[name]) {
 		return;
 	}
 	if (staticRegexp.test(name)) {
 		// See if we are defining an static property, if we are, assign it to the class
-		k[name.replace(staticRegexp, "")] = isFunction(property) ? store(function() {
+		klass[name.replace(staticRegexp, "")] = isFunction(property) ? store(function() {
 			// Force "this" to be a reference to the class itself to simulate "self"
-			return property.apply(k, arguments);
+			return property.apply(klass, arguments);
 		}, property) : property;
 	} else {
 		var parent_prototype = parent.prototype[name];
 		// Else this is not a prefixed static property, so we're assigning it to the prototype
-		k.prototype[name] = isFunction(property) && isFunction(parent_prototype) ? store(function() {
+		klass.prototype[name] = isFunction(property) && isFunction(parent_prototype) ? store(function() {
 			var tmp = this._parent_, ret;
 			this._parent_ = parent_prototype;
 			ret = property.apply(this, arguments);
@@ -69,31 +69,40 @@ var create = function() {
 		methods = args[2];
 	}
 	// Constructor function
-	var k = function() {
+	var klass = function() {
 		// We're not creating a instantiated object so we want to force a instantiation or call the invoke function
 		// we need to test for !this when in "use strict" mode
 		if (!this || !this._construct_) {
-			return k._invoke_.apply(k, arguments);
+			return klass._invoke_.apply(klass, arguments);
 		}
-		this._construct_.apply(this, arguments);
+		// just in case we want to do anything special! (usually don't return anything)
+		var tmp = this._construct_.apply(this, arguments);
+		if (tmp !== undefined) {
+			return tmp;
+		}
+	};
+	// ability to create a new instance using an array of arguments, cannot be overriden
+	delete methods._apply_;
+	klass._apply_ = function(a) {
+		var TempClass = function() {
+			return klass.apply(this, a);
+		};
+		TempClass.prototype = klass.prototype;
+		return new TempClass();
 	};
 	// Use the defined invoke method if possible, otherwise use the default one
-	k._invoke_ = methods._invoke_ || function() {
-		var a = arguments, TempClass = function() {
-			return k.apply(this, a);
-		};
-		TempClass.prototype = k.prototype;
-		return new TempClass();
+	klass._invoke_ = methods._invoke_ || function() {
+		return klass._apply_(arguments);
 	};
 	// Remove the invoke method from the prototype chain
 	delete methods._invoke_;
 	// Keep a list of the inheritance chain
-	k.superclass = parent;
-	k.subclass = [];
-	k.implement = parent.implement.concat(implement);
+	klass.superclass = parent;
+	klass.subclass = [];
+	klass.implement = parent.implement.concat(implement);
 	// Give this class the ability to create sub classes
-	k.Extend = k.prototype.Extend = function(p) {
-		return create(k, p);
+	klass.Extend = klass.prototype.Extend = function(p) {
+		return create(klass, p);
 	};
 
 	// This method allows for the constructor to not be called when making a new subclass
@@ -101,9 +110,9 @@ var create = function() {
 	};
 	SubClass.prototype = parent.prototype;
 	var subclass_prototype = SubClass.prototype;
-	k.prototype = new SubClass();
+	klass.prototype = new SubClass();
 	// Add this class to the list of subclasses of the parent
-	parent.subclass.push(k);
+	parent.subclass.push(klass);
 	// Create a magic method that can invoke any of the parent methods
 	methods._invoke_ = function(name, args) {
 		if (name in subclass_prototype && name !== "_invoke_" && isFunction(subclass_prototype[name])) {
@@ -116,37 +125,37 @@ var create = function() {
 		throw "Function \"" + name + "\" of parent class being invoked is undefined.";
 	};
 	// Bind the special add property function
-	k.addProperty = function(name, property, prefix) {
+	klass.addProperty = function(name, property, prefix) {
 		// the prefix parameter is for internal use only
 		prefix = prefix || "";
 		if (property === undefined) {
 			each(keys(name), function(n) {
-				addProperty(k, SubClass, prefix + n, name[n]);
+				addProperty(klass, SubClass, prefix + n, name[n]);
 			});
 		} else {
-			addProperty(k, SubClass, prefix + name, property);
+			addProperty(klass, SubClass, prefix + name, property);
 		}
-		return k;
+		return klass;
 	};
-	k.addStaticProperty = function(name, property) {
-		return k.addProperty(name, property, "__static_");
+	klass.addStaticProperty = function(name, property) {
+		return klass.addProperty(name, property, "__static_");
 	};
 	// Now implement each of the implemented objects before extending
 	if (implement.length !== 0) {
 		each(implement, function(impl) {
 			var props = impl.__isclass_ ? impl.prototype : impl;
 			each(keys(props), function(name) {
-				if (k.prototype[name] === undefined && methods[name] === undefined) {
-					k.addProperty(name, props[name]);
+				if (klass.prototype[name] === undefined && methods[name] === undefined) {
+					klass.addProperty(name, props[name]);
 				}
 			});
 		});
 	}
 
 	// Now extend each of those methods and allow for a parent accessor
-	k.addProperty(methods);
-	k.prototype.constructor = k;
-	k.prototype._self_ = k;
-	k.__isclass_ = true;
-	return k;
+	klass.addProperty(methods);
+	klass.prototype.constructor = klass;
+	klass.prototype._self_ = klass;
+	klass.__isclass_ = true;
+	return klass;
 };

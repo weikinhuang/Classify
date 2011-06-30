@@ -1,26 +1,35 @@
 // Create a wrapped reference to the Classify object.
 var Classify = create({
 	_invoke_ : function() {
-		var args = argsToArray(arguments), ns, name;
+		var args = argsToArray(arguments), ns, length = args.length;
 		// if the first parameter is a string
 		if (typeof args[0] === "string") {
 			// and there is only 1 arguments, then we just want the namespace
-			if (args.length === 1) {
+			if (length === 1) {
 				return getNamespace(args[0]);
 			}
-			// otherwise the first dot name is the namespace and we want to create a class
-			name = args[0].split(".");
-			if (name.length < 2) {
-				throw "A named call must contain the namespace and class name";
+			// if we passed in 2 arguments of strings then we want a class within a namespace
+			if (length === 2 && typeof args[1] === "string") {
+				return getNamespace(args[0]).ref[args[1]];
 			}
-			ns = getNamespace(name.shift());
-			args[0] = name.join(".");
+			// otherwise we will assume the first parameter is the namespace and the others are creation parameters
+			ns = getNamespace(args.shift());
 			return ns.create.apply(ns, args);
 		}
 		return create.apply(null, args);
 	},
 	_construct_ : function() {
-		throw "Classify object cannot be instantiated!";
+		var args = argsToArray(arguments), params = args.pop(), tmp;
+		if (args.length < 1) {
+			throw "Classify object cannot be instantiated!";
+		}
+		tmp = Classify._invoke_.apply(null, args);
+		// if we found a class, instantiate it
+		if (tmp.__isclass_) {
+			return tmp._apply_(params);
+		}
+		// otherwise, just return it
+		return tmp;
 	}
 });
 // store clean references to these methods
@@ -34,7 +43,7 @@ if (typeof module !== "undefined" && module.exports) {
 	module.exports = Classify;
 	// create a circular reference
 	Classify.Classify = Classify;
+} else {
+	// otherwise attempt to make a global reference
+	root.Classify = Classify;
 }
-
-// always attempt to make a global reference
-root.Classify = Classify;
