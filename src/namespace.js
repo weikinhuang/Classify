@@ -119,8 +119,27 @@ var Namespace = create({
 		return !!this.ref[classname];
 	},
 	get : function(name, callback) {
-		// TODO: be able to override this function to provide autoloading and such
+		// ability to load a class async if a callback is passed in
+		if (isFunction(callback)) {
+			if (this.ref[name]) {
+				callback(this.ref[name]);
+			} else {
+				this.load(name, callback);
+			}
+			return this;
+		}
+		// otherwise just return the class if it is already avaliable
+		return this.ref[name] || null;
+	},
+	load : function(name, callback) {
 		callback && callback(this.ref[name] || null);
+	},
+	setAutoloader : function(callback) {
+		// make sure the callback is a function
+		if (!isFunction(callback)) {
+			return this;
+		}
+		this.load = callback;
 		return this;
 	},
 	getName : function() {
@@ -133,6 +152,10 @@ var Namespace = create({
 
 // get a namespace
 var getNamespace = function(namespace) {
+	// if passed in object is already a namespace, just return it
+	if (namespace instanceof Namespace) {
+		return namespace;
+	}
 	// if the namespace doesn't exist, just create it
 	if (!namespaces[namespace]) {
 		namespaces[namespace] = new Namespace(namespace);
@@ -144,4 +167,15 @@ var getNamespace = function(namespace) {
 var destroyNamespace = function(namespace) {
 	// TODO: more advanced cleanup
 	delete namespaces[namespace];
+};
+
+// gets the first valid existing namespace
+var testNamespace = function(namespace) {
+	var ns = namespace.split("."), l = ns.length, tmp;
+	while ((tmp = ns.slice(0, l--).join(".")) !== "") {
+		if (namespaces[tmp]) {
+			return namespaces[tmp];
+		}
+	}
+	return null;
 };

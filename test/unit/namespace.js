@@ -6,7 +6,10 @@ test("retrieval and creation", function() {
 	ok(ns instanceof Namespace, "getNamespace returned a namespace");
 	equals(ns, getNamespace("Test"), "multiple calls to getNamespace returns the same object");
 	equals(ns.getName(), "Test", "the name of the current namespace is stored");
-	equals(ns.get("A"), ns, "get class returns the namespace for chaining");
+	equals(ns.get("A"), null, "get class with no callback returns the class for use");
+	equals(ns.get("A", function(c) {
+		equals(c, null, "async call to get returns null as class doesn't yet exist");
+	}), ns, "get class returns the namespace for chaining and gives ability to load up a class in a async manner");
 });
 
 test("class creation", function() {
@@ -134,4 +137,30 @@ test("removing namespaces", function() {
 	// try to retrieve another instance of the "Test4" namespace
 	var ns2 = getNamespace("Test4");
 	ok(ns2 !== ns, "new instance of namespace is created");
+});
+
+test("class autoloading", function() {
+	var ns = getNamespace("Test5");
+
+	ns.get("A", function(k) {
+		equals(k, null, "attempting to retieve a undefined class");
+	});
+
+	// create temp class
+	var ca = ns.create("A", {});
+
+	var temp = {};
+	// setting the autoloader fora specific namespace
+	ns.setAutoloader(function(name, callback) {
+		equals(name, "B", "autoloader only being called if class doesn't exist.");
+		callback(temp);
+	});
+
+	// testing autoloader
+	ns.get("B", function(k) {
+		equals(k, temp, "retrieving class through autoloader method");
+	});
+	ns.get("A", function(k) {
+		equals(k, ca, "retrieving class already existing class");
+	});
 });

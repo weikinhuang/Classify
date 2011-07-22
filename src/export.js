@@ -32,10 +32,12 @@ var Classify = create({
 		return tmp;
 	}
 });
+
 // store clean references to these methods
 Classify.create = create;
 Classify.getNamespace = getNamespace;
 Classify.destroyNamespace = destroyNamespace;
+Classify.testNamespace = testNamespace;
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.
@@ -44,6 +46,20 @@ if (typeof module !== "undefined" && module.exports) {
 	// create a circular reference
 	Classify.Classify = Classify;
 } else {
+	// store previous value of root.Classify
+	var root_value = root.Classify;
+
 	// otherwise attempt to make a global reference
 	root.Classify = Classify;
+
+	// Run Classify.js in "noConflict" mode, returning the "Classify" variable to its
+	// previous value. Returns a reference to the Classify object.
+	Classify.noConflict = function() {
+		if (root_value === undefined) {
+			delete root.Classify;
+		} else {
+			root.Classify = root_value;
+		}
+		return Classify;
+	};
 }

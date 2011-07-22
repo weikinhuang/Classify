@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.3.0
+ * Classify JavaScript Library v0.3.5
  * http://www.closedinterval.com/
  *
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Thu Jul 21 23:53:11 EDT 2011
+ * Date: Fri Jul 22 19:26:57 EDT 2011
  */
 (function( root, undefined ) {
 	"use strict";
@@ -390,8 +390,27 @@ var Namespace = create({
 		return !!this.ref[classname];
 	},
 	get : function(name, callback) {
-		// TODO: be able to override this function to provide autoloading and such
+		// ability to load a class async if a callback is passed in
+		if (isFunction(callback)) {
+			if (this.ref[name]) {
+				callback(this.ref[name]);
+			} else {
+				this.load(name, callback);
+			}
+			return this;
+		}
+		// otherwise just return the class if it is already avaliable
+		return this.ref[name] || null;
+	},
+	load : function(name, callback) {
 		callback && callback(this.ref[name] || null);
+	},
+	setAutoloader : function(callback) {
+		// make sure the callback is a function
+		if (!isFunction(callback)) {
+			return this;
+		}
+		this.load = callback;
 		return this;
 	},
 	getName : function() {
@@ -404,6 +423,10 @@ var Namespace = create({
 
 // get a namespace
 var getNamespace = function(namespace) {
+	// if passed in object is already a namespace, just return it
+	if (namespace instanceof Namespace) {
+		return namespace;
+	}
 	// if the namespace doesn't exist, just create it
 	if (!namespaces[namespace]) {
 		namespaces[namespace] = new Namespace(namespace);
@@ -415,6 +438,17 @@ var getNamespace = function(namespace) {
 var destroyNamespace = function(namespace) {
 	// TODO: more advanced cleanup
 	delete namespaces[namespace];
+};
+
+// gets the first valid existing namespace
+var testNamespace = function(namespace) {
+	var ns = namespace.split("."), l = ns.length, tmp;
+	while ((tmp = ns.slice(0, l--).join(".")) !== "") {
+		if (namespaces[tmp]) {
+			return namespaces[tmp];
+		}
+	}
+	return null;
 };// Create a wrapped reference to the Classify object.
 var Classify = create({
 	invoke : function() {
@@ -449,10 +483,12 @@ var Classify = create({
 		return tmp;
 	}
 });
+
 // store clean references to these methods
 Classify.create = create;
 Classify.getNamespace = getNamespace;
 Classify.destroyNamespace = destroyNamespace;
+Classify.testNamespace = testNamespace;
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.
@@ -461,8 +497,22 @@ if (typeof module !== "undefined" && module.exports) {
 	// create a circular reference
 	Classify.Classify = Classify;
 } else {
+	// store previous value of root.Classify
+	var root_value = root.Classify;
+
 	// otherwise attempt to make a global reference
 	root.Classify = Classify;
+
+	// Run Classify.js in "noConflict" mode, returning the "Classify" variable to its
+	// previous value. Returns a reference to the Classify object.
+	Classify.noConflict = function() {
+		if (root_value === undefined) {
+			delete root.Classify;
+		} else {
+			root.Classify = root_value;
+		}
+		return Classify;
+	};
 }
 
 // Establish the root object, "window" in the browser, or "global" on the server.
