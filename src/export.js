@@ -1,6 +1,6 @@
 // Create a wrapped reference to the Classify object.
 var Classify = create({
-	_invoke_ : function() {
+	invoke : function() {
 		var args = argsToArray(arguments), ns, length = args.length;
 		// if the first parameter is a string
 		if (typeof args[0] === "string") {
@@ -18,15 +18,15 @@ var Classify = create({
 		}
 		return create.apply(null, args);
 	},
-	_construct_ : function() {
+	init : function() {
 		var args = argsToArray(arguments), params = args.pop(), tmp;
 		if (args.length < 1) {
 			throw "Classify object cannot be instantiated!";
 		}
-		tmp = Classify._invoke_.apply(null, args);
+		tmp = Classify.invoke.apply(null, args);
 		// if we found a class, instantiate it
 		if (tmp.__isclass_) {
-			return tmp._apply_(params);
+			return tmp.applicate(params);
 		}
 		// otherwise, just return it
 		return tmp;

@@ -29,7 +29,7 @@ dereference = function(base, arg) {
 
 // Namespacing class to create and handle namespaces
 var Namespace = create({
-	_construct_ : function(name) {
+	init : function(name) {
 		this.ref = {};
 		this.name = name;
 	},

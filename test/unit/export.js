@@ -29,7 +29,7 @@ test("constructing global Classify object", function() {
 	// creating a new class and instantiating it
 	var test = new Classify({
 		a : 0,
-		_construct_ : function(a) {
+		init : function(a) {
 			this.a = a;
 		}
 	}, [ 1 ]);

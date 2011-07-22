@@ -45,7 +45,7 @@ test("invocation and constructors", function() {
 	// testing class creation with a basic constructor
 	test = create({
 		a : 1,
-		_construct_ : function() {
+		init : function() {
 			this.a = 2;
 		},
 		b : function() {
@@ -60,7 +60,7 @@ test("invocation and constructors", function() {
 	// test creating a constructor with parameters
 	test = create({
 		a : 1,
-		_construct_ : function(a) {
+		init : function(a) {
 			this.a = a;
 		},
 		b : function() {
@@ -75,7 +75,7 @@ test("invocation and constructors", function() {
 	// test creating a instances with invocation
 	test = create({
 		a : 1,
-		_construct_ : function(a) {
+		init : function(a) {
 			this.a = a;
 		},
 		b : function() {
@@ -90,10 +90,10 @@ test("invocation and constructors", function() {
 	// test overriding invocation function to not generate a class instance
 	test = create({
 		a : 1,
-		_invoke_ : function() {
+		invoke : function() {
 			return "x";
 		},
-		_construct_ : function(a) {
+		init : function(a) {
 			this.a = a;
 		}
 	});
@@ -102,12 +102,12 @@ test("invocation and constructors", function() {
 	// calling apply on a class to generate an instance
 	test = create({
 		a : 1,
-		_construct_ : function(a) {
+		init : function(a) {
 			this.a = a;
 		}
 	});
-	ok(test._apply_([ 2 ]) instanceof test, "assuring creating a new instance of a class by passing an array of parameters is of type class");
-	equals(test._apply_([ 2 ]).a, 2, "creating a new instance of a class by passing an array of parameters");
+	ok(test.applicate([ 2 ]) instanceof test, "assuring creating a new instance of a class by passing an array of parameters is of type class");
+	equals(test.applicate([ 2 ]).a, 2, "creating a new instance of a class by passing an array of parameters");
 });
 
 test("known properties", function() {
@@ -116,7 +116,7 @@ test("known properties", function() {
 
 	equals(test.__isclass_, true, "flag indicating this object was created using the create method");
 	equals((new test()).constructor, test, "assert that we have a internal reference to the constructor via 'constructor'");
-	equals((new test())._self_, test, "assert that we have a internal reference to the constructor via '_self_'");
+	equals((new test()).self, test, "assert that we have a internal reference to the constructor via 'self'");
 	equals(typeof test.superclass, "function", "assert that there is an internal reference to the parent class");
 	equals(test.superclass, base, "assert that the reference to the superclass is the parent");
 	equals(typeof test.subclass, "object", "assert that an array is created holding child classes");
@@ -141,10 +141,10 @@ test("static properties", function() {
 			return test.a;
 		},
 		d : function() {
-			return this._self_;
+			return this.self;
 		},
 		e : function() {
-			return this._self_.a;
+			return this.self.a;
 		}
 	});
 
@@ -154,7 +154,7 @@ test("static properties", function() {
 	equals((new test()).b(), 1, "Invoking dynamic function of a class");
 	equals((new test()).c(), 2, "Reading static property by name within a class");
 	equals((new test()).d(), test, "Reading static definition within a class");
-	equals((new test()).e(), 2, "Reading static property by using _self_ within a class");
+	equals((new test()).e(), 2, "Reading static property by using self within a class");
 });
 
 test("adding new properties", function() {
@@ -224,7 +224,7 @@ test("extending classes using inheritance", function() {
 			return 3;
 		},
 		d : function() {
-			return this._parent_();
+			return this.parent();
 		},
 		f : function() {
 			return this.constructor;
@@ -233,7 +233,7 @@ test("extending classes using inheritance", function() {
 	var subclass_a = create(test, {
 		b : function() {
 			// invoking the parent version of this function
-			return this._parent_() + 4;
+			return this.parent() + 4;
 		}
 	});
 	var subsubclass = create(subclass, {
@@ -241,10 +241,10 @@ test("extending classes using inheritance", function() {
 			return 4;
 		},
 		d : function() {
-			return this._parent_();
+			return this.parent();
 		},
 		e : function() {
-			return this._parent_();
+			return this.parent();
 		}
 	});
 
@@ -292,12 +292,12 @@ test("extending classes using inheritance", function() {
 	// testing parent calling functions in newly added methods
 	subsubclass.addProperty("f", function() {
 		// function with parent version
-		equals(typeof this._parent_, "function", "method with override has a parent method");
-		equals(this._parent_(), this.constructor, "parent method context is current class' context");
+		equals(typeof this.parent, "function", "method with override has a parent method");
+		equals(this.parent(), this.constructor, "parent method context is current class' context");
 	});
 	subsubclass.addProperty("g", function() {
 		// function without parent version
-		equals(typeof this._parent_, "undefined", "method with no override has no parent method");
+		equals(typeof this.parent, "undefined", "method with no override has no parent method");
 	});
 	(new subsubclass()).f();
 	(new subsubclass()).g();
@@ -351,10 +351,10 @@ test("implementing methods in classes from other objects", function() {
 	// implementing subclasses
 	var inf_subclass = create(inf_class, {
 		d : function() {
-			return this._parent_();
+			return this.parent();
 		},
 		e : function() {
-			return this._parent_();
+			return this.parent();
 		},
 		g : function() {
 			return this;
