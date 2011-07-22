@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.2.0
+ * Classify JavaScript Library v0.3.0
  * http://www.closedinterval.com/
  *
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Thu Jul 21 23:42:20 EDT 2011
+ * Date: Thu Jul 21 23:53:11 EDT 2011
  */
 (function( root, undefined ) {
 	"use strict";
