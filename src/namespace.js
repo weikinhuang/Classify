@@ -1,5 +1,7 @@
 // global container containing all the namespace references
 var namespaces = {},
+// early definition for namespacing function
+getNamespace, destroyNamespace, testNamespace,
 // create a function that create namespaces in an object
 provide = function(namespace, base) {
 	// Drill down the namespace array
@@ -12,13 +14,14 @@ provide = function(namespace, base) {
 	return base;
 },
 // ability to de-reference string into it's classes
-dereference = function(base, arg) {
+dereference = function(base, arg, ref) {
 	// Allow parent classes to be passed in as a string for lookup
 	if (typeof arg === "string") {
-		if (!base[arg]) {
+		ref = base[arg] || getNamespace("GLOBAL").get(arg) || null;
+		if (!ref) {
 			throw "Invalid parent class specified.";
 		}
-		return base[arg];
+		return ref;
 	}
 	// if we have an object, then that's what we want, otherwise arrays
 	// we need to loop through and convert them to the proper objects
@@ -151,7 +154,7 @@ var Namespace = create({
 });
 
 // get a namespace
-var getNamespace = function(namespace) {
+getNamespace = function(namespace) {
 	// if passed in object is already a namespace, just return it
 	if (namespace instanceof Namespace) {
 		return namespace;
@@ -164,13 +167,13 @@ var getNamespace = function(namespace) {
 };
 
 // remove a namespace
-var destroyNamespace = function(namespace) {
+destroyNamespace = function(namespace) {
 	// TODO: more advanced cleanup
 	delete namespaces[namespace];
 };
 
 // gets the first valid existing namespace
-var testNamespace = function(namespace) {
+testNamespace = function(namespace) {
 	var ns = namespace.split("."), l = ns.length, tmp;
 	while ((tmp = ns.slice(0, l--).join(".")) !== "") {
 		if (namespaces[tmp]) {

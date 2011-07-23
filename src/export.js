@@ -39,6 +39,11 @@ Classify.getNamespace = getNamespace;
 Classify.destroyNamespace = destroyNamespace;
 Classify.testNamespace = testNamespace;
 
+// provide functionality to allow for name provisioning
+Classify.provide = function(namespace, base) {
+	return provide(namespace, base || root || {});
+};
+
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.
 if (typeof module !== "undefined" && module.exports) {

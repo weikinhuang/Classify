@@ -108,6 +108,31 @@ test("invocation and constructors", function() {
 	});
 	ok(test.applicate([ 2 ]) instanceof test, "assuring creating a new instance of a class by passing an array of parameters is of type class");
 	equals(test.applicate([ 2 ]).a, 2, "creating a new instance of a class by passing an array of parameters");
+
+	// using "this" in invoke to create a instance
+	test = create({
+		a : 1,
+		invoke : function() {
+			return new this();
+		},
+		init : function(a) {
+			this.a = a;
+		}
+	});
+	ok(test() instanceof test, "using the 'this' keyword to instantiate a new instance");
+
+	// overriding
+	test = create({
+		init : function(a) {
+			this.a = a;
+		}
+	});
+	test_sub = create({
+		init : function(a) {
+			return new test(a);
+		}
+	});
+	ok(new test_sub() instanceof test, "overriding the 'new' keyword within a class constructor");
 });
 
 test("known properties", function() {
@@ -301,6 +326,30 @@ test("extending classes using inheritance", function() {
 	});
 	(new subsubclass()).f();
 	(new subsubclass()).g();
+
+	// testing using the parent invoke method
+	var double, triple, single = create({
+		invoke : function() {
+			equals(this, double, "parent invoke method called from child context");
+			if (!this.instance) {
+				this.instance = this.applicate(arguments);
+			}
+			return this.instance;
+		},
+		init : function() {
+			if (this.constructor.instance) {
+				return this.constructor.instance;
+			}
+		}
+	});
+	double = create(single, {});
+	double();
+	triple = create(single, {
+		invoke : function() {
+			equals(this, triple, "child invoke method called from child context");
+		}
+	});
+	triple();
 });
 
 test("implementing methods in classes from other objects", function() {
