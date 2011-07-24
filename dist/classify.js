@@ -5,12 +5,12 @@
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Fri Jul 22 21:20:30 EDT 2011
+ * Date: Sun Jul 24 17:09:17 EDT 2011
  */
 (function( root, undefined ) {
 	"use strict";
 // shortcut for minification compaction
-var prototype = "prototype",
+var prototype = "prototype", string = "string",
 // For IE, check if looping through objects works with toString & valueOf
 IS_ENUMERATION_BUGGY = (function() {
 	var p;
@@ -271,8 +271,10 @@ var create = function() {
 	return klass;
 };// global container containing all the namespace references
 var namespaces = {},
+// name of the globally avaliable namespace
+global_namespace = "GLOBAL",
 // early definition for namespacing function
-getNamespace, destroyNamespace, testNamespace,
+getNamespace, destroyNamespace, testNamespace, getGlobalNamespace,
 // create a function that create namespaces in an object
 provide = function(namespace, base) {
 	// Drill down the namespace array
@@ -287,8 +289,8 @@ provide = function(namespace, base) {
 // ability to de-reference string into it's classes
 dereference = function(base, arg, ref) {
 	// Allow parent classes to be passed in as a string for lookup
-	if (typeof arg === "string") {
-		ref = base[arg] || getNamespace("GLOBAL").get(arg) || null;
+	if (typeof arg === string) {
+		ref = base[arg] || getGlobalNamespace().get(arg) || null;
 		if (!ref) {
 			throw "Invalid parent class specified.";
 		}
@@ -452,18 +454,23 @@ testNamespace = function(namespace) {
 		}
 	}
 	return null;
+};
+
+// get the globally available namespace
+getGlobalNamespace = function() {
+	return getNamespace(global_namespace);
 };// Create a wrapped reference to the Classify object.
 var Classify = create({
 	invoke : function() {
 		var args = argsToArray(arguments), ns, length = args.length;
 		// if the first parameter is a string
-		if (typeof args[0] === "string") {
+		if (typeof args[0] === string) {
 			// and there is only 1 arguments, then we just want the namespace
 			if (length === 1) {
 				return getNamespace(args[0]);
 			}
 			// if we passed in 2 arguments of strings then we want a class within a namespace
-			if (length === 2 && typeof args[1] === "string") {
+			if (length === 2 && typeof args[1] === string) {
 				return getNamespace(args[0]).ref[args[1]];
 			}
 			// otherwise we will assume the first parameter is the namespace and the others are creation parameters
@@ -492,6 +499,7 @@ Classify.create = create;
 Classify.getNamespace = getNamespace;
 Classify.destroyNamespace = destroyNamespace;
 Classify.testNamespace = testNamespace;
+Classify.getGlobalNamespace = getGlobalNamespace;
 
 // provide functionality to allow for name provisioning
 Classify.provide = function(namespace, base) {

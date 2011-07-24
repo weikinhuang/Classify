@@ -172,9 +172,12 @@ test("class autoloading", function() {
 });
 
 test("global namespace inheritance", function() {
+	// testing the getGlobalNamespace function
+	equals(getNamespace("GLOBAL"), getGlobalNamespace(), "global namespace retrieval is a normal namespace");
+
 	var ns = getNamespace("Test6");
 	// add a class to the global namespace
-	var x = Classify("GLOBAL").create("X", {});
+	var x = getGlobalNamespace().create("X", {});
 	// create temp class
 	var ca = ns.create("A", "X", {});
 

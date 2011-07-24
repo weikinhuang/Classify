@@ -1,5 +1,5 @@
 // shortcut for minification compaction
-var prototype = "prototype",
+var prototype = "prototype", string = "string",
 // For IE, check if looping through objects works with toString & valueOf
 IS_ENUMERATION_BUGGY = (function() {
 	var p;

@@ -3,13 +3,13 @@ var Classify = create({
 	invoke : function() {
 		var args = argsToArray(arguments), ns, length = args.length;
 		// if the first parameter is a string
-		if (typeof args[0] === "string") {
+		if (typeof args[0] === string) {
 			// and there is only 1 arguments, then we just want the namespace
 			if (length === 1) {
 				return getNamespace(args[0]);
 			}
 			// if we passed in 2 arguments of strings then we want a class within a namespace
-			if (length === 2 && typeof args[1] === "string") {
+			if (length === 2 && typeof args[1] === string) {
 				return getNamespace(args[0]).ref[args[1]];
 			}
 			// otherwise we will assume the first parameter is the namespace and the others are creation parameters
@@ -38,6 +38,7 @@ Classify.create = create;
 Classify.getNamespace = getNamespace;
 Classify.destroyNamespace = destroyNamespace;
 Classify.testNamespace = testNamespace;
+Classify.getGlobalNamespace = getGlobalNamespace;
 
 // provide functionality to allow for name provisioning
 Classify.provide = function(namespace, base) {

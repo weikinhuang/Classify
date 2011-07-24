@@ -1,7 +1,9 @@
 // global container containing all the namespace references
 var namespaces = {},
+// name of the globally avaliable namespace
+global_namespace = "GLOBAL",
 // early definition for namespacing function
-getNamespace, destroyNamespace, testNamespace,
+getNamespace, destroyNamespace, testNamespace, getGlobalNamespace,
 // create a function that create namespaces in an object
 provide = function(namespace, base) {
 	// Drill down the namespace array
@@ -16,8 +18,8 @@ provide = function(namespace, base) {
 // ability to de-reference string into it's classes
 dereference = function(base, arg, ref) {
 	// Allow parent classes to be passed in as a string for lookup
-	if (typeof arg === "string") {
-		ref = base[arg] || getNamespace("GLOBAL").get(arg) || null;
+	if (typeof arg === string) {
+		ref = base[arg] || getGlobalNamespace().get(arg) || null;
 		if (!ref) {
 			throw "Invalid parent class specified.";
 		}
@@ -181,4 +183,9 @@ testNamespace = function(namespace) {
 		}
 	}
 	return null;
+};
+
+// get the globally available namespace
+getGlobalNamespace = function() {
+	return getNamespace(global_namespace);
 };
