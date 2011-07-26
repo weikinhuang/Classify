@@ -1,28 +1,49 @@
+// quick reference to the seperator string
+var namespace_separator = "/",
 // Create a wrapped reference to the Classify object.
-var Classify = create({
+Classify = create({
 	invoke : function() {
-		var args = argsToArray(arguments), ns, length = args.length;
+		var args = argsToArray(arguments), length = args.length, ns, tmp;
+		// no arguments will return the global namespace
+		if (length === 0) {
+			return getNamespace();
+		}
 		// if the first parameter is a string
 		if (typeof args[0] === string) {
-			// and there is only 1 arguments, then we just want the namespace
+			// and there is only 1 arguments
 			if (length === 1) {
-				return getNamespace(args[0]);
+				tmp = args[0].split(namespace_separator);
+				ns = getNamespace(tmp[0]);
+				// and it was separated with "/" then get the class
+				if (tmp[1]) {
+					return ns.get(tmp[1]);
+				}
+				// otherwise we just want the namespace
+				return ns;
 			}
 			// if we passed in 2 arguments of strings then we want a class within a namespace
 			if (length === 2 && typeof args[1] === string) {
-				return getNamespace(args[0]).ref[args[1]];
+				return getNamespace(args[0]).get(args[1]);
 			}
-			// otherwise we will assume the first parameter is the namespace and the others are creation parameters
-			ns = getNamespace(args.shift());
+			// otherwise we will assume the first parameter is the namespace
+			tmp = args.shift().split(namespace_separator);
+			ns = getNamespace(tmp[0]);
+			// if the first parameter was a string, and separated with "/" then that is the class name
+			if (tmp[1]) {
+				args.unshift(tmp[1]);
+			}
+			// now create a new class within the context of the selected namespace
 			return ns.create.apply(ns, args);
 		}
+		// otherwise they are just class creation parameters
 		return create.apply(null, args);
 	},
 	init : function() {
-		var args = argsToArray(arguments), params = args.pop(), tmp;
+		var args = argsToArray(arguments), params, tmp;
 		if (args.length < 1) {
 			throw "Classify object cannot be instantiated!";
 		}
+		params = isArray(args[args.length - 1]) ? args.pop() : [];
 		tmp = Classify.invoke.apply(null, args);
 		// if we found a class, instantiate it
 		if (tmp.__isclass_) {

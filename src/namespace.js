@@ -161,6 +161,8 @@ getNamespace = function(namespace) {
 	if (namespace instanceof Namespace) {
 		return namespace;
 	}
+	// if we passed in nothing then we want the global namespace
+	namespace = namespace || global_namespace;
 	// if the namespace doesn't exist, just create it
 	if (!namespaces[namespace]) {
 		namespaces[namespace] = new Namespace(namespace);
@@ -170,6 +172,10 @@ getNamespace = function(namespace) {
 
 // remove a namespace
 destroyNamespace = function(namespace) {
+	// can't destroy the global namespace
+	if (namespace === global_namespace) {
+		return;
+	}
 	// TODO: more advanced cleanup
 	delete namespaces[namespace];
 };
