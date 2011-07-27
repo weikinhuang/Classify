@@ -55,17 +55,24 @@ Classify = create({
 });
 
 // store clean references to these methods
-Classify.create = create;
-Classify.getNamespace = getNamespace;
-Classify.destroyNamespace = destroyNamespace;
-Classify.testNamespace = testNamespace;
-Classify.getGlobalNamespace = getGlobalNamespace;
-Classify.version = "@VERSION";
+extend(Classify, {
+	// object version number
+	version : "@VERSION",
 
-// provide functionality to allow for name provisioning
-Classify.provide = function(namespace, base) {
-	return provide(namespace, base || root || {});
-};
+	// direct access functions
+	create : create,
+	getNamespace : getNamespace,
+	destroyNamespace : destroyNamespace,
+	testNamespace : testNamespace,
+	getGlobalNamespace : getGlobalNamespace,
+
+	// utility function to provide functionality to quickly add properties to objects
+	extend : extend,
+	// utility function to provide functionality to allow for name provisioning
+	provide : function(namespace, base) {
+		return provide(namespace.split("."), base || root || {});
+	}
+});
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.

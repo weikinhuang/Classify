@@ -191,4 +191,7 @@ test("global namespace inheritance", function() {
 
 	var y = new ca();
 	ok(y instanceof x, "object extending GLOBAL class is an instance of the global class");
+
+	// retrieval of named classes cascades into the global namespace
+	equals(ns.get("X"), x, "retrieval of named class in namespace cascades into the global namespace");
 });

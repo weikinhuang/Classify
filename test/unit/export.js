@@ -10,6 +10,29 @@ test("check globally accessable Classify object", function() {
 	equals(Classify.getGlobalNamespace, getGlobalNamespace, "get global namespace functionality is bound to the static instance of the class");
 });
 
+test("check globally accessable Classify object's utility functions", function() {
+	// test utility function to provide functionality to quickly add properties to objects
+	var test = {};
+	var extens = {
+		a : 1,
+		valueOf : function() {
+			return this.a;
+		}
+	};
+	var extended = Classify.extend(test, extens);
+
+	equals(extended, test, "extends returns the object beng extended");
+	equals(test.a, 1, "extends extended a normal property");
+	equals(test.valueOf, extens.valueOf, "extends extended a object prototype property");
+
+	// test utility function to provide functionality to allow for name provisioning
+	var test2 = {};
+	var provided = Classify.provide("A.B.C", test2);
+
+	ok(!!(test2.A && test2.A.B && test2.A.B.C), "provisioned a namespace within a object");
+	equals(provided, test2.A.B.C, "the provisioned namespace is returned by provide");
+});
+
 test("invoking global Classify object with string", function() {
 	// calling classify with no parameters
 	equals(Classify(), getGlobalNamespace(), "Classify with no parameters provides global namespace");

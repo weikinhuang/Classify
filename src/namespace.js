@@ -133,8 +133,8 @@ var Namespace = create({
 			}
 			return this;
 		}
-		// otherwise just return the class if it is already avaliable
-		return this.ref[name] || null;
+		// otherwise just return the class if it is already avaliable or reach into the global namespace
+		return this.ref[name] || (this.name !== global_namespace && getGlobalNamespace().get(name)) || null;
 	},
 	load : function(name, callback) {
 		callback && callback(this.ref[name] || null);

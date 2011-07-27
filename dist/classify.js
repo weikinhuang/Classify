@@ -5,7 +5,7 @@
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Tue Jul 26 20:58:36 EDT 2011
+ * Date: Tue Jul 26 21:24:06 EDT 2011
  */
 (function( root, undefined ) {
 	"use strict";
@@ -109,6 +109,16 @@ filter = function(arr, item) {
 		}
 	});
 	return out;
+},
+// simple extension function that takes into account the enumerated keys
+extend = function() {
+	var args = argsToArray(arguments), base = args.shift();
+	each(args, function(extens) {
+		each(keys(extens), function(k) {
+			base[k] = extens[k];
+		});
+	});
+	return base;
 };// regex for testing if property is static
 var staticRegexp = /^__static_/,
 // create the base object that everything extends from
@@ -406,8 +416,8 @@ var Namespace = create({
 			}
 			return this;
 		}
-		// otherwise just return the class if it is already avaliable
-		return this.ref[name] || null;
+		// otherwise just return the class if it is already avaliable or reach into the global namespace
+		return this.ref[name] || (this.name !== global_namespace && getGlobalNamespace().get(name)) || null;
 	},
 	load : function(name, callback) {
 		callback && callback(this.ref[name] || null);
@@ -524,17 +534,24 @@ Classify = create({
 });
 
 // store clean references to these methods
-Classify.create = create;
-Classify.getNamespace = getNamespace;
-Classify.destroyNamespace = destroyNamespace;
-Classify.testNamespace = testNamespace;
-Classify.getGlobalNamespace = getGlobalNamespace;
-Classify.version = "0.6.0";
+extend(Classify, {
+	// object version number
+	version : "0.6.0",
 
-// provide functionality to allow for name provisioning
-Classify.provide = function(namespace, base) {
-	return provide(namespace, base || root || {});
-};
+	// direct access functions
+	create : create,
+	getNamespace : getNamespace,
+	destroyNamespace : destroyNamespace,
+	testNamespace : testNamespace,
+	getGlobalNamespace : getGlobalNamespace,
+
+	// utility function to provide functionality to quickly add properties to objects
+	extend : extend,
+	// utility function to provide functionality to allow for name provisioning
+	provide : function(namespace, base) {
+		return provide(namespace.split("."), base || root || {});
+	}
+});
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.

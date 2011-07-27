@@ -98,4 +98,14 @@ filter = function(arr, item) {
 		}
 	});
 	return out;
+},
+// simple extension function that takes into account the enumerated keys
+extend = function() {
+	var args = argsToArray(arguments), base = args.shift();
+	each(args, function(extens) {
+		each(keys(extens), function(k) {
+			base[k] = extens[k];
+		});
+	});
+	return base;
 };
