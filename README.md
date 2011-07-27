@@ -60,7 +60,7 @@ var Cat = Classify(Pet, [ feline_traits ], {
 var namespace = Classify("Life");
 ```
 
-method 1: through the namespace objects
+###### method 1: through the namespace objects
 ```javascript
 // creating classes within a namespace
 namespace.create("Reptile", {
@@ -104,7 +104,7 @@ namespace.destroy("Tortoise.DesertTortoise");
 namespace.exists("Tortoise.DesertTortoise");
 ```
 
-method 2: through the Classify function
+###### method 2: through the Classify function
 ```javascript
 // creating classes within a namespace
 Classify("Life", "Reptile", {
@@ -181,21 +181,21 @@ Classify is [CommonJS](http://commonjs.org) compliant and can be used in the bro
 
 ### browser environment
 ```javascript
-	<script src="path/to/classify.js" type="text/javascript"></script>
-	<!-- Classify() is now in the global context -->
+<script src="path/to/classify.js" type="text/javascript"></script>
+<!-- Classify() is now in the global context -->
 
-	<script type="text/javascript">
-		var Foo = Classify(...);
-		var Bar = Classify(Foo, ...);
-		var bar = new Bar(...);
-	</script>
+<script type="text/javascript">
+	var Foo = Classify(...);
+	var Bar = Classify(Foo, ...);
+	var bar = new Bar(...);
+</script>
 ```
 
 ### server environment
 ```javascript
-	var Classify = require('path/to/classify');
+var Classify = require('path/to/classify');
 
-	var Foo = Classify(...);
+var Foo = Classify(...);
 ```
 
 Running the unit tests
