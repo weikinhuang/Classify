@@ -25,6 +25,7 @@ var QUnit = require(root + "/test/qunit/qunit.js").QUnit;
 	QUnit.config.blocking = true;
 	QUnit.config.autorun = true;
 	QUnit.config.updateRate = 0;
+	QUnit.config.noglobals = true;
 
 	var final_buffer = null;
 	var current_test_name = null;
@@ -37,6 +38,7 @@ var QUnit = require(root + "/test/qunit/qunit.js").QUnit;
 		if (is_quiet && assertion.result) {
 			return;
 		}
+		totals[assertion.result ? "pass" : "fail"]++;
 		console.log("    +-----+ " + (assertion.result ? "Pass" : "Fail") + " " + index + ". " + assertion.message);
 		if (typeof assertion.expected !== "undefined") {
 			console.log("    |     +----> Expected: " + assertion.expected);
@@ -51,26 +53,19 @@ var QUnit = require(root + "/test/qunit/qunit.js").QUnit;
 	};
 
 	QUnit.testStart = function(test) {
-		current_test_name = test.name;
-		current_test_assertions = [];
+
 	};
 
 	QUnit.testDone = function(test) {
 		var name = test.name, i, l;
 		if (test.failed > 0) {
-			console.log("    + FAIL --------------------- " + name + " --------------------");
-			totals.fail += 1;
+			console.log("    + FAIL: " + name);
 		} else {
 			if (!is_quiet) {
-				console.log("    + PASS --------------------- " + name + " --------------------");
+				console.log("    + PASS: " + name);
 			}
-			totals.pass += 1;
-		}
-		for (i = 0, l = current_test_assertions.length; i < l; i++) {
-			printAssertion(current_test_assertions[i], i + 1, (i + 1) === l);
 		}
 		if (!is_quiet || test.failed > 0) {
-			console.log("    +------------------------------------------------------------");
 			console.log("");
 		}
 	};
@@ -88,12 +83,17 @@ var QUnit = require(root + "/test/qunit/qunit.js").QUnit;
 		}
 		// make sure this is only run once!
 		final_buffer = setTimeout(function() {
+			// print out the found errors
+			for (i = 0, l = current_test_assertions.length; i < l; i++) {
+				printAssertion(current_test_assertions[i], i + 1, (i + 1) === l);
+			}
+			// print out summary
 			if (!is_quiet || totals.fail > 0) {
 				console.log("--------------------------------------------------------------------------------");
 				console.log(" PASS: " + totals.pass + " FAIL: " + totals.fail + " TOTAL: " + (totals.pass + totals.fail));
 				console.log(" Finished in " + stop_watch.elapsed_seconds() + " seconds.");
 				console.log("--------------------------------------------------------------------------------");
-				if(is_quiet){
+				if (is_quiet) {
 					throw "Not all units tests have passed.";
 				}
 			} else {

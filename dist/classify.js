@@ -5,7 +5,7 @@
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Tue Jul 26 08:54:57 EDT 2011
+ * Date: Tue Jul 26 20:58:36 EDT 2011
  */
 (function( root, undefined ) {
 	"use strict";
@@ -183,10 +183,12 @@ var create = function() {
 	var klass = function() {
 		// We're not creating a instantiated object so we want to force a instantiation or call the invoke function
 		// we need to test for !this when in "use strict" mode
-		if (!this || !this.init) {
+		// we need to test for !this.init for quick check if this is a instance or a definition
+		// we need to test for !(this instanceof klass) when the class is a property of a instance class (ie. namespace)
+		if (!this || !this.init || !(this instanceof klass)) {
 			return klass.invoke.apply(klass, arguments);
 		}
-		// just in case we want to do anything special! (usually don't return anything)
+		// just in case we want to do anything special like "new" keyword override (usually don't return anything)
 		var tmp = this.init.apply(this, arguments);
 		if (tmp !== undefined) {
 			return tmp;
@@ -527,6 +529,7 @@ Classify.getNamespace = getNamespace;
 Classify.destroyNamespace = destroyNamespace;
 Classify.testNamespace = testNamespace;
 Classify.getGlobalNamespace = getGlobalNamespace;
+Classify.version = "0.6.0";
 
 // provide functionality to allow for name provisioning
 Classify.provide = function(namespace, base) {

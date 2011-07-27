@@ -1,11 +1,11 @@
 module("namespace");
 
 test("retrieval and creation", function() {
-	var ns = getNamespace("Test");
+	var ns = getNamespace("Namespace1");
 
 	ok(ns instanceof Namespace, "getNamespace returned a namespace");
-	equals(ns, getNamespace("Test"), "multiple calls to getNamespace returns the same object");
-	equals(ns.getName(), "Test", "the name of the current namespace is stored");
+	equals(ns, getNamespace("Namespace1"), "multiple calls to getNamespace returns the same object");
+	equals(ns.getName(), "Namespace1", "the name of the current namespace is stored");
 	equals(ns.get("A"), null, "get class with no callback returns the class for use");
 	equals(ns.get("A", function(c) {
 		equals(c, null, "async call to get returns null as class doesn't yet exist");
@@ -13,7 +13,7 @@ test("retrieval and creation", function() {
 });
 
 test("class creation", function() {
-	var ns = getNamespace("Test1");
+	var ns = getNamespace("Namespace2");
 
 	ok(!ns.exists("A"), "checking for existience of undefined class");
 	ns.get("A", function(k) {
@@ -22,13 +22,16 @@ test("class creation", function() {
 
 	// creating a single class
 	var c = ns.create("A", {
+		invoke : function() {
+			return "invoke";
+		},
 		a : function() {
 			return this;
 		}
 	});
 	ok(!!c.__isclass_, "class created is a class object");
 	ok(new c() instanceof base, "class creation created by extending the base class");
-	equals(ns.A, c, "class reference is stored directly within namespace object");
+	equals(ns.A(), "invoke", "class reference within namespace object can still be invoked");
 	ns.get("A", function(k) {
 		equals(k, c, "class reference is stored in internal reference array");
 	});
@@ -36,6 +39,9 @@ test("class creation", function() {
 
 	// creating nested classes
 	var d = ns.create("B.C", {
+		invoke : function() {
+			return "invoke";
+		},
 		b : function() {
 			return this;
 		}
@@ -43,13 +49,14 @@ test("class creation", function() {
 	equals(typeof ns.B, "object", "an intermediate container object is created by the namespace");
 	ok(new d() instanceof base, "class creation created by extending the base class");
 	equals(ns.B.C, d, "class reference is stored directly within namespace object (nested)");
+	equals(ns.B.C(), "invoke", "class reference within namespace object can still be invoked");
 	ns.get("B.C", function(k) {
 		equals(k, d, "class reference is stored in internal reference array (nested)");
 	});
 });
 
 test("class extension and implementation using named references", function() {
-	var ns = getNamespace("Test2");
+	var ns = getNamespace("Namespace3");
 
 	// extending a class with a named instance
 	var c = ns.create("A", {
@@ -94,7 +101,7 @@ test("class extension and implementation using named references", function() {
 });
 
 test("removing named classes", function() {
-	var ns = getNamespace("Test3");
+	var ns = getNamespace("Namespace4");
 	var ca = ns.create("A", {});
 	var cb = ns.create("B", {});
 	var cc = ns.create("A.C", {});
@@ -130,7 +137,7 @@ test("removing named classes", function() {
 });
 
 test("removing namespaces", function() {
-	var ns = getNamespace("Test4");
+	var ns = getNamespace("Namespace5");
 	var ca = ns.create("A", {});
 	var cb = ns.create("B", {});
 	var cc = ns.create("A.C", {});
@@ -138,15 +145,15 @@ test("removing namespaces", function() {
 	var ce = ns.create("A.E", "A", {});
 	var cf = ns.create("F", "A", {});
 
-	destroyNamespace("Test4");
+	destroyNamespace("Namespace5");
 
-	// try to retrieve another instance of the "Test4" namespace
-	var ns2 = getNamespace("Test4");
+	// try to retrieve another instance of the "Namespace5" namespace
+	var ns2 = getNamespace("Namespace5");
 	ok(ns2 !== ns, "new instance of namespace is created");
 });
 
 test("class autoloading", function() {
-	var ns = getNamespace("Test5");
+	var ns = getNamespace("Namespace6");
 
 	ns.get("A", function(k) {
 		equals(k, null, "attempting to retieve a undefined class");
@@ -176,7 +183,7 @@ test("global namespace inheritance", function() {
 	equals(getGlobalNamespace(), getNamespace("GLOBAL"), "global namespace retrieval is a normal namespace");
 	equals(getNamespace(), getNamespace("GLOBAL"), "global namespace retrieval with no parameters");
 
-	var ns = getNamespace("Test6");
+	var ns = getNamespace("Namespace7");
 	// add a class to the global namespace
 	var x = getGlobalNamespace().create("X", {});
 	// create temp class

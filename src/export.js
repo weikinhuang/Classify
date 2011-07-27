@@ -60,6 +60,7 @@ Classify.getNamespace = getNamespace;
 Classify.destroyNamespace = destroyNamespace;
 Classify.testNamespace = testNamespace;
 Classify.getGlobalNamespace = getGlobalNamespace;
+Classify.version = "@VERSION";
 
 // provide functionality to allow for name provisioning
 Classify.provide = function(namespace, base) {

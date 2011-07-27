@@ -127,7 +127,7 @@ test("invocation and constructors", function() {
 			this.a = a;
 		}
 	});
-	test_sub = create({
+	var test_sub = create({
 		init : function(a) {
 			return new test(a);
 		}

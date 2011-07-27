@@ -57,7 +57,7 @@ test("invoking global Classify object with object", function() {
 	ok(test.__isclass_, "object parameter creates a class with create");
 
 	// 2 object parameters creates class objects
-	test2 = Classify(test, {});
+	var test2 = Classify(test, {});
 	equals(typeof test2, "function", "2 object parameters creates a class");
 	ok(test2.__isclass_, "2 object parameters creates a class with create");
 	ok(new test2() instanceof test, "2 object parameters creates a class with inheritance");
