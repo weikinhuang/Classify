@@ -1,7 +1,9 @@
 // shortcut for minification compaction
 var prototype = "prototype", string = "string",
+// native code test regex
+nativeCodeRegexp = /\[native code\]/i,
 // For IE, check if looping through objects works with toString & valueOf
-IS_ENUMERATION_BUGGY = (function() {
+isEnumerationBuggy = (function() {
 	var p;
 	for (p in {
 		toString : 1
@@ -13,9 +15,9 @@ IS_ENUMERATION_BUGGY = (function() {
 	return true;
 })(),
 // gets the enumerated keys if necessary (bug in older ie < 9)
-ENUMERATED_KEYS = IS_ENUMERATION_BUGGY ? "hasOwnProperty,valueOf,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,constructor".split(",") : [],
+enumeratedKeys = isEnumerationBuggy ? "hasOwnProperty,valueOf,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,constructor".split(",") : [],
 // quick reference to the enumerated items length
-ENUMERATION_LENGTH = ENUMERATED_KEYS.length,
+enumerationLength = enumeratedKeys.length,
 // quick reference to object prototype
 objectPrototype = Object.prototype,
 // quick reference to the toString prototype
@@ -24,8 +26,16 @@ toString = objectPrototype.toString,
 isFunction = function(o) {
 	return typeof o === "function";
 },
+// test if object is native javascript code
+isNative = function(o) {
+	return o && o.constructor && nativeCodeRegexp.test(o.constructor.toString());
+},
+// test if object is extendable
+isExtendable = function(o) {
+	return o && o.prototype && toString.call(o) === "[object Function]";
+},
 // quick test for isArray
-isArray = function(o) {
+isArray = Array.isArray || function(o) {
 	return toString.call(o) === "[object Array]";
 },
 // quickly be able to get all the keys of an object
@@ -34,11 +44,11 @@ keys = function(o) {
 	for (i in o) {
 		k.push(i);
 	}
-	if (IS_ENUMERATION_BUGGY) {
+	if (isEnumerationBuggy) {
 		// only add buggy enumerated values if it's not the Object.prototype's
-		for (i = 0; i < ENUMERATION_LENGTH; i++) {
-			if (o.hasOwnProperty(ENUMERATED_KEYS[i])) {
-				k.push(ENUMERATED_KEYS[i]);
+		for (i = 0; i < enumerationLength; i++) {
+			if (o.hasOwnProperty(enumeratedKeys[i])) {
+				k.push(enumeratedKeys[i]);
 			}
 		}
 	}

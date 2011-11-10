@@ -39,6 +39,42 @@ test("basic requirements", function() {
 	ok(isArray([]), "empty array is an array");
 	ok(isArray([ 1, 2, 3 ]), "non empty array is an array");
 
+	// test if objects are native code
+	ok(isNative(Object), "Object object is native code");
+	ok(isNative(Boolean), "Boolean object is native code");
+	ok(isNative(String), "String object is native code");
+	ok(isNative(Number), "Number object is native code");
+	ok(isNative(Array), "Array object is native code");
+	ok(isNative(Date), "Date object is native code");
+	ok(isNative(RegExp), "RegExp object is native code");
+	ok(isNative(Math), "Math object is native code");
+	ok(isNative(Function), "Function object is native code");
+	ok(isNative({}), "Object instance is native code");
+	ok(isNative([]), "Array instance is native code");
+	ok(!isNative(new function() {
+	}), "new instance of object is not native code");
+	(function() {
+		ok(isNative(arguments), "Arguments instance is native code");
+	})();
+
+	// test if objects are extendable
+	ok(isExtendable(Object), "Object object is an extendable object");
+	ok(isExtendable(Boolean), "Boolean object is an extendable object");
+	ok(isExtendable(String), "String object is an extendable object");
+	ok(isExtendable(Number), "Number object is an extendable object");
+	ok(isExtendable(Array), "Array object is an extendable object");
+	ok(isExtendable(Date), "Date object is an extendable object");
+	ok(isExtendable(RegExp), "RegExp object is an extendable object");
+	ok(isExtendable(Function), "Function object is not extendable object");
+	ok(!isExtendable(Math), "Math object is not an extendable object");
+	ok(!isExtendable({}), "Object instance is not an extendable object");
+	ok(!isExtendable([]), "Array instance is not an extendable object");
+	ok(!isExtendable(new function() {
+	}), "new instance of object is not an extendable object");
+	(function() {
+		ok(!isExtendable(arguments), "Arguments instance is not an extendable object");
+	})();
+
 	// test object keys retrieval
 	test = {};
 	// test empty
