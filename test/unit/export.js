@@ -4,10 +4,10 @@ test("check globally accessable Classify object", function() {
 	ok(Classify.__isclass_, "Classify global object is a class");
 
 	same(Classify.create, create, "Create functionality is bound to the static instance of the class");
-	equals(Classify.getNamespace, getNamespace, "get namespace functionality is bound to the static instance of the class");
-	equals(Classify.destroyNamespace, destroyNamespace, "destroy namespace functionality is bound to the static instance of the class");
-	equals(Classify.testNamespace, testNamespace, "test namespaces is bound to the static instance of the class");
-	equals(Classify.getGlobalNamespace, getGlobalNamespace, "get global namespace functionality is bound to the static instance of the class");
+	equal(Classify.getNamespace, getNamespace, "get namespace functionality is bound to the static instance of the class");
+	equal(Classify.destroyNamespace, destroyNamespace, "destroy namespace functionality is bound to the static instance of the class");
+	equal(Classify.testNamespace, testNamespace, "test namespaces is bound to the static instance of the class");
+	equal(Classify.getGlobalNamespace, getGlobalNamespace, "get global namespace functionality is bound to the static instance of the class");
 });
 
 test("check globally accessable Classify object's utility functions", function() {
@@ -21,21 +21,21 @@ test("check globally accessable Classify object's utility functions", function()
 	};
 	var extended = Classify.extend(test, extens);
 
-	equals(extended, test, "extends returns the object beng extended");
-	equals(test.a, 1, "extends extended a normal property");
-	equals(test.valueOf, extens.valueOf, "extends extended a object prototype property");
+	equal(extended, test, "extends returns the object beng extended");
+	equal(test.a, 1, "extends extended a normal property");
+	equal(test.valueOf, extens.valueOf, "extends extended a object prototype property");
 
 	// test utility function to provide functionality to allow for name provisioning
 	var test2 = {};
 	var provided = Classify.provide("A.B.C", test2);
 
 	ok(!!(test2.A && test2.A.B && test2.A.B.C), "provisioned a namespace within a object");
-	equals(provided, test2.A.B.C, "the provisioned namespace is returned by provide");
+	equal(provided, test2.A.B.C, "the provisioned namespace is returned by provide");
 });
 
 test("invoking global Classify object with string", function() {
 	// calling classify with no parameters
-	equals(Classify(), getGlobalNamespace(), "Classify with no parameters provides global namespace");
+	equal(Classify(), getGlobalNamespace(), "Classify with no parameters provides global namespace");
 
 	var export1 = getNamespace("Export1");
 	var test = export1.create("A", {
@@ -44,30 +44,30 @@ test("invoking global Classify object with string", function() {
 
 	// calling classify with single string parameter
 	// single string parameter returns the namespace
-	equals(Classify("Export1"), getNamespace("Export1"), "single string parameter returns the namespace");
+	equal(Classify("Export1"), getNamespace("Export1"), "single string parameter returns the namespace");
 
 	// single string parameter with a / and nothing after should return a namespace
-	equals(Classify("Export1/"), getNamespace("Export1"), "single string parameter returns the namespace");
+	equal(Classify("Export1/"), getNamespace("Export1"), "single string parameter returns the namespace");
 
 	// single string parameter with a / and nothing after should return a namespace
-	equals(Classify("Export1/A"), test, "single string parameter with a '/' return a class within the namespace");
-	equals(Classify("Export1/nonexist"), null, "single string parameter with a '/' with non existient class returns null");
+	equal(Classify("Export1/A"), test, "single string parameter with a '/' return a class within the namespace");
+	equal(Classify("Export1/nonexist"), null, "single string parameter with a '/' with non existient class returns null");
 
 	// calling classify with two string parameters
-	equals(Classify("Export1", "A"), test, "two string parameters return a class within the namespace");
-	equals(Classify("Export1", "nonexist"), null, "two string parameters with non existient class returns null");
+	equal(Classify("Export1", "A"), test, "two string parameters return a class within the namespace");
+	equal(Classify("Export1", "nonexist"), null, "two string parameters with non existient class returns null");
 
 	// calling classify with first parameter string and mixed parameters
-	equals(Classify("Export1/B", {}), getNamespace("Export1").get("B"), "first parameter string with '/' creates a class in namespace");
-	equals(Classify("Export1", "C", {}), getNamespace("Export1").get("C"), "two string parameters creates a class in namespace");
+	equal(Classify("Export1/B", {}), getNamespace("Export1").get("B"), "first parameter string with '/' creates a class in namespace");
+	equal(Classify("Export1", "C", {}), getNamespace("Export1").get("C"), "two string parameters creates a class in namespace");
 
 	// calling classify with first parameter string and parent class creation
 	test = Classify("Export1", "D", "C", {});
-	equals(test, getNamespace("Export1").get("D"), "3 string parameters create a class in namespace with parent");
+	equal(test, getNamespace("Export1").get("D"), "3 string parameters create a class in namespace with parent");
 	ok((new test()) instanceof getNamespace("Export1").get("C"), "3 string parameters create a class in namespace with parent is instance of parent");
 
 	test = Classify("Export1/E", "C", {});
-	equals(test, getNamespace("Export1").get("E"), "2 string parameters create a class in namespace with parent");
+	equal(test, getNamespace("Export1").get("E"), "2 string parameters create a class in namespace with parent");
 	ok((new test()) instanceof getNamespace("Export1").get("C"), "2 string parameters create a class in namespace with parent is instance of parent");
 });
 
@@ -76,12 +76,12 @@ test("invoking global Classify object with object", function() {
 	var test = Classify({
 		a : 1
 	});
-	equals(typeof test, "function", "object parameter creates a class");
+	equal(typeof test, "function", "object parameter creates a class");
 	ok(test.__isclass_, "object parameter creates a class with create");
 
 	// 2 object parameters creates class objects
 	var test2 = Classify(test, {});
-	equals(typeof test2, "function", "2 object parameters creates a class");
+	equal(typeof test2, "function", "2 object parameters creates a class");
 	ok(test2.__isclass_, "2 object parameters creates a class with create");
 	ok(new test2() instanceof test, "2 object parameters creates a class with inheritance");
 });
@@ -96,17 +96,17 @@ test("constructing global Classify object", function() {
 
 	// creating a new class and instantiating it
 	var test = new Classify(definition);
-	equals(typeof test, "object", "instantiated Classify object is an object");
-	equals(test.a, 0, "instantiated Classify object calls new class constructor and is an instance of created class");
+	equal(typeof test, "object", "instantiated Classify object is an object");
+	equal(test.a, 0, "instantiated Classify object calls new class constructor and is an instance of created class");
 
 	// creating a new class and instantiating it with parameters
 	test = new Classify(definition, [ 1 ]);
-	equals(typeof test, "object", "instantiated Classify object with parameters is an object");
-	equals(test.a, 1, "instantiated Classify object with parameters calls new class constructor and is an instance of created class");
+	equal(typeof test, "object", "instantiated Classify object with parameters is an object");
+	equal(test.a, 1, "instantiated Classify object with parameters calls new class constructor and is an instance of created class");
 
 	// instantiating but retrieving a namespace
 	test = new Classify("Export3");
-	equals(test, getNamespace("Export3"), "instantiated Classify object for namespace will return the namespace");
+	equal(test, getNamespace("Export3"), "instantiated Classify object for namespace will return the namespace");
 
 	// constructing a new class through the use of "new Classify"
 	test = getNamespace("Export3").create("E", definition);

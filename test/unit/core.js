@@ -68,7 +68,7 @@ test("basic requirements", function() {
 	// test force array functionality
 	same(toArray(1), [ 1 ], "convert an object to an array");
 	test = [ 1, 2, 3 ];
-	equals(toArray(test), test, "existing object is already an array");
+	equal(toArray(test), test, "existing object is already an array");
 
 	// test converting arguments into an array
 	(function() {
@@ -81,30 +81,30 @@ test("basic requirements", function() {
 	}, fn_base = function() {
 		return 1;
 	};
-	equals(store(fn, fn_base), fn, "store returned the original function reference");
-	equals(fn.__original_, fn_base, "original function reference stored correctly");
+	equal(store(fn, fn_base), fn, "store returned the original function reference");
+	equal(fn.__original_, fn_base, "original function reference stored correctly");
 
 	// iteration functionality
 	test = [ 1 ];
-	equals(each(test, function(v, i, o) {
+	equal(each(test, function(v, i, o) {
 		same(this, 1, "iteration context passed correctly");
-		equals(v, 1, "iteration value passed correctly");
-		equals(i, 0, "iteration index passed correctly");
-		equals(o, test, "iteration of complete object passed correctly");
+		equal(v, 1, "iteration value passed correctly");
+		equal(i, 0, "iteration index passed correctly");
+		equal(o, test, "iteration of complete object passed correctly");
 	}), test, "each iteration return passed in object");
 	// iterating through objects
 	test = {
 		a : 1
 	};
-	equals(each(test, function(v, i, o) {
+	equal(each(test, function(v, i, o) {
 		same(this, 1, "iteration context of object passed correctly");
-		equals(v, 1, "iteration value of object passed correctly");
-		equals(i, "a", "iteration index of object passed correctly");
-		equals(o, test, "iteration of complete object of object passed correctly");
+		equal(v, 1, "iteration value of object passed correctly");
+		equal(i, "a", "iteration index of object passed correctly");
+		equal(o, test, "iteration of complete object of object passed correctly");
 	}), test, "each iteration return passed in object");
 
 	each(test, function(v, i, o) {
-		equals(this, test, "iteration context passed correctly when specified");
+		equal(this, test, "iteration context passed correctly when specified");
 	}, test);
 
 	// mapping functionality
