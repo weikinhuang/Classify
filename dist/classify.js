@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.6.0
+ * Classify JavaScript Library v0.7.0
  * http://www.closedinterval.com/
  *
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Sat Nov 19 21:11:23 EST 2011
+ * Date: Sat Nov 19 21:32:13 EST 2011
  */
 (function( root, undefined ) {
 	"use strict";
@@ -253,7 +253,7 @@ var create = function() {
 			this.invoke = tmp;
 			return ret;
 		}
-		throw "Function \"" + name + "\" of parent class being invoked is undefined.";
+		throw new Error("Function \"" + name + "\" of parent class being invoked is undefined.");
 	};
 	// Bind the special add property function
 	klass.addProperty = function(name, property, prefix) {
@@ -312,7 +312,7 @@ dereference = function(base, arg, ref) {
 	if (typeof arg === string) {
 		ref = base[arg] || getGlobalNamespace().get(arg) || null;
 		if (!ref) {
-			throw "Invalid parent class specified.";
+			throw new Error("Invalid parent class [" + arg + "] specified.");
 		}
 		return ref;
 	}
@@ -397,7 +397,7 @@ var Namespace = create({
 			self.destroy(v._namespace_);
 		});
 		// we also need to delete the reference to this object from the parent!
-		if(c.superclass.subclass) {
+		if (c.superclass.subclass) {
 			c.superclass.subclass = filter(c.superclass.subclass, c);
 		}
 		// now we remove all non inherited classes, but fall under this namespace
@@ -530,7 +530,7 @@ Classify = create({
 	init : function() {
 		var args = argsToArray(arguments), params, tmp;
 		if (args.length < 1) {
-			throw "Classify object cannot be instantiated!";
+			throw new Error("Classify object cannot be instantiated!");
 		}
 		params = isArray(args[args.length - 1]) ? args.pop() : [];
 		tmp = Classify.invoke.apply(null, args);
@@ -546,7 +546,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.6.0",
+	version : "0.7.0",
 
 	// direct access functions
 	create : create,
