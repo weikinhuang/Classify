@@ -1,4 +1,3 @@
-#! /usr/bin/env node
 // -*- js -*-
 
 global.sys = require(/^v0\.[012]/.test(process.version) ? "sys" : "util");
@@ -295,9 +294,9 @@ function squeeze_it(code) {
                 });
                 if (options.ast)
                         return sys.inspect(ast, null, null);
-                result += time_it("generate", function(){ return pro.gen_code(ast, options.codegen_options) });
+                result += time_it("generate", function(){ return pro.gen_code(ast, options.codegen_options); });
                 if (!options.codegen_options.beautify && options.max_line_length) {
-                        result = time_it("split", function(){ return pro.split_lines(result, options.max_line_length) });
+                        result = time_it("split", function(){ return pro.split_lines(result, options.max_line_length); });
                 }
                 return result;
         } catch(ex) {

@@ -352,6 +352,103 @@ test("extending classes using inheritance", function() {
 	triple();
 });
 
+test("extending core Javascript objects using inheritance", function() {
+	// extending the Number object
+	var test_number = create(Number, {
+		init : function() {
+			this.value = Number.prototype.constructor.apply(this, arguments);
+		},
+		custom : function() {
+			return "I am " + this.toFixed(6) + ".";
+		},
+		round : function() {
+			return Math.round(this.valueOf());
+		},
+		valueOf : function() {
+			return Number(this.value).valueOf();
+		},
+		toString : function() {
+			return Number(this.value).toString();
+		}
+	});
+
+	// this test fails in Internet explorer because of using prototypes
+	// of the scalar objects are prohibited in extended objects
+	try {
+		var test_n = new test_number("15.6");
+		equal(test_n.valueOf(), 15.6, "Overriden valueOf function called for Number");
+		equal(test_n.toString(), "15.6", "Overriden toString function called for Number");
+		equal(test_n.toPrecision(4), "15.60", "Native function called for Number");
+		equal(test_n.round(), 16, "Custom prototype function (round) called for Number.");
+		equal(test_n.custom(), "I am 15.600000.", "Custom prototype function using native function called for Number.");
+		ok(test_n instanceof test_number, "Extended Number object is an instance of itself.");
+		ok(test_n instanceof Number, "Extended Number object is an instance of Number.");
+	} catch (e) {
+		// IE throws this type of error
+		if (!(e instanceof TypeError)) {
+			throw e;
+		}
+	}
+
+	// extending the Error object
+	var test_error = create(Error, {
+		init : function(message, code) {
+			this.message = message;
+			this.code = code;
+		},
+		custom : function() {
+			return "I'm an error!";
+		},
+		toString : function() {
+			return this.message;
+		},
+		valueOf : function() {
+			return this.code;
+		}
+	});
+
+	// throwing custom errors
+	try {
+		throw new test_error("test", 3);
+	} catch (e) {
+		equal(e.valueOf(), 3, "Overriden valueOf function called");
+		equal(e.custom(), "I'm an error!", "Custom prototype function called.");
+		ok(e instanceof test_error, "Extended error object is an instance of itself.");
+		ok(e instanceof Error, "Extended error object is an instance of Error.");
+	}
+});
+
+test("extending Javascript objects not bult using Classify using inheritance", function() {
+	var test = function(value) {
+		this.value = value;
+	};
+	test.prototype.custom = function() {
+		return "lorem ipsum";
+	};
+	test.prototype.override = function() {
+		return "lorem ipsum";
+	};
+
+	// extending the Number object
+	var test_obj = create(test, {
+		shuffle : function() {
+			return "ipsum lorem";
+		},
+		override : function() {
+			return "t" + this.parent();
+		}
+	});
+
+	var instance = new test_obj("test");
+
+	ok(instance instanceof test_obj, "Extended external object is an instance of itself.");
+	ok(instance instanceof test, "Extended external object is an instance of external class.");
+	equal(instance.value, "test", "External object's constructor function called.");
+	equal(instance.custom(), "lorem ipsum", "External object's prototype function called.");
+	equal(instance.shuffle(), "ipsum lorem", "Internal object's prototype function called.");
+	equal(instance.override(), "tlorem ipsum", "External object's function called through the \"parent\" special function.");
+});
+
 test("implementing methods in classes from other objects", function() {
 	var inf = {
 		a : function() {

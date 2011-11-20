@@ -1,7 +1,5 @@
 // shortcut for minification compaction
 var prototype = "prototype", string = "string",
-// native code test regex
-nativeCodeRegexp = /\[native code\]/i,
 // For IE, check if looping through objects works with toString & valueOf
 isEnumerationBuggy = (function() {
 	var p;
@@ -25,10 +23,6 @@ toString = objectPrototype.toString,
 // test if object is a function
 isFunction = function(o) {
 	return typeof o === "function";
-},
-// test if object is native javascript code
-isNative = function(o) {
-	return o && o.constructor && nativeCodeRegexp.test(o.constructor.toString());
 },
 // test if object is extendable
 isExtendable = function(o) {

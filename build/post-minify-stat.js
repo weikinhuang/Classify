@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 var print = require("sys").print,
 	fs = require("fs"),
 	exec = require('child_process').exec,
@@ -25,7 +23,7 @@ exec("gzip -cq " + escapeshellarg(process.argv[2]), function (error_s, stdout_s)
 		print( "Original Size:	" + src.length + " bytes (" + stdout_s.length + " bytes gzipped)\n" );
 		print( "Compiled Size:	" + min.length + " bytes (" + stdout_m.length + " bytes gzipped)\n" );
 
-		print( "        Saved:	" + (min.length / src.length * 100).toFixed(2) + "% off the original size (" + (stdout_m.length / stdout_s.length * 100).toFixed(2) + "% off the gzipped size)\n" );
+		print( "        Saved:	" + ((src.length - min.length) / src.length * 100).toFixed(2) + "% off the original size (" + ((stdout_s.length - stdout_m.length) / stdout_s.length * 100).toFixed(2) + "% off the gzipped size)\n" );
 	});
 });
 */

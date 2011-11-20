@@ -5,14 +5,12 @@
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Wed Nov  9 22:21:39 EST 2011
+ * Date: Sat Nov 19 21:11:23 EST 2011
  */
 (function( root, undefined ) {
 	"use strict";
 // shortcut for minification compaction
 var prototype = "prototype", string = "string",
-// native code test regex
-nativeCodeRegexp = /\[native code\]/i,
 // For IE, check if looping through objects works with toString & valueOf
 isEnumerationBuggy = (function() {
 	var p;
@@ -36,10 +34,6 @@ toString = objectPrototype.toString,
 // test if object is a function
 isFunction = function(o) {
 	return typeof o === "function";
-},
-// test if object is native javascript code
-isNative = function(o) {
-	return o && o.constructor && nativeCodeRegexp.test(o.constructor.toString());
 },
 // test if object is extendable
 isExtendable = function(o) {
@@ -188,7 +182,7 @@ var create = function() {
 	if (arg_len === 1) {
 		methods = args[0];
 	} else if (arg_len === 2) {
-		if (!args[0].__isclass_) {
+		if (!args[0].__isclass_ && !isExtendable(args[0])) {
 			implement = toArray(args[0]);
 		} else {
 			parent = args[0];
@@ -198,6 +192,10 @@ var create = function() {
 		parent = args[0];
 		implement = toArray(args[1]);
 		methods = args[2];
+	}
+	// extending from an outside object and not passing in a constructor
+	if (!parent.__isclass_ && !methods.init) {
+		methods.init = parent;
 	}
 	// Constructor function
 	var klass = function() {
@@ -232,7 +230,7 @@ var create = function() {
 	// Keep a list of the inheritance chain
 	klass.superclass = parent;
 	klass.subclass = [];
-	klass.implement = parent.implement.concat(implement);
+	klass.implement = (parent.implement || []).concat(implement);
 	// Give this class the ability to create sub classes
 	klass.Extend = klass[prototype].Extend = function(p) {
 		return create(klass, p);
@@ -245,7 +243,7 @@ var create = function() {
 	var subclass_prototype = SubClass[prototype];
 	klass[prototype] = new SubClass();
 	// Add this class to the list of subclasses of the parent
-	parent.subclass.push(klass);
+	parent.subclass && parent.subclass.push(klass);
 	// Create a magic method that can invoke any of the parent methods
 	methods.invoke = function(name, args) {
 		if (name in subclass_prototype && name !== "invoke" && isFunction(subclass_prototype[name])) {
@@ -398,8 +396,10 @@ var Namespace = create({
 		each(c.subclass, function(v) {
 			self.destroy(v._namespace_);
 		});
-		// TODO: we also need to delete the reference to this object from the parent!
-		c.superclass.subclass = filter(c.superclass.subclass, c);
+		// we also need to delete the reference to this object from the parent!
+		if(c.superclass.subclass) {
+			c.superclass.subclass = filter(c.superclass.subclass, c);
+		}
 		// now we remove all non inherited classes, but fall under this namespace
 		each(deref, function(v, k) {
 			if (k !== classname && k.indexOf(classname) === 0) {

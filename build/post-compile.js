@@ -8,7 +8,7 @@ src = src.replace( /^(\s*\*\/)(.+)/m, "$1\n$2" ) + ";";
 
 var proto = (/(\w+)="prototype"/).exec(src);
 if(proto) {
-	src = src.replace(/\.prototype\b/g, "[" + proto[1] + "]")
+	src = src.replace(/\.prototype\b/g, "[" + proto[1] + "]");
 }
 
 print( src );

@@ -105,8 +105,10 @@ var Namespace = create({
 		each(c.subclass, function(v) {
 			self.destroy(v._namespace_);
 		});
-		// TODO: we also need to delete the reference to this object from the parent!
-		c.superclass.subclass = filter(c.superclass.subclass, c);
+		// we also need to delete the reference to this object from the parent!
+		if(c.superclass.subclass) {
+			c.superclass.subclass = filter(c.superclass.subclass, c);
+		}
 		// now we remove all non inherited classes, but fall under this namespace
 		each(deref, function(v, k) {
 			if (k !== classname && k.indexOf(classname) === 0) {

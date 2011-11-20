@@ -57,7 +57,7 @@ var create = function() {
 	if (arg_len === 1) {
 		methods = args[0];
 	} else if (arg_len === 2) {
-		if (!args[0].__isclass_) {
+		if (!args[0].__isclass_ && !isExtendable(args[0])) {
 			implement = toArray(args[0]);
 		} else {
 			parent = args[0];
@@ -67,6 +67,10 @@ var create = function() {
 		parent = args[0];
 		implement = toArray(args[1]);
 		methods = args[2];
+	}
+	// extending from an outside object and not passing in a constructor
+	if (!parent.__isclass_ && !methods.init) {
+		methods.init = parent;
 	}
 	// Constructor function
 	var klass = function() {
@@ -101,7 +105,7 @@ var create = function() {
 	// Keep a list of the inheritance chain
 	klass.superclass = parent;
 	klass.subclass = [];
-	klass.implement = parent.implement.concat(implement);
+	klass.implement = (parent.implement || []).concat(implement);
 	// Give this class the ability to create sub classes
 	klass.Extend = klass.prototype.Extend = function(p) {
 		return create(klass, p);
@@ -114,7 +118,7 @@ var create = function() {
 	var subclass_prototype = SubClass.prototype;
 	klass.prototype = new SubClass();
 	// Add this class to the list of subclasses of the parent
-	parent.subclass.push(klass);
+	parent.subclass && parent.subclass.push(klass);
 	// Create a magic method that can invoke any of the parent methods
 	methods.invoke = function(name, args) {
 		if (name in subclass_prototype && name !== "invoke" && isFunction(subclass_prototype[name])) {
