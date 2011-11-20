@@ -21,7 +21,7 @@ dereference = function(base, arg, ref) {
 	if (typeof arg === string) {
 		ref = base[arg] || getGlobalNamespace().get(arg) || null;
 		if (!ref) {
-			throw "Invalid parent class specified.";
+			throw new Error("Invalid parent class [" + arg + "] specified.");
 		}
 		return ref;
 	}
@@ -106,7 +106,7 @@ var Namespace = create({
 			self.destroy(v._namespace_);
 		});
 		// we also need to delete the reference to this object from the parent!
-		if(c.superclass.subclass) {
+		if (c.superclass.subclass) {
 			c.superclass.subclass = filter(c.superclass.subclass, c);
 		}
 		// now we remove all non inherited classes, but fall under this namespace

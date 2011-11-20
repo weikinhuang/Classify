@@ -128,7 +128,7 @@ var create = function() {
 			this.invoke = tmp;
 			return ret;
 		}
-		throw "Function \"" + name + "\" of parent class being invoked is undefined.";
+		throw new Error("Function \"" + name + "\" of parent class being invoked is undefined.");
 	};
 	// Bind the special add property function
 	klass.addProperty = function(name, property, prefix) {

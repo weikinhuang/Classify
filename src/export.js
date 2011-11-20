@@ -41,7 +41,7 @@ Classify = create({
 	init : function() {
 		var args = argsToArray(arguments), params, tmp;
 		if (args.length < 1) {
-			throw "Classify object cannot be instantiated!";
+			throw new Error("Classify object cannot be instantiated!");
 		}
 		params = isArray(args[args.length - 1]) ? args.pop() : [];
 		tmp = Classify.invoke.apply(null, args);
