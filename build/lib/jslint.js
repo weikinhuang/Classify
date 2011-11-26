@@ -912,7 +912,7 @@ var JSLINT = (function () {
         member,
         node = array_to_object([
             'Buffer', 'clearInterval', 'clearTimeout', 'console', 'exports',
-            'global', 'module', 'process', 'querystring', 'require',
+            'global', 'module', 'process', 'querystring', 'require', 'define',
             'setInterval', 'setTimeout', '__dirname', '__filename'
         ], false),
         node_js,
