@@ -58,7 +58,7 @@ unit : classify
 lint: classify
 	@@if test ! -z ${JS_ENGINE}; then \
 		echo "Checking Classify against JSLint..."; \
-		${JS_ENGINE} build/jslint-check.js ${CL}; \
+		${JS_ENGINE} build/jshint-check.js ${CL}; \
 	else \
 		echo "You must have NodeJS installed in order to test Classify against JSLint."; \
 	fi

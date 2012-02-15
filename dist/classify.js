@@ -5,7 +5,7 @@
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Fri Nov 25 19:26:28 EST 2011
+ * Date: Wed Feb 15 11:11:01 EST 2012
  */
 (function( root, undefined ) {
 	"use strict";
@@ -28,7 +28,7 @@ enumeratedKeys = isEnumerationBuggy ? "hasOwnProperty,valueOf,isPrototypeOf,prop
 // quick reference to the enumerated items length
 enumerationLength = enumeratedKeys.length,
 // quick reference to object prototype
-objectPrototype = Object[prototype],
+objectPrototype = Object.prototype,
 // quick reference to the toString prototype
 toString = objectPrototype.toString,
 // test if object is a function
@@ -37,7 +37,7 @@ isFunction = function(o) {
 },
 // test if object is extendable
 isExtendable = function(o) {
-	return o && o[prototype] && toString.call(o) === "[object Function]";
+	return o && o.prototype && toString.call(o) === "[object Function]";
 },
 // quick test for isArray
 isArray = Array.isArray || function(o) {
@@ -50,7 +50,7 @@ keys = function(o) {
 		k.push(i);
 	}
 	if (isEnumerationBuggy) {
-		// only add buggy enumerated values if it's not the Object[prototype]'s
+		// only add buggy enumerated values if it's not the Object.prototype's
 		for (i = 0; i < enumerationLength; i++) {
 			if (o.hasOwnProperty(enumeratedKeys[i])) {
 				k.push(enumeratedKeys[i]);
@@ -65,7 +65,7 @@ toArray = function(o) {
 },
 // create ability to convert the arguments object to an array
 argsToArray = function(o) {
-	return Array[prototype].slice.call(o, 0);
+	return Array.prototype.slice.call(o, 0);
 },
 // ability to store the original definition into the new function definition
 store = function(fn, base) {
@@ -130,13 +130,13 @@ base = (function() {
 	var fn = function() {
 	};
 	// Make sure we always have a constructor
-	fn[prototype].init = function() {
+	fn.prototype.init = function() {
 	};
 	fn.superclass = null;
 	fn.subclass = [];
 	fn.implement = [];
-	fn[prototype].constructor = base;
-	fn[prototype].self = base;
+	fn.prototype.constructor = base;
+	fn.prototype.self = base;
 	fn.__isclass_ = true;
 	return fn;
 })(),
@@ -153,9 +153,9 @@ addProperty = function(klass, parent, name, property) {
 			return property.apply(klass, arguments);
 		}, property) : property;
 	} else {
-		var parent_prototype = parent[prototype][name];
+		var parent_prototype = parent.prototype[name];
 		// Else this is not a prefixed static property, so we're assigning it to the prototype
-		klass[prototype][name] = isFunction(property) && isFunction(parent_prototype) ? store(function() {
+		klass.prototype[name] = isFunction(property) && isFunction(parent_prototype) ? store(function() {
 			var tmp = this.parent, ret;
 			this.parent = parent_prototype;
 			ret = property.apply(this, arguments);
@@ -218,7 +218,7 @@ var create = function() {
 		var TempClass = function() {
 			return klass.apply(this, a);
 		};
-		TempClass[prototype] = klass[prototype];
+		TempClass.prototype = klass.prototype;
 		return new TempClass();
 	};
 	// Use the defined invoke method if possible, otherwise use the default one
@@ -232,16 +232,16 @@ var create = function() {
 	klass.subclass = [];
 	klass.implement = (parent.implement || []).concat(implement);
 	// Give this class the ability to create sub classes
-	klass.Extend = klass[prototype].Extend = function(p) {
+	klass.Extend = klass.prototype.Extend = function(p) {
 		return create(klass, p);
 	};
 
 	// This method allows for the constructor to not be called when making a new subclass
 	var SubClass = function() {
 	};
-	SubClass[prototype] = parent[prototype];
-	var subclass_prototype = SubClass[prototype];
-	klass[prototype] = new SubClass();
+	SubClass.prototype = parent.prototype;
+	var subclass_prototype = SubClass.prototype;
+	klass.prototype = new SubClass();
 	// Add this class to the list of subclasses of the parent
 	parent.subclass && parent.subclass.push(klass);
 	// Create a magic method that can invoke any of the parent methods
@@ -274,9 +274,9 @@ var create = function() {
 	// Now implement each of the implemented objects before extending
 	if (implement.length !== 0) {
 		each(implement, function(impl) {
-			var props = impl.__isclass_ ? impl[prototype] : impl;
+			var props = impl.__isclass_ ? impl.prototype : impl;
 			each(keys(props), function(name) {
-				if (klass[prototype][name] === undefined && methods[name] === undefined) {
+				if (klass.prototype[name] === undefined && methods[name] === undefined) {
 					klass.addProperty(name, props[name]);
 				}
 			});
@@ -285,8 +285,8 @@ var create = function() {
 
 	// Now extend each of those methods and allow for a parent accessor
 	klass.addProperty(methods);
-	klass[prototype].constructor = klass;
-	klass[prototype].self = klass;
+	klass.prototype.constructor = klass;
+	klass.prototype.self = klass;
 	klass.__isclass_ = true;
 	return klass;
 };// global container containing all the namespace references
@@ -565,15 +565,15 @@ extend(Classify, {
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.
-if (typeof module !== "undefined" && module.exports) {
-	module.exports = Classify;
+if (typeof root.module !== "undefined" && root.module.exports) {
+	root.module.exports = Classify;
 	// create a circular reference
 	Classify.Classify = Classify;
-} else if (typeof define === "function" && define.amd) {
+} else if (typeof root.define === "function" && root.define.amd) {
 	// Export Classify as an AMD module only if there is a AMD module loader,
 	// use lowercase classify, because AMD modules are usually loaded with filenames
 	// and Classify would usually be loaded with lowercase classify.js
-	define("classify", function() {
+	root.define("classify", function() {
 		return Classify;
 	});
 } else {
