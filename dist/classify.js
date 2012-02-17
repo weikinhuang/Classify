@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.7.0
+ * Classify JavaScript Library v0.7.5
  * http://www.closedinterval.com/
  *
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Thu Feb 16 22:17:01 EST 2012
+ * Date: Thu Feb 16 22:09:37 EST 2012
  */
 (function( root, undefined ) {
 	"use strict";
@@ -546,7 +546,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.7.0",
+	version : "0.7.5",
 
 	// direct access functions
 	create : create,
