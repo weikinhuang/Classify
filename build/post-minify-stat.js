@@ -1,4 +1,4 @@
-var print = require("sys").print,
+var print = require(/^v0\.[012]/.test(process.version) ? "sys" : "util").print,
 	fs = require("fs"),
 	exec = require('child_process').exec,
 	src = fs.readFileSync(process.argv[2], "utf8"),

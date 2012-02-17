@@ -231,6 +231,7 @@ test("adding new properties", function() {
 test("extending classes using inheritance", function() {
 	// testing class for known properties in every defined class
 	var test = create({
+		z : 1,
 		a : function() {
 			return 1;
 		},
@@ -245,6 +246,7 @@ test("extending classes using inheritance", function() {
 		}
 	});
 	var subclass = create(test, {
+		z : 2,
 		c : function() {
 			return 3;
 		},
@@ -292,6 +294,15 @@ test("extending classes using inheritance", function() {
 	equal((new subclass_a()).b(), 6, "parent method in overriden method is executed with additional logic");
 	equal((new subsubclass()).d(), 4, "parent method in overriden method is executed (multi level)");
 	equal((new subsubclass()).e(), subsubclass, "parent method's 'this' is still referencing proper object");
+	
+	// calling apply on a class to generate an instance
+	ok(subclass.applicate([ 2 ]) instanceof test, "assuring creating a new instance of a class by passing an array of parameters is of type parent class");
+	ok(subclass.applicate([ 2 ]) instanceof subclass, "assuring creating a new instance of a class by passing an array of parameters is of type class");
+	equal(subclass.applicate([ 2 ]).z, 2, "creating a new instance of a class by passing an array of parameters");
+	
+	// calling invoke on a class to generate an instance
+	ok(subclass(2) instanceof test, "assuring creating a new instance of a class using invocation is of type parent class");
+	ok(subclass(2) instanceof subclass, "assuring creating a new instance of a class using invocation is of type class");
 
 	// testing inherited properties
 	var test_a = create({
@@ -326,7 +337,7 @@ test("extending classes using inheritance", function() {
 	});
 	(new subsubclass()).f();
 	(new subsubclass()).g();
-
+	
 	// testing using the parent invoke method
 	var double, triple, single = create({
 		invoke : function() {

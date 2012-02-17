@@ -97,9 +97,9 @@ var create = function() {
 		return new TempClass();
 	};
 	// Use the defined invoke method if possible, otherwise use the default one
-	klass.invoke = methods.invoke || parent.invoke || function() {
+	klass.invoke = methods.invoke || (parent.invoke && !parent.invoke.__original_ ? parent.invoke : null) || store(function() {
 		return klass.applicate(arguments);
-	};
+	}, true);
 	// Remove the invoke method from the prototype chain
 	delete methods.invoke;
 	// Keep a list of the inheritance chain

@@ -5,7 +5,7 @@
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Wed Feb 15 11:11:01 EST 2012
+ * Date: Thu Feb 16 22:17:01 EST 2012
  */
 (function( root, undefined ) {
 	"use strict";
@@ -222,9 +222,9 @@ var create = function() {
 		return new TempClass();
 	};
 	// Use the defined invoke method if possible, otherwise use the default one
-	klass.invoke = methods.invoke || parent.invoke || function() {
+	klass.invoke = methods.invoke || (parent.invoke && !parent.invoke.__original_ ? parent.invoke : null) || store(function() {
 		return klass.applicate(arguments);
-	};
+	}, true);
 	// Remove the invoke method from the prototype chain
 	delete methods.invoke;
 	// Keep a list of the inheritance chain
