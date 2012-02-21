@@ -20,7 +20,8 @@ if (jshint.errors.length > 0) {
 		console.log("");
 	});
 	
-	throw "JSHint check failed";
+	console.log("JSHint check failed");
+	process.exit(1);
 } else {
 	console.log("JSHint check passed.");
 	if(data.globals && data.globals.length > 0) {

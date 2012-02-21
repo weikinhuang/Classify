@@ -94,7 +94,8 @@ var QUnit = require(root + "/test/qunit/qunit.js").QUnit;
 				console.log(" Finished in " + stop_watch.elapsed_seconds() + " seconds.");
 				console.log("--------------------------------------------------------------------------------");
 				if (is_quiet) {
-					throw "Not all units tests have passed.";
+					console.log("Not all units tests have passed.");
+					process.exit(1);
 				}
 			} else {
 				console.log("Unit Tests passed.");
