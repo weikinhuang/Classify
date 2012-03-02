@@ -5,7 +5,7 @@
  * Copyright 2011, Wei Kin Huang
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Thu Feb 16 22:09:37 EST 2012
+ * Date: Fri Mar  2 22:02:33 EST 2012
  */
 (function( root, undefined ) {
 	"use strict";

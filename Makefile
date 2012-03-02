@@ -8,7 +8,7 @@ DIST_DIR = ${PREFIX}/dist
 JS_ENGINE ?= `which node nodejs 2>/dev/null`
 COMPILER = ${JS_ENGINE} ${BUILD_DIR}/uglify.js --unsafe
 PRE_COMPILER = ${JS_ENGINE} ${BUILD_DIR}/pre-compile.js
-POST_COMPILER = ${JS_ENGINE} ${BUILD_DIR}/post-compile.js
+PRE_MINIFY_COMPILER = ${JS_ENGINE} ${BUILD_DIR}/post-compile.js
 POST_MINIFY_STAT = ${JS_ENGINE} ${BUILD_DIR}/post-minify-stat.js
 
 BASE_FILES = ${SRC_DIR}/core.js\
@@ -68,8 +68,8 @@ min: classify lint ${CL_MIN}
 ${CL_MIN}: ${CL}
 	@@if test ! -z ${JS_ENGINE}; then \
 		echo "Minifying Classify" ${CL_MIN}; \
-		${COMPILER} ${CL} > ${CL_MIN}.tmp; \
-		${POST_COMPILER} ${CL_MIN}.tmp > ${CL_MIN}; \
+		${PRE_MINIFY_COMPILER} ${CL} > ${CL_MIN}.tmp; \
+		${COMPILER} ${CL_MIN}.tmp > ${CL_MIN}; \
 		rm -f ${CL_MIN}.tmp; \
 		${POST_MINIFY_STAT} ${CL} ${CL_MIN} \
 	else \
