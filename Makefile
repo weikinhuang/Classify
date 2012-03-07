@@ -68,9 +68,7 @@ min: classify lint ${CL_MIN}
 ${CL_MIN}: ${CL}
 	@@if test ! -z ${JS_ENGINE}; then \
 		echo "Minifying Classify" ${CL_MIN}; \
-		${PRE_MINIFY_COMPILER} ${CL} > ${CL_MIN}.tmp; \
-		${COMPILER} ${CL_MIN}.tmp > ${CL_MIN}; \
-		rm -f ${CL_MIN}.tmp; \
+		${PRE_MINIFY_COMPILER} ${CL} | ${COMPILER} > ${CL_MIN}; \
 		${POST_MINIFY_STAT} ${CL} ${CL_MIN} \
 	else \
 		echo "You must have NodeJS installed in order to minify Classify."; \
