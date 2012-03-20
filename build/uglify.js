@@ -1,15 +1,19 @@
+#!/usr/bin/env node
 // -*- js -*-
 
 global.sys = require(/^v0\.[012]/.test(process.version) ? "sys" : "util");
 var fs = require("fs");
 var uglify = require("./uglify-js"), // symlink ~/.node_libraries/uglify-js.js to ../uglify-js.js
+    consolidator = uglify.consolidator,
     jsp = uglify.parser,
     pro = uglify.uglify;
 
 var options = {
         ast: false,
+        consolidate: false,
         mangle: true,
         mangle_toplevel: false,
+        no_mangle_functions: false,
         squeeze: true,
         make_seqs: true,
         dead_code: true,
@@ -44,6 +48,10 @@ out: while (args.length > 0) {
             case "--beautify":
                 options.codegen_options.beautify = true;
                 break;
+            case "-c":
+            case "--consolidate-primitive-values":
+                options.consolidate = true;
+                break;
             case "-i":
             case "--indent":
                 options.codegen_options.indent_level = args.shift();
@@ -55,6 +63,10 @@ out: while (args.length > 0) {
             case "-mt":
             case "--mangle-toplevel":
                 options.mangle_toplevel = true;
+                break;
+            case "-nmf":
+            case "--no-mangle-functions":
+                options.no_mangle_functions = true;
                 break;
             case "--no-mangle":
             case "-nm":
@@ -242,7 +254,7 @@ function output(text) {
                         mode: 0644
                 });
         }
-        out.write(text + ";");
+        out.write(text.replace(/;*$/, ";"));
         if (options.output !== true) {
                 out.end();
         }
@@ -272,14 +284,18 @@ function squeeze_it(code) {
         }
         try {
                 var ast = time_it("parse", function(){ return jsp.parse(code); });
+                if (options.consolidate) ast = time_it("consolidate", function(){
+                        return consolidator.ast_consolidate(ast);
+                });
                 if (options.lift_vars) {
                         ast = time_it("lift", function(){ return pro.ast_lift_variables(ast); });
                 }
                 if (options.mangle) ast = time_it("mangle", function(){
                         return pro.ast_mangle(ast, {
-                                toplevel: options.mangle_toplevel,
-                                defines: options.defines,
-                                except: options.reserved_names
+                                toplevel     : options.mangle_toplevel,
+                                defines      : options.defines,
+                                except       : options.reserved_names,
+                                no_functions : options.no_mangle_functions
                         });
                 });
                 if (options.squeeze) ast = time_it("squeeze", function(){
@@ -294,9 +310,9 @@ function squeeze_it(code) {
                 });
                 if (options.ast)
                         return sys.inspect(ast, null, null);
-                result += time_it("generate", function(){ return pro.gen_code(ast, options.codegen_options); });
+                result += time_it("generate", function(){ return pro.gen_code(ast, options.codegen_options) });
                 if (!options.codegen_options.beautify && options.max_line_length) {
-                        result = time_it("split", function(){ return pro.split_lines(result, options.max_line_length); });
+                        result = time_it("split", function(){ return pro.split_lines(result, options.max_line_length) });
                 }
                 return result;
         } catch(ex) {

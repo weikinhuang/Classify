@@ -191,7 +191,7 @@ var OPERATORS = array_to_hash([
 
 var WHITESPACE_CHARS = array_to_hash(characters(" \u00a0\n\r\t\f\u000b\u200b\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000"));
 
-var PUNC_BEFORE_EXPRESSION = array_to_hash(characters("[{}(,.;:"));
+var PUNC_BEFORE_EXPRESSION = array_to_hash(characters("[{(,.;:"));
 
 var PUNC_CHARS = array_to_hash(characters("[]{}(),;:"));
 
@@ -486,10 +486,10 @@ function tokenizer($TEXT) {
         };
 
         function read_name() {
-                var backslash = false, name = "", ch;
+                var backslash = false, name = "", ch, escaped = false, hex;
                 while ((ch = peek()) != null) {
                         if (!backslash) {
-                                if (ch == "\\") backslash = true, next();
+                                if (ch == "\\") escaped = backslash = true, next();
                                 else if (is_identifier_char(ch)) name += next();
                                 else break;
                         }
@@ -500,6 +500,10 @@ function tokenizer($TEXT) {
                                 name += ch;
                                 backslash = false;
                         }
+                }
+                if (HOP(KEYWORDS, name) && escaped) {
+                        hex = name.charCodeAt(0).toString(16).toUpperCase();
+                        name = "\\u" + "0000".substr(hex.length) + hex + name.slice(1);
                 }
                 return name;
         };
@@ -781,8 +785,12 @@ function parse($TEXT, exigent_mode, embed_tokens) {
                         S.token = S.input(S.token.value.substr(1)); // force regexp
                 }
                 switch (S.token.type) {
-                    case "num":
                     case "string":
+                        if (S.token.value == "use strict") {
+                                next();
+                                return as("use-strict");
+                        }
+                    case "num":
                     case "regexp":
                     case "operator":
                     case "atom":
