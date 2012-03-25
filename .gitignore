@@ -1,0 +1,12 @@
+.settings
+*~
+*.diff
+*.patch
+/*.html
+.svn
+*/.svn
+.DS_Store
+.externalToolBuilders
+.buildpath
+.project
+test/dev.html
