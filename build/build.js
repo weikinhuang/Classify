@@ -16,9 +16,6 @@ module.exports = (function(root) {
 	// reference to the full source file
 	data = null, min_data = null, copy_data = null;
 
-	// process.stdout.getWindowSize()[0]; //cols
-	// process.stdout.getWindowSize()[1]; //rows
-
 	var build_opts = {
 		clean : function(options, callback) {
 			return clean.apply(null, arguments);
@@ -55,7 +52,7 @@ module.exports = (function(root) {
 			current = next;
 			next = steps.shift();
 			if (success === false) {
-				console.log("Build process failed on step: " + current);
+				console.log("\x1B[31m\u2716 \x1B[0mBuild process failed on step: \x1B[31m" + current + "\x1B[0m");
 				console.log("");
 				clean({}, function() {
 					process.exit(1);
@@ -74,9 +71,12 @@ module.exports = (function(root) {
 					timer = +new Date();
 					build_opts[next](options, chain);
 				} else {
-					console.log("Unknown build command: " + next);
+					console.log("\x1B[31m\u2716 \x1B[0mUnknown build command: \x1B[31m" + next + "\x1B[0m");
 					process.exit(2);
 				}
+			} else {
+				console.log("\x1B[32m\u2714 \x1B[0mBuild process completed!");
+				process.exit(0);
 			}
 		}
 		chain();
@@ -334,7 +334,7 @@ module.exports = (function(root) {
 	// export the execution function
 	return {
 		process : function(options) {
-			build(options.build.split(" "), options);
+			build(process.argv.length > 2 ? Array.prototype.slice.call(process.argv, 2) : options.build.split(" "), options);
 		}
 	};
 })(global);
