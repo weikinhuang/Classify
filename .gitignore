@@ -10,3 +10,4 @@
 .buildpath
 .project
 test/dev.html
+build/.sizecache.json
