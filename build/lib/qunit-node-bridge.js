@@ -21,14 +21,14 @@ currentmodule;
 var sandbox = {
 	require : require,
 	exports : {},
-	window : {
-		setTimeout : setTimeout,
-		setInterval : setInterval
-	},
-	console : console,
+	setTimeout : setTimeout,
+	setInterval : setInterval,
 	clearTimeout : clearTimeout,
-	clearInterval : clearInterval
+	clearInterval : clearInterval,
+	console : console
 };
+// window is a circualr reference
+sandbox.window = sandbox;
 
 try {
 	vm.runInNewContext(fs.readFileSync(qunitPath, "utf-8"), sandbox, qunitPath);
@@ -41,6 +41,9 @@ sandbox.root = sandbox.window;
 
 // have a global reference to QUnit within the sandbox
 sandbox.QUnit = sandbox.exports;
+
+// don't have qunit reorder tests
+sandbox.QUnit.config.reorder = false;
 
 // start
 sandbox.QUnit.testStart(function(test) {
@@ -71,7 +74,7 @@ sandbox.QUnit.testDone(function(data) {
 
 // override the done function to signal back to the parent process that this unit test is done
 sandbox.QUnit.done((function() {
-	var timeout, later = function(data) {
+	var timeout = null, later = function(data) {
 		timeout = null;
 		process.send({
 			event : "done",
