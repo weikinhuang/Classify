@@ -100,7 +100,6 @@ module.exports = (function(root) {
 
 	function unit(options, callback) {
 		console.log("Running unit tests...");
-
 		var child = exec.fork(builddir + '/lib/qunit-node-bridge.js', [ JSON.stringify({
 			src : options.src,
 			tests : options.unit
@@ -110,13 +109,19 @@ module.exports = (function(root) {
 
 		child.on('message', function(msg) {
 			if (msg.event === 'assertionDone') {
-				console.log(msg.data);
+				if (msg.data.result === false) {
+					console.log(msg.data);
+				}
 			} else if (msg.event === 'testDone') {
-				console.log(msg.data);
+				// console.log(msg.data);
 			} else if (msg.event === 'done') {
 				console.log(msg.data);
-				// callback(msg.data);
 				child.kill();
+				if (msg.data.failed > 0) {
+					callback(false);
+					return;
+				}
+				callback(true);
 			}
 		});
 	}

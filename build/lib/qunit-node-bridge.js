@@ -15,9 +15,9 @@ options = JSON.parse(process.argv[2]),
 // path to the qunit library
 qunitPath = path.join(__dirname, "..", "qunit/qunit.js"),
 // misc variables
-currentTest;
+currentmodule;
 
-// globals needed by qunit
+// globals needed by qunit sandbox
 var sandbox = {
 	require : require,
 	exports : {},
@@ -36,30 +36,32 @@ try {
 	process.exit(1);
 }
 
-// append these properties to the sandbox
+// keep a reference to the "root" variable
 sandbox.root = sandbox.window;
+
+// have a global reference to QUnit within the sandbox
 sandbox.QUnit = sandbox.exports;
 
+// start
 sandbox.QUnit.testStart(function(test) {
-	// currentTest is undefined while first test is not done yet
-	currentTest = test.name;
-
 	// use last module name if no module name defined
-	currentModule = test.module || currentModule;
+	currentmodule = test.module || currentmodule;
 });
 
+// override the log function to output back to the parent process
 sandbox.QUnit.log(function(data) {
 	data.test = this.config.current.testName;
-	data.module = currentModule;
+	data.module = currentmodule;
 	process.send({
 		event : "assertionDone",
 		data : data
 	});
 });
 
+// override the testDone function to signal back to the parent process
 sandbox.QUnit.testDone(function(data) {
 	// use last module name if no module name defined
-	data.module = data.module || currentModule;
+	data.module = data.module || currentmodule;
 
 	process.send({
 		event : "testDone",
@@ -67,6 +69,7 @@ sandbox.QUnit.testDone(function(data) {
 	});
 });
 
+// override the done function to signal back to the parent process that this unit test is done
 sandbox.QUnit.done((function() {
 	var timeout, later = function(data) {
 		timeout = null;
@@ -83,20 +86,24 @@ sandbox.QUnit.done((function() {
 	};
 })());
 
+// load source and tests into the sandbox
 function load(src, root) {
 	// keep appending the source to the sandbox
 	src.forEach(function(file) {
 		try {
-			vm.runInNewContext(fs.readFileSync(root + "/" + file, "utf-8"), sandbox, qunitPath);
+			vm.runInNewContext(fs.readFileSync(root + file, "utf-8"), sandbox, qunitPath);
 		} catch (e) {
-			console.log(e.message);
-			console.log(file);
+			console.log(e.message + " in " + file);
+			process.exit(1);
 		}
 	});
 }
 
+// load dependencies
+load(options.depends || [], "");
+
 // load up the source files
-load(options.src, srcdir);
+load(options.src, srcdir + "/");
 
 // load up the test files
-load(options.tests, testdir);
+load(options.tests, testdir + "/");
