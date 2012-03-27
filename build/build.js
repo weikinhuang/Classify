@@ -52,6 +52,7 @@ module.exports = (function(root) {
 			current = next;
 			next = steps.shift();
 			if (success === false) {
+				console.log("");
 				console.log("\x1B[31m\u2716 \x1B[0mBuild process failed on step: \x1B[31m" + current + "\x1B[0m");
 				console.log("");
 				clean({}, function() {
@@ -109,37 +110,37 @@ module.exports = (function(root) {
 		});
 	}
 
-	function unit(options, callback) {
+	function processUnitTestResults(results, summary, callback) {
+		Object.keys(results).forEach(function(test) {
+			console.log("     \x1B[39;1mModule:\x1B[0m " + test);
+			results[test].forEach(function(assertion) {
+				console.log("        " + (assertion.result ? "\x1B[32m\u2714" : "\x1B[31m\u2716") + " \x1B[0m\x1B[39;1mTest #\x1B[0m " + assertion.index + "/" + summary.total);
+				console.log("            " + assertion.message + " [\x1B[37m" + assertion.test + "\x1B[0m]");
+				if (typeof assertion.expected !== "undefined") {
+					console.log("                -> \x1B[32mExpected: " + assertion.expected + "\x1B[0m");
+					// if test failed, then we need to output the result
+					if (!assertion.result) {
+						console.log("                ->   \x1B[31mResult: " + assertion.actual + "\x1B[0m");
+					}
+				}
+			});
+		});
+
+		if (summary.failed > 0) {
+			console.log("    \x1B[31m\u2716 \x1B[0m" + summary.failed + " / " + summary.total + " Failed");
+		} else {
+			console.log("    \x1B[32m\u2714 \x1B[0mAll tests passed!");
+		}
+		callback(summary.failed === 0, summary.runtime);
+	}
+
+	function unitNode(options, callback) {
 		var child = exec.fork(builddir + "/lib/qunit-node-bridge.js", [ JSON.stringify({
 			src : options.src,
 			tests : options.unit
 		}) ], {
 			env : process.env
 		}), results = {}, index = 0;
-
-		function processResults(summary) {
-			Object.keys(results).forEach(function(test) {
-				console.log("     \x1B[39;1mModule:\x1B[0m " + test);
-				results[test].forEach(function(assertion) {
-					console.log("        " + (assertion.result ? "\x1B[32m\u2714" : "\x1B[31m\u2716") + " \x1B[0m\x1B[39;1mTest #\x1B[0m " + assertion.index + "/" + summary.total);
-					console.log("            " + assertion.message + " [\x1B[37m" + assertion.test + "\x1B[0m]");
-					if (typeof assertion.expected !== "undefined") {
-						console.log("                -> \x1B[32mExpected: " + assertion.expected + "\x1B[0m");
-						// if test failed, then we need to output the result
-						if (!assertion.result) {
-							console.log("                ->   \x1B[31mResult: " + assertion.actual + "\x1B[0m");
-						}
-					}
-				});
-			});
-
-			if (summary.failed > 0) {
-				console.log("    \x1B[31m\u2716 \x1B[0m" + summary.failed + " / " + summary.total + " Failed");
-			} else {
-				console.log("    \x1B[32m\u2714 \x1B[0mAll tests passed!");
-			}
-			callback(summary.failed === 0, summary.runtime);
-		}
 
 		child.on("message", function(msg) {
 			if (msg.event === "assertionDone") {
@@ -153,8 +154,52 @@ module.exports = (function(root) {
 			} else if (msg.event === "testDone") {
 			} else if (msg.event === "done") {
 				child.kill();
-				processResults(msg.data);
+				processUnitTestResults(results, msg.data, callback);
 			}
+		});
+	}
+
+	function unitPhantom(options, callback) {
+		var child = exec.spawn("phantomjs", [ builddir + "/lib/qunit-phantom-bridge.js", builddir + "/lib/qunit-phantom-bridge.html" ], {
+			env : process.env
+		}), results = {}, index = 0;
+
+		child.stdout.setEncoding("utf-8");
+		child.stdout.on("data", function(stdout) {
+			try {
+				var msg = JSON.parse(stdout.toString());
+			} catch (e) {
+				return;
+			}
+			if (msg.event === "assertionDone") {
+				msg.data.index = ++index;
+				if (msg.data.result === false) {
+					if (!results[msg.data.module]) {
+						results[msg.data.module] = [];
+					}
+					results[msg.data.module].push(msg.data);
+				}
+			} else if (msg.event === "testDone") {
+			} else if (msg.event === "done") {
+				processUnitTestResults(results, msg.data, callback);
+			}
+		});
+		child.on("exit", function(code) {
+			// phantomjs doesn't exist
+			if (code === 127) {
+				callback(true);
+			}
+		});
+	}
+
+	function unit(options, callback) {
+		console.log("Running unit tests against QUnit in \x1B[39;1mNodeJs\x1B[0m environment...");
+		unitNode(options, function(success_node) {
+			console.log("");
+			console.log("Running unit tests against QUnit in \x1B[39;1mPhantomJs\x1B[0m environment...");
+			unitPhantom(options, function(success_phantom) {
+				callback(success_node && success_phantom);
+			});
 		});
 	}
 
@@ -280,8 +325,7 @@ module.exports = (function(root) {
 
 		data = intro + src + outro;
 		data = data.replace(/@VERSION\b/g, options.version);
-		data = data.replace(/@DATE\b/g, (new Date()).toUTCString());
-		return data;
+		return data.replace(/@DATE\b/g, (new Date()).toUTCString());
 	}
 
 	function getMinSource(options) {

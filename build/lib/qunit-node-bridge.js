@@ -45,12 +45,6 @@ sandbox.QUnit = sandbox.exports;
 // don't have qunit reorder tests
 sandbox.QUnit.config.reorder = false;
 
-// start
-sandbox.QUnit.testStart(function(test) {
-	// use last module name if no module name defined
-	currentmodule = test.module || currentmodule;
-});
-
 // override the log function to output back to the parent process
 sandbox.QUnit.log(function(data) {
 	data.test = this.config.current.testName;
@@ -59,6 +53,12 @@ sandbox.QUnit.log(function(data) {
 		event : "assertionDone",
 		data : data
 	});
+});
+
+// start test
+sandbox.QUnit.testStart(function(test) {
+	// use last module name if no module name defined
+	currentmodule = test.module || currentmodule;
 });
 
 // override the testDone function to signal back to the parent process
@@ -71,6 +71,20 @@ sandbox.QUnit.testDone(function(data) {
 		data : data
 	});
 });
+
+sandbox.QUnit.moduleStart = function(data) {
+	process.send({
+		event : "moduleStart",
+		data : data
+	});
+};
+
+sandbox.QUnit.moduleDone = function(data) {
+	process.send({
+		event : "moduleDone",
+		data : data
+	});
+};
 
 // override the done function to signal back to the parent process that this unit test is done
 sandbox.QUnit.done((function() {
