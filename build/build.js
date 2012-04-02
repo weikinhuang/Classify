@@ -47,7 +47,7 @@ module.exports = (function(root) {
 	};
 
 	function build(steps, options) {
-		var current = "", next = "", timer = 0;
+		var current = "", next = "", timer = 0, total_time = 0, item_time;
 		function chain(success, runtime) {
 			current = next;
 			next = steps.shift();
@@ -56,12 +56,16 @@ module.exports = (function(root) {
 				console.log("\x1B[31m\u2716 \x1B[0mBuild process failed on step: \x1B[31m" + current + "\x1B[0m");
 				console.log("");
 				clean({}, function() {
-					process.exit(1);
+					setTimeout(function() {
+						process.exit(1);
+					}, 1);
 				});
 				return;
 			}
 			if (success === true) {
-				console.log("    Finished in \x1B[35m" + ((runtime || (+new Date() - timer)) / 1000).toFixed(3) + "\x1B[0m seconds.");
+				item_time = (runtime || (+new Date() - timer));
+				total_time += item_time;
+				console.log("    Finished in \x1B[35m" + (item_time / 1000).toFixed(3) + "\x1B[0m seconds.");
 				console.log("");
 			}
 			if (next != null) {
@@ -73,11 +77,18 @@ module.exports = (function(root) {
 					build_opts[next](options, chain);
 				} else {
 					console.log("\x1B[31m\u2716 \x1B[0mUnknown build command: \x1B[31m" + next + "\x1B[0m");
-					process.exit(2);
+					setTimeout(function() {
+						process.exit(2);
+					}, 1);
+					return;
 				}
 			} else {
-				console.log("\x1B[32m\u2714 \x1B[0mBuild process completed!");
-				process.exit(0);
+				console.log("\x1B[32m\u2714 \x1B[0mBuild process completed in \x1B[35m" + (total_time / 1000).toFixed(3) + "\x1B[0m seconds.");
+				console.log("");
+				setTimeout(function() {
+					process.exit(0);
+				}, 1);
+				return;
 			}
 		}
 		chain();
@@ -131,6 +142,7 @@ module.exports = (function(root) {
 		} else {
 			console.log("    \x1B[32m\u2714 \x1B[0mAll tests passed!");
 		}
+		console.log("");
 	}
 
 	function unitNode(options, callback) {
@@ -204,6 +216,10 @@ module.exports = (function(root) {
 				runtime += summary.runtime;
 				processUnitTestResults(results, summary);
 			}
+			if (results === true) {
+				console.log("    \x1B[31m\u2716 \x1B[0mEnvironment " + env + " not found!");
+				console.log("");
+			}
 			if (tests.length === 0) {
 				callback(success, runtime);
 				return;
@@ -212,7 +228,7 @@ module.exports = (function(root) {
 		};
 		if (options.env.node === true) {
 			tests.push(function() {
-				console.log("Running unit tests against QUnit in \x1B[39;1mNodeJs\x1B[0m environment...");
+				console.log("    Running in \x1B[39;1mNodeJs\x1B[0m environment...");
 				unitNode(options, function(results, summary) {
 					complete("NodeJs", results, summary);
 				});
@@ -220,7 +236,7 @@ module.exports = (function(root) {
 		}
 		if (options.env.web === true) {
 			tests.push(function() {
-				console.log("Running unit tests against QUnit in \x1B[39;1mPhantomJs\x1B[0m environment...");
+				console.log("    Running in \x1B[39;1mPhantomJs\x1B[0m environment...");
 				unitPhantom(options, function(results, summary) {
 					complete("PhantomJs", results, summary);
 				});
@@ -293,15 +309,16 @@ module.exports = (function(root) {
 
 		gzip(getMinSource(options), function(data, length) {
 			sizes[options.name + ".min.js.gz"] = length;
-			fs.writeFileSync(builddir + "/.sizecache.json", JSON.stringify(sizes, true), "utf-8");
-			for (key in sizes) {
+			Object.keys(sizes).forEach(function(key) {
 				var diff = oldsizes[key] && (sizes[key] - oldsizes[key]);
 				if (diff > 0) {
 					diff = "+" + diff;
 				}
 				console.log("%s %s %s", lpad(sizes[key], 8), lpad(diff ? "(" + diff + ")" : "(-)", 8), key);
-			}
-			callback(true);
+			});
+			fs.writeFile(builddir + "/.sizecache.json", JSON.stringify(sizes, true), "utf-8", function() {
+				callback(true);
+			});
 		});
 	}
 
