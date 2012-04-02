@@ -1,14 +1,14 @@
 module.exports = {
-	name : "",
+	name : "classify",
 	pkg : "package.json",
-	version : "0.0.0",
+	version : "0.7.5",
 	wrap : {
-		copy : [],
-		intro : [],
-		outro : []
+		copy : [ "copyright.js" ],
+		intro : [ "intro.js" ],
+		outro : [ "outro.js" ]
 	},
-	src : [],
-	unit : [],
+	src : [ "core.js", "create.js", "namespace.js", "export.js" ],
+	unit : [ "core.js", "create.js", "namespace.js", "export.js" ],
 	env : {
 		node : true,
 		web : true
@@ -25,6 +25,14 @@ module.exports = {
 		lift_vars : false,
 		consolidate : false,
 		preparse : function(src) {
+			// Previously done in sed but reimplemented here due to portability issues
+			src = src.replace(/^(\s*\*\/)(.+)/m, "$1\n$2");
+
+			var proto = (/(\w+)\s*=\s*"prototype"/).exec(src);
+			if (proto) {
+				src = src.replace(/\.prototype\b/g, "[" + proto[1] + "]");
+			}
+
 			return src;
 		},
 		mangle : {
