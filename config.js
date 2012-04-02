@@ -9,6 +9,10 @@ module.exports = {
 	},
 	src : [],
 	unit : [],
+	env : {
+		node : true,
+		web : true
+	},
 	lint : {
 		expr : true,
 		node : true,

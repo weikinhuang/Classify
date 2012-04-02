@@ -110,7 +110,7 @@ module.exports = (function(root) {
 		});
 	}
 
-	function processUnitTestResults(results, summary, callback) {
+	function processUnitTestResults(results, summary) {
 		Object.keys(results).forEach(function(test) {
 			console.log("     \x1B[39;1mModule:\x1B[0m " + test);
 			results[test].forEach(function(assertion) {
@@ -131,7 +131,6 @@ module.exports = (function(root) {
 		} else {
 			console.log("    \x1B[32m\u2714 \x1B[0mAll tests passed!");
 		}
-		callback(summary.failed === 0, summary.runtime);
 	}
 
 	function unitNode(options, callback) {
@@ -151,10 +150,9 @@ module.exports = (function(root) {
 					}
 					results[msg.data.module].push(msg.data);
 				}
-			} else if (msg.event === "testDone") {
 			} else if (msg.event === "done") {
 				child.kill();
-				processUnitTestResults(results, msg.data, callback);
+				callback(results, msg.data);
 			}
 		});
 	}
@@ -162,15 +160,7 @@ module.exports = (function(root) {
 	function unitPhantom(options, callback) {
 		var child = exec.spawn("phantomjs", [ builddir + "/lib/qunit-phantom-bridge.js", builddir + "/lib/qunit-phantom-bridge.html" ], {
 			env : process.env
-		}), results = {}, index = 0;
-
-		child.stdout.setEncoding("utf-8");
-		child.stdout.on("data", function(stdout) {
-			try {
-				var msg = JSON.parse(stdout.toString());
-			} catch (e) {
-				return;
-			}
+		}), results = {}, index = 0, processEvent = function(msg) {
 			if (msg.event === "assertionDone") {
 				msg.data.index = ++index;
 				if (msg.data.result === false) {
@@ -179,10 +169,25 @@ module.exports = (function(root) {
 					}
 					results[msg.data.module].push(msg.data);
 				}
-			} else if (msg.event === "testDone") {
 			} else if (msg.event === "done") {
-				processUnitTestResults(results, msg.data, callback);
+				callback(results, msg.data);
 			}
+		};
+
+		child.stdout.setEncoding("utf-8");
+		child.stdout.on("data", function(stdout) {
+			stdout.toString().split("{\"event\"").forEach(function(data) {
+				if (!data) {
+					return;
+				}
+				try {
+					var msg = JSON.parse("{\"event\"" + data);
+					processEvent(msg);
+				} catch (e) {
+					throw e;
+					return;
+				}
+			});
 		});
 		child.on("exit", function(code) {
 			// phantomjs doesn't exist
@@ -193,14 +198,36 @@ module.exports = (function(root) {
 	}
 
 	function unit(options, callback) {
-		console.log("Running unit tests against QUnit in \x1B[39;1mNodeJs\x1B[0m environment...");
-		unitNode(options, function(success_node) {
-			console.log("");
-			console.log("Running unit tests against QUnit in \x1B[39;1mPhantomJs\x1B[0m environment...");
-			unitPhantom(options, function(success_phantom) {
-				callback(success_node && success_phantom);
+		var tests = [], success = true, runtime = 0, complete = function(env, results, summary) {
+			if (env !== null && results !== true) {
+				success = success && summary.failed === 0;
+				runtime += summary.runtime;
+				processUnitTestResults(results, summary);
+			}
+			if (tests.length === 0) {
+				callback(success, runtime);
+				return;
+			}
+			(tests.shift())();
+		};
+		if (options.env.node === true) {
+			tests.push(function() {
+				console.log("Running unit tests against QUnit in \x1B[39;1mNodeJs\x1B[0m environment...");
+				unitNode(options, function(results, summary) {
+					complete("NodeJs", results, summary);
+				});
 			});
-		});
+		}
+		if (options.env.web === true) {
+			tests.push(function() {
+				console.log("Running unit tests against QUnit in \x1B[39;1mPhantomJs\x1B[0m environment...");
+				unitPhantom(options, function(results, summary) {
+					complete("PhantomJs", results, summary);
+				});
+			});
+		}
+		// start the unit tests
+		complete(null);
 	}
 
 	function lint(options, callback) {
@@ -233,7 +260,7 @@ module.exports = (function(root) {
 			data.unused.forEach(function(e, i) {
 				var msg = "    ";
 				msg += (i === 0 ? "Unused variable: " : "                 ");
-				msg += "\"" + e.name + "\" at line " + e.line + " in " + e["function"];
+				msg += "\"\x1B[36m" + e.name + "\x1B[0m\" at line " + e.line + " in " + e["function"];
 				console.log(msg);
 			});
 		}
