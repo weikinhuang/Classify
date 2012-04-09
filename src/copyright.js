@@ -2,8 +2,8 @@
  * Classify JavaScript Library v@VERSION
  * http://www.closedinterval.com/
  *
- * Copyright 2011, Wei Kin Huang
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * Copyright 2011-2012, Wei Kin Huang
+ * Classify is freely distributable under the MIT license.
  *
  * Date: @DATE
  */
