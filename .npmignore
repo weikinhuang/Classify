@@ -1,0 +1,11 @@
+.gitattributes
+.gitignore
+.npmignore
+config.js
+make.js
+
+README.md
+
+src/
+build/
+test/
