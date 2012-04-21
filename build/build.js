@@ -53,7 +53,7 @@ module.exports = (function(root) {
 			next = steps.shift();
 			if (success === false) {
 				console.log("");
-				console.log("\x1B[31m\u2716 \x1B[0mBuild process failed on step: \x1B[31m" + current + "\x1B[0m");
+				console.log("\x1B[38;5;160m\u2716 \x1B[0mBuild process failed on step: \x1B[38;5;160m" + current + "\x1B[0m");
 				console.log("");
 				clean({}, function() {
 					setTimeout(function() {
@@ -65,7 +65,7 @@ module.exports = (function(root) {
 			if (success === true) {
 				item_time = (runtime || (+new Date() - timer));
 				total_time += item_time;
-				console.log("    Finished in \x1B[35m" + (item_time / 1000).toFixed(3) + "\x1B[0m seconds.");
+				console.log("    Finished in \x1B[38;5;171m" + (item_time / 1000).toFixed(3) + "\x1B[0m seconds.");
 				console.log("");
 			}
 			if (next != null) {
@@ -76,14 +76,14 @@ module.exports = (function(root) {
 					timer = +new Date();
 					build_opts[next](options, chain);
 				} else {
-					console.log("\x1B[31m\u2716 \x1B[0mUnknown build command: \x1B[31m" + next + "\x1B[0m");
+					console.log("\x1B[38;5;160m\u2716 \x1B[0mUnknown build command: \x1B[38;5;160m" + next + "\x1B[0m");
 					setTimeout(function() {
 						process.exit(2);
 					}, 1);
 					return;
 				}
 			} else {
-				console.log("\x1B[32m\u2714 \x1B[0mBuild process completed in \x1B[35m" + (total_time / 1000).toFixed(3) + "\x1B[0m seconds.");
+				console.log("\x1B[38;5;34m\u2714 \x1B[0mBuild process completed in \x1B[38;5;171m" + (total_time / 1000).toFixed(3) + "\x1B[0m seconds.");
 				console.log("");
 				setTimeout(function() {
 					process.exit(0);
@@ -125,22 +125,22 @@ module.exports = (function(root) {
 		Object.keys(results).forEach(function(test) {
 			console.log("     \x1B[39;1mModule:\x1B[0m " + test);
 			results[test].forEach(function(assertion) {
-				console.log("        " + (assertion.result ? "\x1B[32m\u2714" : "\x1B[31m\u2716") + " \x1B[0m\x1B[39;1mTest #\x1B[0m " + assertion.index + "/" + summary.total);
-				console.log("            " + assertion.message + " [\x1B[37m" + assertion.test + "\x1B[0m]");
+				console.log("        " + (assertion.result ? "\x1B[38;5;34m\u2714" : "\x1B[38;5;160m\u2716") + " \x1B[0m\x1B[39;1mTest #\x1B[0m " + assertion.index + "/" + summary.total);
+				console.log("            " + assertion.message + " [\x1B[38;5;248m" + assertion.test + "\x1B[0m]");
 				if (typeof assertion.expected !== "undefined") {
-					console.log("                -> \x1B[32mExpected: " + assertion.expected + "\x1B[0m");
+					console.log("                -> \x1B[38;5;34mExpected: " + assertion.expected + "\x1B[0m");
 					// if test failed, then we need to output the result
 					if (!assertion.result) {
-						console.log("                ->   \x1B[31mResult: " + assertion.actual + "\x1B[0m");
+						console.log("                ->   \x1B[38;5;160mResult: " + assertion.actual + "\x1B[0m");
 					}
 				}
 			});
 		});
 
 		if (summary.failed > 0) {
-			console.log("    \x1B[31m\u2716 \x1B[0m" + summary.failed + " / " + summary.total + " Failed");
+			console.log("    \x1B[38;5;160m\u2716 \x1B[0m" + summary.failed + " / " + summary.total + " Failed");
 		} else {
-			console.log("    \x1B[32m\u2714 \x1B[0mAll tests passed!");
+			console.log("    \x1B[38;5;34m\u2714 \x1B[0mAll tests passed!");
 		}
 		console.log("");
 	}
@@ -217,7 +217,7 @@ module.exports = (function(root) {
 				processUnitTestResults(results, summary);
 			}
 			if (results === true) {
-				console.log("    \x1B[31m\u2716 \x1B[0mEnvironment " + env + " not found!");
+				console.log("    \x1B[38;5;160m\u2716 \x1B[0mEnvironment " + env + " not found!");
 				console.log("");
 			}
 			if (tests.length === 0) {
@@ -255,12 +255,12 @@ module.exports = (function(root) {
 		var data = jshint.data();
 
 		if (jshint.errors.length > 0) {
-			console.log("    \x1B[31m\u2716 \x1B[0m" + jshint.errors.length + " Linting error(s) found.");
+			console.log("    \x1B[38;5;160m\u2716 \x1B[0m" + jshint.errors.length + " Linting error(s) found.");
 			jshint.errors.forEach(function(e) {
 				if (!e) {
 					return;
 				}
-				console.log("        Problem at line " + e.line + ":" + (e.character === true ? "EOL" : e.character) + ": \x1B[31m" + e.reason + "\x1B[0m");
+				console.log("        Problem at line " + e.line + ":" + (e.character === true ? "EOL" : e.character) + ": \x1B[38;5;160m" + e.reason + "\x1B[0m");
 				console.log("            " + (e.evidence || "").replace(/\t/g, " ").trim());
 			});
 
@@ -268,15 +268,15 @@ module.exports = (function(root) {
 			return;
 		}
 
-		console.log("    \x1B[32m\u2714 \x1B[0mCode linting passed!");
+		console.log("    \x1B[38;5;34m\u2714 \x1B[0mCode linting passed!");
 		if (data.globals && data.globals.length > 0) {
-			console.log("    Globals: \x1B[36m" + data.globals.join("\x1B[0m, \x1B[36m") + "\x1B[0m");
+			console.log("    Globals: \x1B[38;5;33m" + data.globals.join("\x1B[0m, \x1B[38;5;33m") + "\x1B[0m");
 		}
 		if (data.unused) {
 			data.unused.forEach(function(e, i) {
 				var msg = "    ";
 				msg += (i === 0 ? "Unused variable: " : "                 ");
-				msg += "\"\x1B[36m" + e.name + "\x1B[0m\" at line " + e.line + " in " + e["function"];
+				msg += "\"\x1B[38;5;73m" + e.name + "\x1B[0m\" at line " + e.line + " in " + e["function"];
 				console.log(msg);
 			});
 		}
@@ -298,7 +298,7 @@ module.exports = (function(root) {
 	}
 
 	function size(options, callback) {
-		var oldsizes = {}, sizes = {}, key = null;
+		var oldsizes = {}, sizes = {};
 		try {
 			oldsizes = JSON.parse(fs.readFileSync(builddir + "/.sizecache.json", "utf-8"));
 		} catch (e) {
