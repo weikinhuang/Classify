@@ -11,8 +11,10 @@ this.module = {};
 <script type="text/javascript">
 this.___opts = this.module.exports;
 this.module = this.___prev_module;
-delete this.___prev_module;
-console.log(this.___opts.name);
+try {
+	delete this.___prev_module;
+} catch(e) {
+}
 </script>
 <script type="text/javascript">
 document.write("<title>" + this.___opts.name + " Test Suite</title>");
@@ -33,15 +35,19 @@ document.write("<h1 id=\"qunit-header\">" + this.___opts.name + " Test Suite</h1
 var root = this;
 </script>
 <script type="text/javascript">
-this.___opts.src.forEach(function(file){
-	document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../src/' + file + '"></scr' + 'ipt>');
-});
+(function(files) {
+	for ( var i = 0, l = files.length; i < l; i++) {
+		document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../src/' + files[i] + '"></scr' + 'ipt>');
+	}
+})(this.___opts.src);
 </script>
 <script type="text/javascript" src="qunit/qunit.js"></script>
 <script type="text/javascript">
-this.___opts.unit.forEach(function(file){
-	document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../test/' + file + '"></scr' + 'ipt>');
-});
+(function(files) {
+	for ( var i = 0, l = files.length; i < l; i++) {
+		document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../test/' + files[i] + '"></scr' + 'ipt>');
+	}
+})(this.___opts.unit);
 </script>
 </body>
 </html>
