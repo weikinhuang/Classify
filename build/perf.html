@@ -11,7 +11,10 @@ this.module = {};
 <script type="text/javascript">
 this.___opts = this.module.exports;
 this.module = this.___prev_module;
-delete this.___prev_module;
+try {
+	delete this.___prev_module;
+} catch(e) {
+}
 </script>
 <script type="text/javascript">
 document.write("<title>" + this.___opts.name + " Benchmarking Tests</title>");
@@ -42,9 +45,11 @@ document.write("<h1 id=\"perf-header\">" + this.___opts.name + " Benchmarking Te
 var root = this;
 </script>
 <script type="text/javascript">
-this.___opts.src.forEach(function(file){
-	document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../src/' + file + '"></scr' + 'ipt>');
-});
+(function(files) {
+	for ( var i = 0, l = files.length; i < l; i++) {
+		document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../src/' + files[i] + '"></scr' + 'ipt>');
+	}
+})(this.___opts.src);
 </script>
 <script type="text/javascript" src="perf/benchmark.js"></script>
 <script type="text/javascript">
@@ -52,9 +57,11 @@ var ___benchmarks = new Benchmark.Suite();
 </script>
 <script type="text/javascript" src="perf/perf.js"></script>
 <script type="text/javascript">
-this.___opts.perf.forEach(function(file){
-	document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../perf/' + file + '"></scr' + 'ipt>');
-});
+(function(files) {
+	for ( var i = 0, l = files.length; i < l; i++) {
+		document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../perf/' + files[i] + '"></scr' + 'ipt>');
+	}
+})(this.___opts.perf);
 </script>
 <script type="text/javascript">
 ___benchmarks.run({
