@@ -9,6 +9,7 @@ module.exports = {
 	},
 	src : [ "core.js", "create.js", "namespace.js", "export.js" ],
 	unit : [ "core.js", "create.js", "namespace.js", "export.js" ],
+	perf : [],
 	env : {
 		node : true,
 		web : true
