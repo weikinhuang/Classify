@@ -52,7 +52,7 @@ module.exports = (function(root) {
 	}
 
 	function unitPhantom(options, callback) {
-		var child = exec.spawn("phantomjs", [ options.dir.build + "/lib/qunit-phantom-bridge.js", options.dir.build + "/lib/qunit-phantom-bridge.html" ], {
+		var child = exec.spawn("phantomjs", [ options.dir.build + "/lib/phantom-bridge.js", options.dir.build + "/lib/qunit-phantom-bridge.html" ], {
 			env : process.env
 		}), results = {}, index = 0, processEvent = function(msg) {
 			if (msg.event === "assertionDone") {

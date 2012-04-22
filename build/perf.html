@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript">
+var root = this;
+this.___prev_module = this.module;
+this.module = {};
+</script>
+<script type="text/javascript" src="../config.js"></script>
+<script type="text/javascript">
+this.___opts = this.module.exports;
+this.module = this.___prev_module;
+delete this.___prev_module;
+console.log(this.___opts.name);
+</script>
+<script type="text/javascript">
+document.write("<title>" + this.___opts.name + " Benchmarking Tests</title>");
+</script>
+<link rel="stylesheet" media="screen" href="perf/perf.css" />
+</head>
+
+<body>
+<script type="text/javascript">
+document.write("<h1 id=\"perf-header\">" + this.___opts.name + " Benchmarking Tests</h1>");
+</script>
+
+<table id="perf-container">
+	<thead>
+		<tr class="perf-header">
+			<th colspan="3" id="perf-status">Initializing...</th>
+		</tr>
+		<tr class="perf-sub-header">
+			<th>Name</th>
+			<th>Ops/sec</th>
+			<th>Test</th>
+		</tr>
+	</thead>
+	<tbody id="perf-tests"></tbody>
+</table>
+
+<script type="text/javascript">
+var root = this;
+</script>
+<script type="text/javascript">
+this.___opts.src.forEach(function(file){
+	document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../src/' + file + '"></scr' + 'ipt>');
+});
+</script>
+<script type="text/javascript" src="perf/benchmark.js"></script>
+<script type="text/javascript">
+var ___benchmarks = new Benchmark.Suite();
+</script>
+<script type="text/javascript" src="perf/perf.js"></script>
+<script type="text/javascript">
+this.___opts.perf.forEach(function(file){
+	document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../perf/' + file + '"></scr' + 'ipt>');
+});
+</script>
+<script type="text/javascript">
+___benchmarks.run({
+	async : true,
+	queued: true
+});
+</script>
+</body>
+</html>

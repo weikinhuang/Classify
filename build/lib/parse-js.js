@@ -337,6 +337,10 @@ function tokenizer($TEXT) {
                 if (!is_comment) {
                         ret.comments_before = S.comments_before;
                         S.comments_before = [];
+                        // make note of any newlines in the comments that came before
+                        for (var i = 0, len = ret.comments_before.length; i < len; i++) {
+                                ret.nlb = ret.nlb || ret.comments_before[i].nlb;
+                        }
                 }
                 S.newline_before = false;
                 return ret;
@@ -684,13 +688,14 @@ NodeWithToken.prototype.toString = function() { return this.name; };
 function parse($TEXT, exigent_mode, embed_tokens) {
 
         var S = {
-                input       : typeof $TEXT == "string" ? tokenizer($TEXT, true) : $TEXT,
-                token       : null,
-                prev        : null,
-                peeked      : null,
-                in_function : 0,
-                in_loop     : 0,
-                labels      : []
+                input         : typeof $TEXT == "string" ? tokenizer($TEXT, true) : $TEXT,
+                token         : null,
+                prev          : null,
+                peeked        : null,
+                in_function   : 0,
+                in_directives : true,
+                in_loop       : 0,
+                labels        : []
         };
 
         S.token = next();
@@ -709,6 +714,9 @@ function parse($TEXT, exigent_mode, embed_tokens) {
                 } else {
                         S.token = S.input();
                 }
+                S.in_directives = S.in_directives && (
+                        S.token.type == "string" || is("punc", ";")
+                );
                 return S.token;
         };
 
@@ -786,10 +794,10 @@ function parse($TEXT, exigent_mode, embed_tokens) {
                 }
                 switch (S.token.type) {
                     case "string":
-                        if (S.token.value == "use strict") {
-                                next();
-                                return as("use-strict");
-                        }
+                        var dir = S.in_directives, stat = simple_statement();
+                        if (dir && stat[1][0] == "string" && !is("punc", ","))
+                            return as("directive", stat[1][1]);
+                        return stat;
                     case "num":
                     case "regexp":
                     case "operator":
@@ -965,6 +973,7 @@ function parse($TEXT, exigent_mode, embed_tokens) {
                           (function(){
                                   ++S.in_function;
                                   var loop = S.in_loop;
+                                  S.in_directives = true;
                                   S.in_loop = 0;
                                   var a = block_();
                                   --S.in_function;

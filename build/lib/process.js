@@ -203,8 +203,8 @@ function ast_walker() {
                 "atom": function(name) {
                         return [ this[0], name ];
                 },
-                "use-strict": function() {
-                        return this;
+                "directive": function(dir) {
+                        return [ this[0], dir ];
                 }
         };
 
@@ -277,6 +277,7 @@ function Scope(parent) {
         this.refs = {};         // names referenced from this scope
         this.uses_with = false; // will become TRUE if with() is detected in this or any subscopes
         this.uses_eval = false; // will become TRUE if eval() is detected in this or any subscopes
+        this.directives = [];   // directives activated from this scope
         this.parent = parent;   // parent scope
         this.children = [];     // sub-scopes
         if (parent) {
@@ -379,6 +380,9 @@ Scope.prototype = {
                                 this.names[name] = type || "var";
                         return name;
                 }
+        },
+        active: function(dir) {
+                return member(dir, this.directives) || this.parent && this.parent.active(dir);
         }
 };
 
@@ -607,6 +611,9 @@ function ast_mangle(ast, options) {
                         return with_scope(self.scope, function(){
                                 return [ self[0], MAP(body, walk) ];
                         });
+                },
+                "directive": function() {
+                        return MAP.at_top(this);
                 }
         }, function() {
                 return walk(ast_add_scope(ast));
@@ -1004,7 +1011,7 @@ function ast_squeeze(ast, options) {
                 keep_comps  : true
         });
 
-        var w = ast_walker(), walk = w.walk;
+        var w = ast_walker(), walk = w.walk, scope;
 
         function negate(c) {
                 var not_c = [ "unary-prefix", "!", c ];
@@ -1067,7 +1074,17 @@ function ast_squeeze(ast, options) {
         };
 
         function _lambda(name, args, body) {
-                return [ this[0], name, args, tighten(body, "lambda") ];
+                return [ this[0], name, args, with_scope(body.scope, function() {
+                        return tighten(body, "lambda");
+                }) ];
+        };
+
+        function with_scope(s, cont) {
+                var _scope = scope;
+                scope = s;
+                var ret = cont();
+                scope = _scope;
+                return ret;
         };
 
         // this function does a few things:
@@ -1286,7 +1303,9 @@ function ast_squeeze(ast, options) {
                 },
                 "if": make_if,
                 "toplevel": function(body) {
-                        return [ "toplevel", tighten(body) ];
+                        return with_scope(this.scope, function() {
+                            return [ "toplevel", tighten(body) ];
+                        });
                 },
                 "switch": function(expr, body) {
                         var last = body.length - 1;
@@ -1357,11 +1376,17 @@ function ast_squeeze(ast, options) {
                                 return [ this[0], rvalue[1], lvalue, rvalue[3] ]
                         }
                         return [ this[0], op, lvalue, rvalue ];
+                },
+                "directive": function(dir) {
+                        if (scope.active(dir))
+                            return [ "block" ];
+                        scope.directives.push(dir);
+                        return [ this[0], dir ];
                 }
         }, function() {
                 for (var i = 0; i < 2; ++i) {
                         ast = prepare_ifs(ast);
-                        ast = walk(ast);
+                        ast = walk(ast_add_scope(ast));
                 }
                 return ast;
         });
@@ -1550,7 +1575,7 @@ function gen_code(ast, options) {
                 "string": encode_string,
                 "num": make_num,
                 "name": make_name,
-                "debugger": function(){ return "debugger" },
+                "debugger": function(){ return "debugger;" },
                 "toplevel": function(statements) {
                         return make_block_statements(statements)
                                 .join(newline + newline);
@@ -1751,6 +1776,7 @@ function gen_code(ast, options) {
                         return obj_needs_parens ? "(" + out + ")" : out;
                 },
                 "regexp": function(rx, mods) {
+                        if (options.ascii_only) rx = to_ascii(rx);
                         return "/" + rx + "/" + mods;
                 },
                 "array": function(elements) {
@@ -1775,8 +1801,8 @@ function gen_code(ast, options) {
                 "atom": function(name) {
                         return make_name(name);
                 },
-                "use-strict": function() {
-                        return make_string("use strict") + ";";
+                "directive": function(dir) {
+                        return make_string(dir) + ";";
                 }
         }, function(){ return make(ast) });
 
@@ -1837,7 +1863,7 @@ function gen_code(ast, options) {
                                 return must_has_semicolon(node[3]); // dive into the `else' branch
                         }
                         return must_has_semicolon(node[2]); // dive into the `then' branch
-                    case "use-strict":
+                    case "directive":
                         return true;
                 }
         };
