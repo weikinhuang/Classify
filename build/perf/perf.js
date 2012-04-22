@@ -12,6 +12,8 @@
 	var table = document.getElementById("perf-tests");
 	var statusElem = document.getElementById("perf-status");
 
+	var textProp = document.all ? "innerText" : "textContent";
+
 	tests.on("add", function(e) {
 		var test = e.target;
 		var tr = document.createElement("tr");
@@ -38,9 +40,9 @@
 		tdBody.className = "test-body";
 		tdStatus.className = "test-status";
 
-		aName.innerText = test.name;
-		preBody.innerText = (test.fn.toSource ? test.fn.toSource() : test.fn.toString()).replace(/\t/g, "    ").replace(/^function\s*\(.*\)\s*\{\s*[\n\r]+/, "").replace(/\s*[\n\r]+}\s*$/, "").replace(/^\    /gm, "");
-		tdStatus.innerText = "Ready";
+		aName[textProp] = test.name;
+		preBody[textProp] = test.fn.toString().replace(/\t/g, "    ").replace(/^function\s*\(.*\)\s*\{\s*[\n\r]+/, "").replace(/\s*[\n\r]+}\s*$/, "").replace(/^\    /gm, "");
+		tdStatus[textProp] = "Ready";
 
 		tr.appendChild(tdName);
 		tr.appendChild(tdStatus);
@@ -50,8 +52,8 @@
 		// bind events
 		test.on("start", function(e) {
 			tr.className = "";
-			statusElem.innerText = "Starting: " + this.name;
-			tdStatus.innerText = "Running...";
+			statusElem[textProp] = "Starting: " + this.name;
+			tdStatus[textProp] = "Running...";
 			i = 0;
 		}).on("cycle", function(e) {
 			var size = ++i;
@@ -59,7 +61,7 @@
 		}).on("error", function(e) {
 			tr.className = "test-error";
 		}).on("reset", function(e) {
-			tdStatus.innerText = "Ready";
+			tdStatus[textProp] = "Ready";
 		}).on("complete", function(e) {
 			if (this.error) {
 				tdStatus.innerHTML = this.error.message;
@@ -71,8 +73,8 @@
 	});
 
 	tests.on("complete", function() {
-		statusElem.innerText = "All tests completed!";
+		statusElem[textProp] = "All tests completed!";
 	}).on("reset", function() {
-		statusElem.innerText = "Initializing...";
+		statusElem[textProp] = "Initializing...";
 	});
 })(this, ___benchmarks);
