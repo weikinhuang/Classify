@@ -25,7 +25,15 @@ var sandbox = {
 	setInterval : setInterval,
 	clearTimeout : clearTimeout,
 	clearInterval : clearInterval,
-	console : console
+	console : console,
+	Object : Object,
+	Function : Function,
+	Boolean : Boolean,
+	Number : Number,
+	String : String,
+	RegExp : RegExp,
+	Array : Array,
+	Date : Date
 };
 // window is a circualr reference
 sandbox.window = sandbox;

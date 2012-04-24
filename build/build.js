@@ -4,10 +4,30 @@ module.exports = (function(root) {
 	// path utilities
 	path = require("path"),
 	// quick reference to root dir
-	workdir = path.dirname(__dirname);
+	workdir = path.dirname(__dirname),
+	// default options
+	defaultOptions = {
+		name : "build",
+		pkg : "package.json",
+		version : "0.0.0",
+		wrap : {},
+		src : [],
+		unit : [],
+		perf : [],
+		env : {},
+		lint : {},
+		min : {},
+		build : "clean concat lint unit min size"
+	};
 
 	// function to init the parameters
 	function processor(steps, options) {
+		// merge the default options into the options array
+		Object.keys(defaultOptions).forEach(function(key) {
+			if (options[key] == null) {
+				options[key] = defaultOptions[key];
+			}
+		});
 		var exclude = [], i, l;
 		for (i = 0, l = steps.length; i < l; i++) {
 			if (/^-/.test(steps[i])) {
