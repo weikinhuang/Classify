@@ -26,7 +26,7 @@ module.exports = (function(root) {
 		callback.print("Checking sizes against previous build...");
 		var oldsizes = {}, sizes = {};
 		try {
-			oldsizes = JSON.parse(fs.readFileSync(source.builddir + "/.sizecache.json", "utf-8"));
+			oldsizes = JSON.parse(fs.readFileSync(options.dir.build + "/.sizecache.json", "utf-8"));
 		} catch (e) {
 		}
 

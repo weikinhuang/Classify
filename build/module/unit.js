@@ -22,7 +22,7 @@ module.exports = (function(root) {
 		if (summary.failed > 0) {
 			callback.log("\x1B[38;5;160m\u2716 \x1B[0m" + summary.failed + " / " + summary.total + " Failed");
 		} else {
-			callback.log("\x1B[38;5;34m\u2714 \x1B[0mAll tests passed!");
+			callback.log("\x1B[38;5;34m\u2714 \x1B[0mAll tests [" + summary.passed + " / " + summary.total + "] passed!");
 		}
 		callback.log("");
 	}
