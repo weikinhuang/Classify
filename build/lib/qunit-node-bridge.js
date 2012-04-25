@@ -111,17 +111,26 @@ sandbox.QUnit.done((function() {
 	};
 })());
 
-// load source and tests into the sandbox
+//load source and tests into the sandbox
 function load(src, root) {
-	// keep appending the source to the sandbox
+	var files = []
+	// build up the source file
 	src.forEach(function(file) {
 		try {
-			vm.runInNewContext(fs.readFileSync(root + file, "utf-8"), sandbox, qunitPath);
+			files.push(fs.readFileSync(root + file, "utf-8"));
 		} catch (e) {
 			console.log(e.message + " in " + file);
 			process.exit(1);
 		}
 	});
+
+	// run the source in the sandbox
+	try {
+		vm.runInNewContext(files.join("\n"), sandbox, qunitPath);
+	} catch (e) {
+		console.log(e.message);
+		process.exit(1);
+	}
 }
 
 // load dependencies
