@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.7.5
+ * Classify JavaScript Library v0.8.0
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Thu, 26 Apr 2012 00:30:08 GMT
+ * Date: Thu, 26 Apr 2012 01:02:07 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -160,6 +160,20 @@ base = (function() {
 	fn.__isclass_ = true;
 	return fn;
 })(),
+// wraps a function so that the "this.parent" is bound to the function
+wrapParentProperty = function(parentPrototype, property) {
+	return store(function() {
+		var tmp = this.parent, ret;
+		this.parent = parentPrototype;
+		ret = property.apply(this, arguments);
+		if (tmp === undefined) {
+			delete this.parent;
+		} else {
+			this.parent = tmp;
+		}
+		return ret;
+	}, property);
+},
 // adds a property to an existing class taking into account parent
 addProperty = function(klass, parent, name, property) {
 	// we don't want to re-add the core javascript properties, it's redundant
@@ -185,34 +199,14 @@ addProperty = function(klass, parent, name, property) {
 	} else {
 		var parent_prototype = parent.prototype[name], self_prototype = klass.prototype;
 		// Else this is not a prefixed static property, so we're assigning it to the prototype
-		self_prototype[name] = isFunction(property) && isFunction(parent_prototype) ? store(function() {
-			var tmp = this.parent, ret;
-			this.parent = parent_prototype;
-			ret = property.apply(this, arguments);
-			if (tmp === undefined) {
-				delete this.parent;
-			} else {
-				this.parent = tmp;
-			}
-			return ret;
-		}, property) : property;
+		self_prototype[name] = isFunction(property) && isFunction(parent_prototype) ? wrapParentProperty(parent_prototype, property) : property;
 
 		// Wrap all child implementation with the parent wrapper
 		if (isFunction(property)) {
 			each(klass.subclass, function(k) {
 				// add only if it's not already wrapped
 				if (isFunction(k.prototype[name]) && !k.prototype[name].__original_) {
-					k.prototype[name] = store(function() {
-						var tmp = this.parent, ret;
-						this.parent = self_prototype;
-						ret = property.apply(this, arguments);
-						if (tmp === undefined) {
-							delete this.parent;
-						} else {
-							this.parent = tmp;
-						}
-						return ret;
-					}, k.prototype[name]);
+					k.prototype[name] = wrapParentProperty(self_prototype, k.prototype[name]);
 				}
 			});
 		}
@@ -759,7 +753,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.7.5",
+	version : "0.8.0",
 
 	// direct access functions
 	create : create,
