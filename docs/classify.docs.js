@@ -209,6 +209,16 @@ Classify.Class.prototype.self = Classify.Class;
 Classify.Class.prototype.init = function() {
 	return new Classify.Class();
 };
+/**
+ * Internal reference property for methods that override a parent method, allow for access to the parent version of the function
+ *
+ * @memberOf Classify.Class
+ * @returns {Object}
+ * @type {Object}
+ */
+Classify.Class.prototype.parent = function() {
+	return new Object();
+};
 
 /**
  * Namespace container that hold a tree of classes

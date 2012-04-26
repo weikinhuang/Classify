@@ -66,7 +66,7 @@ addProperty = function(klass, parent, name, property) {
 			each(klass.subclass, function(k) {
 				// add only if it's not already wrapped
 				if (isFunction(k.prototype[name]) && !k.prototype[name].__original_) {
-					k.prototype[name] = wrapParentProperty(self_prototype, k.prototype[name]);
+					k.prototype[name] = wrapParentProperty(self_prototype[name], k.prototype[name]);
 				}
 			});
 		}

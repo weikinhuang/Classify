@@ -5,7 +5,7 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Thu, 26 Apr 2012 21:01:52 GMT
+ * Date: Thu, 26 Apr 2012 22:27:57 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -206,7 +206,7 @@ addProperty = function(klass, parent, name, property) {
 			each(klass.subclass, function(k) {
 				// add only if it's not already wrapped
 				if (isFunction(k.prototype[name]) && !k.prototype[name].__original_) {
-					k.prototype[name] = wrapParentProperty(self_prototype, k.prototype[name]);
+					k.prototype[name] = wrapParentProperty(self_prototype[name], k.prototype[name]);
 				}
 			});
 		}

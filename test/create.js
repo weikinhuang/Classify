@@ -374,7 +374,7 @@ QUnit.test("adding new properties", function() {
 			return 3;
 		},
 		h : function() {
-			return this.parent.h();
+			return this.parent();
 		}
 	});
 
