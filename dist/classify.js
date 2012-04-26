@@ -5,7 +5,7 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Thu, 26 Apr 2012 02:11:17 GMT
+ * Date: Thu, 26 Apr 2012 21:01:52 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -382,7 +382,7 @@ var create = function() {
 	klass.addStaticProperty = function(name, property) {
 		return klass.addProperty(name, property, "__static_");
 	};
-	klass.removeStaticProperty = function(name, property) {
+	klass.removeStaticProperty = function(name) {
 		return klass.removeProperty("__static_" + name);
 	};
 	klass.addObservableProperty = function(name, property) {
@@ -641,6 +641,7 @@ var Namespace = create({
 	},
 	load : function(name, callback) {
 		callback && callback(this.ref[name] || null);
+		return this;
 	},
 	setAutoloader : function(callback) {
 		// make sure the callback is a function

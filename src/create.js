@@ -242,7 +242,7 @@ var create = function() {
 	klass.addStaticProperty = function(name, property) {
 		return klass.addProperty(name, property, "__static_");
 	};
-	klass.removeStaticProperty = function(name, property) {
+	klass.removeStaticProperty = function(name) {
 		return klass.removeProperty("__static_" + name);
 	};
 	klass.addObservableProperty = function(name, property) {

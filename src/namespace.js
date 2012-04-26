@@ -140,6 +140,7 @@ var Namespace = create({
 	},
 	load : function(name, callback) {
 		callback && callback(this.ref[name] || null);
+		return this;
 	},
 	setAutoloader : function(callback) {
 		// make sure the callback is a function
