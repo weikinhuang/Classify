@@ -5,7 +5,7 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Thu, 26 Apr 2012 01:02:07 GMT
+ * Date: Thu, 26 Apr 2012 02:11:17 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -410,7 +410,7 @@ var create = function() {
 	klass.__isclass_ = true;
 	return klass;
 };
-// Observer class that handles an abstraction layer to the 
+// Observer class that handles an abstraction layer to class properties (getter and setter methods)
 var Observer = create({
 	init : function(context, name, value) {
 		// an Observer can only be instantiated with an instance of an object
@@ -448,9 +448,12 @@ var Observer = create({
 		}
 		// setter method is called for return value to set if specified
 		this.value = this.setter ? this.setter.call(this.context, value, original) : value;
-		// fire off all event listeners in the order they were added
-		for (; i < l; i++) {
-			this.events[i].call(this.context, value, original);
+		// only fire event listeners if the value has changed
+		if (this.value !== original) {
+			// fire off all event listeners in the order they were added
+			for (; i < l; i++) {
+				this.events[i].call(this.context, value, original);
+			}
 		}
 		return this.context;
 	},
@@ -757,6 +760,7 @@ extend(Classify, {
 
 	// direct access functions
 	create : create,
+	Namespace : Namespace,
 	getNamespace : getNamespace,
 	destroyNamespace : destroyNamespace,
 	testNamespace : testNamespace,

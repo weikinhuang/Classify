@@ -61,6 +61,7 @@ extend(Classify, {
 
 	// direct access functions
 	create : create,
+	Namespace : Namespace,
 	getNamespace : getNamespace,
 	destroyNamespace : destroyNamespace,
 	testNamespace : testNamespace,

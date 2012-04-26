@@ -29,7 +29,7 @@ QUnit.test("basic observer creation", function() {
 
 	try {
 		var observer2 = new Observer(null, "z", val);
-		testinstance.z = observer;
+		testinstance.z = observer2;
 	} catch (e) {
 		QUnit.ok(!!e, "Observer null context throws error on instantiation.");
 	}
@@ -160,7 +160,7 @@ QUnit.test("observer readonly with 'writable' functionality", function() {
 	});
 	testinstance.z = observer;
 	// set the value
-	observer.set(newvalue)
+	observer.set(newvalue);
 	// check that the internal value was propertly set
 	QUnit.equal(observer.get(), newvalue, "The internal value of the observer was modified by the setter when writable.");
 
@@ -171,7 +171,7 @@ QUnit.test("observer readonly with 'writable' functionality", function() {
 	});
 	testinstance.y = observer2;
 	// set the value
-	observer2.set(newvalue)
+	observer2.set(newvalue);
 	// check that the internal value was not modified
 	QUnit.equal(observer2.get(), val, "The internal value of the observer was not modified by the setter when not writable.");
 
@@ -184,7 +184,7 @@ QUnit.test("observer readonly with 'writable' functionality", function() {
 	// adjust the writable flag
 	observer3.writable = false;
 	// set the value
-	observer3.set(newvalue)
+	observer3.set(newvalue);
 	// check that the internal value was not modified
 	QUnit.equal(observer2.get(), val, "The internal value of the observer was not modified by the setter when not writable.");
 });
@@ -264,6 +264,17 @@ QUnit.test("observer with bound setter event listeners", function() {
 
 	// trigger the event listeners
 	observer.set(newvalue);
+
+	// create observer with writable flag true
+	var observer2 = new Observer(testinstance, "y", val);
+
+	// add event listeners
+	observer2.addListener(function(value, original) {
+		throw new Error("Unmodified value should not call this listener");
+	});
+
+	// attempt to trigger the event listeners
+	observer2.set(val);
 
 	// get the list of event listeners
 	var listeners = observer.listeners();

@@ -1,4 +1,4 @@
-// Observer class that handles an abstraction layer to the 
+// Observer class that handles an abstraction layer to class properties (getter and setter methods)
 var Observer = create({
 	init : function(context, name, value) {
 		// an Observer can only be instantiated with an instance of an object
@@ -36,9 +36,12 @@ var Observer = create({
 		}
 		// setter method is called for return value to set if specified
 		this.value = this.setter ? this.setter.call(this.context, value, original) : value;
-		// fire off all event listeners in the order they were added
-		for (; i < l; i++) {
-			this.events[i].call(this.context, value, original);
+		// only fire event listeners if the value has changed
+		if (this.value !== original) {
+			// fire off all event listeners in the order they were added
+			for (; i < l; i++) {
+				this.events[i].call(this.context, value, original);
+			}
 		}
 		return this.context;
 	},
