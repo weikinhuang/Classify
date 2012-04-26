@@ -1,11 +1,12 @@
 QUnit.module("core");
 
 QUnit.test("basic requirements", function() {
-	QUnit.expect(58);
+	QUnit.expect(61);
 	var test, empty;
 	// test basic properties of the base Object
 	QUnit.ok(Object.prototype, "Object prototype exists");
 	QUnit.ok(Object.prototype.toString, "Object prototype toString exists");
+	QUnit.ok(Object.prototype.hasOwnProperty, "Object prototype hasOwnProperty exists");
 
 	// test basic internal functions
 
@@ -93,6 +94,10 @@ QUnit.test("basic requirements", function() {
 	(function() {
 		QUnit.deepEqual(argsToArray(arguments), [ 1, 2, 3 ], "converted arguments array");
 	})(1, 2, 3);
+	
+	// test indexOf
+	QUnit.equal(indexOf([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 11), -1, "Missing array element returns -1.");
+	QUnit.equal(indexOf([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 5), 4, "Found array element at proper index.");
 
 	// test storing a original function into a new function
 	var fn = function() {

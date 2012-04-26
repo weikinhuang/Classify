@@ -20,6 +20,8 @@ enumerationLength = enumeratedKeys.length,
 objectPrototype = Object.prototype,
 // quick reference to the toString prototype
 toString = objectPrototype.toString,
+// quick reference to the toString prototype
+hasOwn = objectPrototype.hasOwnProperty,
 // test if object is a function
 isFunction = function(o) {
 	return typeof o === "function";
@@ -55,6 +57,18 @@ toArray = function(o) {
 // create ability to convert the arguments object to an array
 argsToArray = function(o) {
 	return Array.prototype.slice.call(o, 0);
+},
+// test if an item is in a array
+indexOf = Array.prototype.indexOf ? function(array, item) {
+	return array.indexOf(item);
+} : function(array, item) {
+	var i = 0, length = array.length;
+	for (; i < length; i++) {
+		if (array[i] === item) {
+			return i;
+		}
+	}
+	return -1;
 },
 // ability to store the original definition into the new function definition
 store = function(fn, base) {

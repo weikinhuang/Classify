@@ -186,53 +186,6 @@ QUnit.test("static properties", function() {
 	QUnit.equal((new test()).e(), 2, "Reading static property by using self within a class");
 });
 
-QUnit.test("adding new properties", function() {
-	QUnit.expect(6);
-	// testing class for known properties in every defined class
-	var test = create({});
-
-	// adding properties to the prototype
-	test.prototype.b = function() {
-		return 1;
-	};
-	QUnit.equal((new test()).b(), 1, "invoking a method added using prototype method");
-	test.addProperty("c", function() {
-		return 1;
-	});
-	QUnit.equal((new test()).c(), 1, "invoking a method added using addProperty method");
-
-	// adding properties to the object
-	test.b = function() {
-		return 1;
-	};
-	QUnit.equal(test.b(), 1, "invoking a method added using classical method");
-	test.addStaticProperty("c", function() {
-		return 1;
-	});
-	QUnit.equal(test.c(), 1, "invoking a method added using addStaticProperty method");
-
-	// test that references is proper
-	test.addStaticProperty("d", function() {
-		QUnit.equal(this, test, "assuring the 'this' reference of a method added using addStaticProperty method is the constructor");
-		return 1;
-	});
-	test.c();
-
-	// test adding multiple properties
-	test.addProperty({
-		e : function() {
-			return 1;
-		}
-	});
-	QUnit.equal((new test()).e(), 1, "adding multiple properties to the class with add property");
-	test.addStaticProperty({
-		f : function() {
-			return 2;
-		}
-	});
-	QUnit.equal(test.f(), 2, "adding multiple static properties to the class with addStaticProperty");
-});
-
 QUnit.test("extending classes using inheritance", function() {
 	QUnit.expect(25);
 	// testing class for known properties in every defined class
@@ -367,6 +320,135 @@ QUnit.test("extending classes using inheritance", function() {
 		}
 	});
 	triple();
+});
+
+QUnit.test("adding new properties", function() {
+	QUnit.expect(8);
+	// testing class for known properties in every defined class
+	var test = create({});
+
+	// adding properties to the prototype
+	test.prototype.b = function() {
+		return 1;
+	};
+	QUnit.equal((new test()).b(), 1, "invoking a method added using prototype method");
+	test.addProperty("c", function() {
+		return 1;
+	});
+	QUnit.equal((new test()).c(), 1, "invoking a method added using addProperty method");
+
+	// adding properties to the object
+	test.b = function() {
+		return 1;
+	};
+	QUnit.equal(test.b(), 1, "invoking a method added using classical method");
+	test.addStaticProperty("c", function() {
+		return 1;
+	});
+	QUnit.equal(test.c(), 1, "invoking a method added using addStaticProperty method");
+
+	// test that references is proper
+	test.addStaticProperty("d", function() {
+		QUnit.equal(this, test, "assuring the 'this' reference of a method added using addStaticProperty method is the constructor");
+		return 1;
+	});
+	test.c();
+
+	// test adding multiple properties
+	test.addProperty({
+		e : function() {
+			return 1;
+		}
+	});
+	QUnit.equal((new test()).e(), 1, "adding multiple properties to the class with add property");
+	test.addStaticProperty({
+		f : function() {
+			return 2;
+		}
+	});
+	QUnit.equal(test.f(), 2, "adding multiple static properties to the class with addStaticProperty");
+
+	// test adding properties to parent classes
+	var subclass = create(test, {
+		g : function() {
+			return 3;
+		},
+		h : function() {
+			return this.parent.h();
+		}
+	});
+
+	test.addProperty("i", function() {
+		return 4;
+	});
+	QUnit.equal((new subclass()).i(), 4, "invoking a method added using to parent prototype after definition.");
+
+	test.addProperty("h", function() {
+		return 5;
+	});
+	QUnit.equal((new subclass()).h(), 5, "invoking a method added using to parent prototype after definition with existing child method.");
+});
+
+QUnit.test("removing existing properties", function() {
+	QUnit.expect(7);
+	// testing class for known properties in every defined class
+	var test = create({
+		__static_z : function() {
+			return 1;
+		},
+		__static_y : 1,
+		x : 1,
+		a : function() {
+			return 1;
+		}
+	});
+
+	// remove a static function
+	test.removeStaticProperty("z");
+	QUnit.equal(test.z, undefined, "static function removed from class.");
+
+	// remove a static value
+	test.removeStaticProperty("y");
+	QUnit.equal(test.y, undefined, "static property removed from class.");
+
+	// remove a prototype value
+	test.removeProperty("x");
+	QUnit.equal((new test()).x, undefined, "instance property removed from class prototype.");
+
+	// remove a prototype function
+	test.removeProperty("a");
+	QUnit.equal((new test()).a, undefined, "instance function removed from class prototype.");
+
+	var test2 = create({
+		x : 1,
+		a : function() {
+			return 1;
+		},
+		b : function() {
+			return 2;
+		}
+	});
+
+	// test removing properties to parent classes
+	var subclass = create(test2, {
+		x : 2,
+		b : function() {
+			QUnit.equal(this.parent, undefined, "parent reference removed when parent function is removed");
+		},
+		c : function() {
+			return 3;
+		}
+	});
+	// remove overriden property in parent
+	test2.removeProperty("x");
+	QUnit.equal((new subclass()).x, 2, "Removing parent property doesn't remove child property if defined in child.");
+
+	test2.removeProperty("a");
+	QUnit.equal((new subclass()).a, undefined, "Removing parent function removes it from child prototype chain.");
+
+	test2.removeProperty("b");
+	// trigger test for removing parent function overriden in child
+	(new subclass()).b();
 });
 
 QUnit.test("extending core Javascript objects using inheritance", function() {

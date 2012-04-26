@@ -1,14 +1,14 @@
 module.exports = {
 	name : "classify",
 	pkg : "package.json",
-	version : "0.7.5",
+	version : "0.8.0",
 	wrap : {
 		copy : [ "copyright.js" ],
 		intro : [ "intro.js" ],
 		outro : [ "outro.js" ]
 	},
-	src : [ "core.js", "create.js", "namespace.js", "export.js" ],
-	unit : [ "core.js", "create.js", "namespace.js", "export.js" ],
+	src : [ "core.js", "create.js", "observer.js", "namespace.js", "export.js" ],
+	unit : [ "core.js", "create.js", "observer.js", "namespace.js", "export.js" ],
 	perf : [],
 	env : {
 		node : true,
@@ -56,5 +56,5 @@ module.exports = {
 			inline_script : false
 		}
 	},
-	build : "clean concat lint unit min size"
+	build : "clean lint unit concat min size"
 };

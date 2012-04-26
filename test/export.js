@@ -1,7 +1,7 @@
 QUnit.module("export");
 
 QUnit.test("check globally accessable Classify object", function() {
-	QUnit.expect(6);
+	QUnit.expect(7);
 	QUnit.ok(Classify.__isclass_, "Classify global object is a class");
 
 	QUnit.deepEqual(Classify.create, create, "Create functionality is bound to the static instance of the class");
@@ -9,6 +9,7 @@ QUnit.test("check globally accessable Classify object", function() {
 	QUnit.equal(Classify.destroyNamespace, destroyNamespace, "destroy namespace functionality is bound to the static instance of the class");
 	QUnit.equal(Classify.testNamespace, testNamespace, "test namespaces is bound to the static instance of the class");
 	QUnit.equal(Classify.getGlobalNamespace, getGlobalNamespace, "get global namespace functionality is bound to the static instance of the class");
+	QUnit.equal(Classify.Observer, Observer, "Observer class is bound to the static instance of the class");
 });
 
 QUnit.test("check globally accessable Classify object's utility functions", function() {

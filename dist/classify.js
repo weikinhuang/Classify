@@ -5,7 +5,7 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Fri Mar  2 22:02:33 EST 2012
+ * Date: Thu, 26 Apr 2012 00:30:08 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -31,6 +31,8 @@ enumerationLength = enumeratedKeys.length,
 objectPrototype = Object.prototype,
 // quick reference to the toString prototype
 toString = objectPrototype.toString,
+// quick reference to the toString prototype
+hasOwn = objectPrototype.hasOwnProperty,
 // test if object is a function
 isFunction = function(o) {
 	return typeof o === "function";
@@ -66,6 +68,18 @@ toArray = function(o) {
 // create ability to convert the arguments object to an array
 argsToArray = function(o) {
 	return Array.prototype.slice.call(o, 0);
+},
+// test if an item is in a array
+indexOf = Array.prototype.indexOf ? function(array, item) {
+	return array.indexOf(item);
+} : function(array, item) {
+	var i = 0, length = array.length;
+	for (; i < length; i++) {
+		if (array[i] === item) {
+			return i;
+		}
+	}
+	return -1;
 },
 // ability to store the original definition into the new function definition
 store = function(fn, base) {
@@ -123,8 +137,13 @@ extend = function() {
 		});
 	});
 	return base;
-};// regex for testing if property is static
+};
+// regex for testing if property is static
 var staticRegexp = /^__static_/,
+// regex for testing if property is observable
+observableRegexp = /^__observable_/,
+// regex for keyword properties
+keywordRegexp = /^__static_(?:superclass|subclass|implement|observables|Extend|prototype|subclass|applicate|addProperty|removeProperty|addStaticProperty|addObservableProperty|removeObservableProperty)$/,
 // create the base object that everything extends from
 base = (function() {
 	var fn = function() {
@@ -135,6 +154,7 @@ base = (function() {
 	fn.superclass = null;
 	fn.subclass = [];
 	fn.implement = [];
+	fn.observables = {};
 	fn.prototype.constructor = base;
 	fn.prototype.self = base;
 	fn.__isclass_ = true;
@@ -152,10 +172,20 @@ addProperty = function(klass, parent, name, property) {
 			// Force "this" to be a reference to the class itself to simulate "self"
 			return property.apply(klass, arguments);
 		}, property) : property;
+	} else if (observableRegexp.test(name)) {
+		name = name.replace(observableRegexp, "");
+		klass.observables[name] = property;
+		// we need to delete the observable property from all children as well as the current class
+		each(klass.subclass, function(k) {
+			// remove it only if it is equal to the parent class
+			if (!hasOwn.call(k.observables, name)) {
+				k.addObservableProperty(name, property);
+			}
+		});
 	} else {
-		var parent_prototype = parent.prototype[name];
+		var parent_prototype = parent.prototype[name], self_prototype = klass.prototype;
 		// Else this is not a prefixed static property, so we're assigning it to the prototype
-		klass.prototype[name] = isFunction(property) && isFunction(parent_prototype) ? store(function() {
+		self_prototype[name] = isFunction(property) && isFunction(parent_prototype) ? store(function() {
 			var tmp = this.parent, ret;
 			this.parent = parent_prototype;
 			ret = property.apply(this, arguments);
@@ -166,6 +196,79 @@ addProperty = function(klass, parent, name, property) {
 			}
 			return ret;
 		}, property) : property;
+
+		// Wrap all child implementation with the parent wrapper
+		if (isFunction(property)) {
+			each(klass.subclass, function(k) {
+				// add only if it's not already wrapped
+				if (isFunction(k.prototype[name]) && !k.prototype[name].__original_) {
+					k.prototype[name] = store(function() {
+						var tmp = this.parent, ret;
+						this.parent = self_prototype;
+						ret = property.apply(this, arguments);
+						if (tmp === undefined) {
+							delete this.parent;
+						} else {
+							this.parent = tmp;
+						}
+						return ret;
+					}, k.prototype[name]);
+				}
+			});
+		}
+	}
+},
+// removes a property from the chain
+removeProperty = function(klass, name) {
+	// we don't want to remove the core javascript properties or special properties
+	if ((klass[name] && klass[name] === objectPrototype[name]) || keywordRegexp.test(name)) {
+		return;
+	}
+	// See if we are removing an static property, if we are just delete it
+	if (staticRegexp.test(name)) {
+		name = name.replace(staticRegexp, "");
+		klass[name] = null;
+		try {
+			delete klass[name];
+		} catch (e) {
+		}
+	} else if (observableRegexp.test(name)) {
+		name = name.replace(observableRegexp, "");
+		var tmp = klass.observables[name];
+		// we need to delete the observable property from all children as well as the current class
+		each(klass.subclass, function(k) {
+			// remove it only if it is equal to the parent class
+			if (k.observables[name] === tmp) {
+				k.removeObservableProperty(name);
+			}
+		});
+		klass.observables[name] = null;
+		try {
+			delete klass.observables[name];
+		} catch (e) {
+		}
+	} else {
+		// if we are not removing a function from the prototype chain, then just delete it
+		if (!isFunction(klass.prototype[name])) {
+			klass.prototype[name] = null;
+			try {
+				delete klass.prototype[name];
+			} catch (e) {
+			}
+			return;
+		}
+		// we need to delete the observable property from all children as well as the current class
+		each(klass.subclass, function(k) {
+			// remove the parent function wrapper for child classes
+			if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].__original_)) {
+				k.prototype[name] = k.prototype[name].__original_;
+			}
+		});
+		klass.prototype[name] = null;
+		try {
+			delete klass.prototype[name];
+		} catch (e) {
+		}
 	}
 };
 
@@ -199,12 +302,19 @@ var create = function() {
 	}
 	// Constructor function
 	var klass = function() {
+		var prop;
 		// We're not creating a instantiated object so we want to force a instantiation or call the invoke function
 		// we need to test for !this when in "use strict" mode
 		// we need to test for !this.init for quick check if this is a instance or a definition
 		// we need to test for !(this instanceof klass) when the class is a property of a instance class (ie. namespace)
 		if (!this || !this.init || !(this instanceof klass)) {
 			return klass.invoke.apply(klass, arguments);
+		}
+		// initialize the observable properties if any
+		for (prop in klass.observables) {
+			if (hasOwn.call(klass.observables, prop)) {
+				this[prop] = new Observer(this, prop, klass.observables[prop]);
+			}
 		}
 		// just in case we want to do anything special like "new" keyword override (usually don't return anything)
 		var tmp = this.init.apply(this, arguments);
@@ -231,6 +341,7 @@ var create = function() {
 	klass.superclass = parent;
 	klass.subclass = [];
 	klass.implement = (parent.implement || []).concat(implement);
+	klass.observables = extend({}, parent.observables);
 	// Give this class the ability to create sub classes
 	klass.Extend = klass.prototype.Extend = function(p) {
 		return create(klass, p);
@@ -268,8 +379,23 @@ var create = function() {
 		}
 		return klass;
 	};
+	// Bind the special remove property function
+	klass.removeProperty = function(name) {
+		removeProperty(klass, name);
+		return klass;
+	};
+	// shortcut methods for adding and removing special properties
 	klass.addStaticProperty = function(name, property) {
 		return klass.addProperty(name, property, "__static_");
+	};
+	klass.removeStaticProperty = function(name, property) {
+		return klass.removeProperty("__static_" + name);
+	};
+	klass.addObservableProperty = function(name, property) {
+		return klass.addProperty(name, property, "__observable_");
+	};
+	klass.removeObservableProperty = function(name) {
+		return klass.removeProperty("__observable_" + name);
 	};
 	// Now implement each of the implemented objects before extending
 	if (implement.length !== 0) {
@@ -289,7 +415,94 @@ var create = function() {
 	klass.prototype.self = klass;
 	klass.__isclass_ = true;
 	return klass;
-};// global container containing all the namespace references
+};
+// Observer class that handles an abstraction layer to the 
+var Observer = create({
+	init : function(context, name, value) {
+		// an Observer can only be instantiated with an instance of an object
+		if (!context) {
+			throw new Error("Cannot create Observer without class context.");
+		}
+		// set internal context
+		this.context = context;
+		// the name of the property
+		this.name = name;
+		// array of event listeners to watch for the set call
+		this.events = [];
+		// flag to check that this observer is writable
+		this.writable = true;
+		// if an object is passed in as value, the break it up into it's parts
+		if (value !== null && typeof value === "object") {
+			this.getter = isFunction(value.get) ? value.get : null;
+			this.setter = isFunction(value.set) ? value.set : null;
+			this.value = value.value;
+			this.writable = typeof value.writable === "boolean" ? value.writable : true;
+		} else {
+			// otherwise only the value is passed in
+			this.value = value;
+		}
+	},
+	get : function() {
+		// getter method is called for return value if specified
+		return this.getter ? this.getter.call(this.context, this.value) : this.value;
+	},
+	set : function(value) {
+		var i = 0, l = this.events.length, original = this.value;
+		// if this is not writable then we can't do anything
+		if (!this.writable) {
+			return this.context;
+		}
+		// setter method is called for return value to set if specified
+		this.value = this.setter ? this.setter.call(this.context, value, original) : value;
+		// fire off all event listeners in the order they were added
+		for (; i < l; i++) {
+			this.events[i].call(this.context, value, original);
+		}
+		return this.context;
+	},
+	addListener : function(listener) {
+		// event listeners can only be functions
+		if (!isFunction(listener)) {
+			throw new Error('addListener only takes instances of Function');
+		}
+		// add the event to the queue
+		this.events.push(listener);
+		return this.context;
+	},
+	removeListener : function(listener) {
+		// event listeners can only be functions
+		if (!isFunction(listener)) {
+			throw new Error('removeListener only takes instances of Function');
+		}
+		// remove the event listener if it exists
+		var i = indexOf(this.events, listener);
+		if (i < 0) {
+			return this.context;
+		}
+		this.events.splice(i, 1);
+		return this.context;
+	},
+	removeAllListeners : function() {
+		// garbage cleanup
+		this.events = null;
+		// reset the internal events array
+		this.events = [];
+		return this.context;
+	},
+	listeners : function() {
+		// gets the list of all the listeners
+		return this.events;
+	},
+	toValue : function() {
+		// gets the scalar value of the internal property
+		return this.value && this.value.toValue ? this.value.toValue() : this.value;
+	},
+	toString : function() {
+		// overriden toString function to say this is an instance of an observer
+		return "[observer " + this.name + "]";
+	}
+});
+// global container containing all the namespace references
 var namespaces = {},
 // name of the globally avaliable namespace
 global_namespace = "GLOBAL",
@@ -554,6 +767,7 @@ extend(Classify, {
 	destroyNamespace : destroyNamespace,
 	testNamespace : testNamespace,
 	getGlobalNamespace : getGlobalNamespace,
+	Observer : Observer,
 
 	// utility function to provide functionality to quickly add properties to objects
 	extend : extend,
