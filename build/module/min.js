@@ -6,7 +6,7 @@ module.exports = (function(root) {
 	return function(options, source, callback) {
 		callback.print("Minifying source file with UglifyJs...");
 		try {
-			fs.writeFile(options.dir.dist + "/" + options.name + ".min.js", source.copyright + ";" + source.minSource, "utf-8", function(error) {
+			fs.writeFile(options.dir.dist + "/" + options.name + ".min.js", source.copyright + ";" + source.minSource + ";", "utf-8", function(error) {
 				if (error) {
 					return callback({
 						error : error
