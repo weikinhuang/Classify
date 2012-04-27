@@ -14,6 +14,7 @@ module.exports = (function(root) {
 		src : [],
 		unit : [],
 		perf : [],
+		docs : [],
 		env : {},
 		lint : {},
 		min : {},
@@ -47,7 +48,8 @@ module.exports = (function(root) {
 			base : workdir,
 			build : workdir + "/build",
 			dist : workdir + "/dist",
-			src : workdir + "/src"
+			src : workdir + "/src",
+			doc : workdir + "/docs"
 		};
 		build(steps, options);
 	}
