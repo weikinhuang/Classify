@@ -314,7 +314,8 @@ module.exports = (function(root) {
 		var groups = groupByMembers(docblocks);
 
 		if (options.doc.markdown) {
-			fs.writeFileSync(options.dir.doc + "/" + options.name + ".md", createMarkdown(options, groups), "utf8");
+			var markdownOutputName = typeof options.doc.markdown === "string" ? options.doc.markdown : options.name;
+			fs.writeFileSync(options.dir.doc + "/" + markdownOutputName + ".md", createMarkdown(options, groups), "utf8");
 		}
 
 		callback();
