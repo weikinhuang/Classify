@@ -10,6 +10,7 @@ module.exports = {
 	src : [ "core.js", "create.js", "observer.js", "namespace.js", "export.js" ],
 	unit : [ "core.js", "create.js", "observer.js", "namespace.js", "export.js" ],
 	perf : [],
+	docs : [ "classify.docs.js" ],
 	env : {
 		node : true,
 		web : true
@@ -55,6 +56,9 @@ module.exports = {
 			space_colon : false,
 			inline_script : false
 		}
+	},
+	doc : {
+		markdown : true
 	},
 	build : "clean lint unit concat min size"
 };
