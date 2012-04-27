@@ -58,7 +58,7 @@ module.exports = {
 		}
 	},
 	doc : {
-		markdown : true
+		markdown : "README"
 	},
 	build : "clean lint unit concat min size"
 };
