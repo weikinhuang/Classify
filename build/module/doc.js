@@ -14,7 +14,7 @@ module.exports = (function(root) {
 		var fnRegexp = /\bfunction(\s*|[^\(]+)?\(/;
 		var commentRegexp = /^\/\*\*[\S\s]+?\s*(\*\s+@|\*\/$)/;
 		var returnsRegexp = /@returns\s+([\S\s]+?)\s*(\*\s+@|\*\/$)/;
-		var paramsRegexp = /@param\s+([\S\s]+?)\s*(\*\s+@|\*\/$)/g;
+		var paramsRegexp = /@param\s+([\S\s]+?)\s*(?:\*\s*@|\*\/$)/;
 		var exampleRegexp = /@example\n[\S\s]+$/g;
 		var staticRegexp = /@static\b/;
 		var privateRegexp = /@private\b/;
@@ -72,11 +72,11 @@ module.exports = (function(root) {
 					returnsMatchParts.comment = (/^{?[^\s]+}(.+)$/.exec(returnsMatchClean) || [])[1] || null;
 					doc.returns = returnsMatchParts;
 				}
-				var params = [];
+				var params = [], paramMatcher, paramBlock = block.doc;
 				// strip out all the params from block
-				block.doc.replace(paramsRegexp, function(match, part) {
+				while ((paramMatcher = paramsRegexp.exec(paramBlock)) !== null) {
 					var paramsMatchParts = {};
-					var paramsMatchClean = trim(part.replace(/^\s*\*\s*/gm, "").split(/\n/g).join(" ").replace(/\s+/g, " "));
+					var paramsMatchClean = trim(paramMatcher[1].replace(/^\s*\*\s*/gm, "").split(/\n/g).join(" ").replace(/\s+/g, " "));
 					paramsMatchParts.type = (/^{?([^\s]+)}/.exec(paramsMatchClean) || [])[1] || null;
 					paramsMatchParts.name = (/^{?[^\s]+}\s+([^\s]+)\s+.+$/.exec(paramsMatchClean) || [])[1] || null;
 					paramsMatchParts.isOptional = false;
@@ -88,7 +88,10 @@ module.exports = (function(root) {
 					}
 					paramsMatchParts.comment = (/^{?[^\s]+}\s+([^\s]+)\s+(.+)$/.exec(paramsMatchClean) || [])[2] || null;
 					params.push(paramsMatchParts);
-				});
+					paramBlock = paramBlock.replace(paramsRegexp, function(match, part) {
+						return match.substr(-1);
+					});
+				}
 				doc.params = params;
 
 				var superMatch = superRegexp.exec(block.doc);
@@ -162,27 +165,21 @@ module.exports = (function(root) {
 
 	function createMarkdown(options, docGroups) {
 		var markdown = [];
-
 		markdown.push("# " + options.name + " `v" + options.version + "`");
 		markdown.push("==================================================");
 		markdown.push("");
-
 		Object.keys(docGroups).forEach(function(key) {
 			var group = docGroups[key];
-
 			// section header
 			markdown.push("## `" + key + "`");
-
 			if (group.base) {
 				markdown.push(" * [`" + key + "`](#" + key + ")");
 			}
-
 			if (group.statics.length > 0) {
 				group.statics.forEach(function(doc) {
 					markdown.push(" * [`" + doc.name + "`](#" + doc.name + ")");
 				});
 			}
-
 			if (group.prototypes.length > 0) {
 				markdown.push("");
 				markdown.push("");
@@ -191,28 +188,23 @@ module.exports = (function(root) {
 					markdown.push(" * [`" + doc.name.replace(/\.prototype\./, "#") + "`](#" + doc.name + ")");
 				});
 			}
-
 			markdown.push("");
 			markdown.push("");
 		});
 
 		Object.keys(docGroups).forEach(function(key) {
 			var group = docGroups[key];
-
 			// section header
 			markdown.push("## `" + key + "`");
-
 			if (group.base) {
 				markdown.push("");
 				outputMarkdownBlock(group.base, markdown);
 			}
-
 			if (group.statics.length > 0) {
 				group.statics.forEach(function(doc) {
 					outputMarkdownBlock(doc, markdown);
 				});
 			}
-
 			if (group.prototypes.length > 0) {
 				markdown.push("");
 				markdown.push("");
@@ -221,12 +213,10 @@ module.exports = (function(root) {
 					outputMarkdownBlock(doc, markdown);
 				});
 			}
-
 			markdown.push("");
 			markdown.push("");
 		});
-
-		console.log(markdown.join("\n"));
+		return trim(markdown.join("\n"));
 	}
 
 	function outputMarkdownBlock(block, messages) {
@@ -256,11 +246,11 @@ module.exports = (function(root) {
 		messages.push("[&#9650;](#)");
 		messages.push("");
 		if (block.varType === "function") {
-			if(block.isConstructor) {
+			if (block.isConstructor) {
 				messages.push("");
 				messages.push("##### Constructor method");
 			}
-			if(block.superClass || block.augments) {
+			if (block.superClass || block.augments) {
 				messages.push("");
 				messages.push("##### Extends `" + (block.superClass || block.augments) + "`");
 			}
@@ -288,10 +278,18 @@ module.exports = (function(root) {
 			if (block.returns) {
 				messages.push("");
 				messages.push("##### Returns");
-				messages.push("`" + block.returns.type + "`: " + (block.returns.comment || ""));
+				if (block.returns.comment) {
+					messages.push("`" + block.returns.type + "`: " + block.returns.comment);
+				} else {
+					messages.push("`" + block.returns.type + "`");
+				}
 			}
 		} else {
-			messages.push("`" + block.type + "`: " + (block.comment || ""));
+			if (block.comment) {
+				messages.push("`" + block.type + "`: " + block.comment);
+			} else {
+				messages.push("`" + block.type + "`");
+			}
 		}
 		if (block.example) {
 			messages.push("");
@@ -313,10 +311,11 @@ module.exports = (function(root) {
 			docsfile.push(fs.readFileSync(options.dir.doc + "/" + file, "utf8").replace(/\r/g, ""));
 		});
 		var docblocks = parseDocs(docsfile.join("\n"));
-
 		var groups = groupByMembers(docblocks);
 
-		createMarkdown(options, groups);
+		if (options.doc.markdown) {
+			fs.writeFileSync(options.dir.doc + "/" + options.name + ".md", createMarkdown(options, groups), "utf8");
+		}
 
 		callback();
 	};

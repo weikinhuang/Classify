@@ -18,6 +18,7 @@ module.exports = (function(root) {
 		env : {},
 		lint : {},
 		min : {},
+		doc : {},
 		build : "clean concat lint unit min size"
 	};
 
