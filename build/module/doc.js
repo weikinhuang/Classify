@@ -20,6 +20,7 @@ module.exports = (function(root) {
 		var privateRegexp = /@private\b/;
 		var constructorRegexp = /@constructor\b/;
 		var memberOfRegexp = /@memberOf\s+.+$/m;
+		var nameRegexp = /@name\s+.+$/m;
 		var superRegexp = /@super\s+.+$/m;
 		var augmentsRegexp = /@augments\s+.+$/m;
 		var typeRegexp = /@type\s+.+$/m;
@@ -41,8 +42,6 @@ module.exports = (function(root) {
 			if (commentMatch && commentMatch[0]) {
 				doc.comment = trim(commentMatch[0].replace(/^\/\*\*/, "").replace(/^\s*\*\s*/gm, "").replace(/^\s*\*\s*@\s*$/gm, "").split(/\n/g).join(" ").replace(/\s+/g, " "));
 			}
-			// console.log(comment);
-			// console.log(block.def);
 			// parse example if any
 			var exampleMatch = exampleRegexp.exec(block.doc);
 			if (exampleMatch && exampleMatch[0]) {
@@ -53,18 +52,17 @@ module.exports = (function(root) {
 			if (memberOfMatch && memberOfMatch[0]) {
 				doc.memberOf = trim(memberOfMatch[0].replace(/@memberOf\s+/, "")).replace(/^{|}$/g, "");
 			}
-			var typeMatch = memberOfRegexp.exec(block.doc);
+			var typeMatch = typeRegexp.exec(block.doc);
 			if (typeMatch && typeMatch[0]) {
 				doc.type = trim(typeMatch[0].replace(/@type\s+/, "")).replace(/^{|}$/g, "");
 			}
 
 			doc.isStatic = staticRegexp.test(block.doc);
 			doc.isPrivate = privateRegexp.test(block.doc);
-			// var returns = staticRegexp.test(block.doc);
 
 			// check if it is a function or not
 			if (fnRegexp.test(block.def)) {
-				doc.type = "function";
+				doc.varType = "function";
 				doc.isConstructor = constructorRegexp.test(block.doc);
 				var returnsMatch = returnsRegexp.exec(block.doc);
 				if (returnsMatch && returnsMatch[0]) {
@@ -107,9 +105,16 @@ module.exports = (function(root) {
 					doc.name = trim(block.def.replace(/^\s*function\s+/, "").replace(/([^\(]+).+$/, "$1"));
 				}
 			} else {
-				doc.type = "var";
+				doc.varType = "var";
 				doc.name = trim((block.def.split("=")[0] || "").replace(/^\s*var\s+/, ""));
 			}
+
+			// override the name property if defined
+			var nameMatch = nameRegexp.exec(block.doc);
+			if (nameMatch && nameMatch[0]) {
+				doc.name = trim(nameMatch[0].replace(/@name\s+/, "")).replace(/^{|}$/g, "");
+			}
+
 			docblocks.push(doc);
 		});
 		return docblocks;
@@ -155,6 +160,149 @@ module.exports = (function(root) {
 		return sortedGroups;
 	}
 
+	function createMarkdown(options, docGroups) {
+		var markdown = [];
+
+		markdown.push("# " + options.name + " `v" + options.version + "`");
+		markdown.push("==================================================");
+		markdown.push("");
+
+		Object.keys(docGroups).forEach(function(key) {
+			var group = docGroups[key];
+
+			// section header
+			markdown.push("## `" + key + "`");
+
+			if (group.base) {
+				markdown.push(" * [`" + key + "`](#" + key + ")");
+			}
+
+			if (group.statics.length > 0) {
+				group.statics.forEach(function(doc) {
+					markdown.push(" * [`" + doc.name + "`](#" + doc.name + ")");
+				});
+			}
+
+			if (group.prototypes.length > 0) {
+				markdown.push("");
+				markdown.push("");
+				markdown.push("## `" + key + ".prototype`");
+				group.prototypes.forEach(function(doc) {
+					markdown.push(" * [`" + doc.name.replace(/\.prototype\./, "#") + "`](#" + doc.name + ")");
+				});
+			}
+
+			markdown.push("");
+			markdown.push("");
+		});
+
+		Object.keys(docGroups).forEach(function(key) {
+			var group = docGroups[key];
+
+			// section header
+			markdown.push("## `" + key + "`");
+
+			if (group.base) {
+				markdown.push("");
+				outputMarkdownBlock(group.base, markdown);
+			}
+
+			if (group.statics.length > 0) {
+				group.statics.forEach(function(doc) {
+					outputMarkdownBlock(doc, markdown);
+				});
+			}
+
+			if (group.prototypes.length > 0) {
+				markdown.push("");
+				markdown.push("");
+				markdown.push("## `" + key + ".prototype`");
+				group.prototypes.forEach(function(doc) {
+					outputMarkdownBlock(doc, markdown);
+				});
+			}
+
+			markdown.push("");
+			markdown.push("");
+		});
+
+		console.log(markdown.join("\n"));
+	}
+
+	function outputMarkdownBlock(block, messages) {
+		var name = block.name;
+		if (block.varType === "function") {
+			name += "(";
+			if (block.params && block.params.length > 0) {
+				block.params.forEach(function(param, i) {
+					var param_str = "";
+					if (i > 0) {
+						param_str += ", ";
+					}
+					param_str += param.name;
+					if (param.isOptional) {
+						if (param.value) {
+							param_str += "=" + param.value;
+						}
+						param_str = "[" + param_str + "]";
+					}
+					name += param_str;
+				});
+			}
+			name += ")";
+		}
+		messages.push('### <a id="' + block.name + '" href="#">`' + name + "`</a>");
+		messages.push(block.comment.replace(/\.$/, "") + ".");
+		messages.push("[&#9650;](#)");
+		messages.push("");
+		if (block.varType === "function") {
+			if(block.isConstructor) {
+				messages.push("");
+				messages.push("##### Constructor method");
+			}
+			if(block.superClass || block.augments) {
+				messages.push("");
+				messages.push("##### Extends `" + (block.superClass || block.augments) + "`");
+			}
+			if (block.params && block.params.length > 0) {
+				messages.push("");
+				messages.push("##### Arguments");
+				block.params.forEach(function(param, i) {
+					var param_str = "";
+					param_str += param.name;
+					if (param.isOptional) {
+						if (param.value) {
+							param_str += "=" + param.value;
+						}
+						param_str = "[" + param_str + "]";
+					}
+					name += param_str;
+					var param_line = (i + 1) + ". `" + param_str + "` `{" + param.type + "}`";
+					if (param.comment) {
+						param_line += ": " + param.comment;
+					}
+					messages.push(param_line);
+				});
+			}
+
+			if (block.returns) {
+				messages.push("");
+				messages.push("##### Returns");
+				messages.push("`" + block.returns.type + "`: " + (block.returns.comment || ""));
+			}
+		} else {
+			messages.push("`" + block.type + "`: " + (block.comment || ""));
+		}
+		if (block.example) {
+			messages.push("");
+			messages.push("##### Example");
+			messages.push("```javascript");
+			messages.push(block.example);
+			messages.push("```");
+		}
+		messages.push("");
+	}
+
 	return function(options, source, callback) {
 		if (options.docs.length === 0) {
 			callback();
@@ -167,7 +315,8 @@ module.exports = (function(root) {
 		var docblocks = parseDocs(docsfile.join("\n"));
 
 		var groups = groupByMembers(docblocks);
-		console.log(groups);
+
+		createMarkdown(options, groups);
 
 		callback();
 	};
