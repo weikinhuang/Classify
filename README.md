@@ -1,9 +1,12 @@
 [Classify](http://www.closedinterval.com/classify)
 ==================================================
 
-Classify is a Javascript library that allows for cross platform classical inheritance and namespaces behind the prototype syntax in an easy to use interface function.
+Classify is a Javascript library that allows for cross platform and cross browser classical inheritance
+and namespaces behind the prototype syntax in an easy to use interface function. Classify also provides
+"observable" properties that can be assigned getters and setters and onchange listeners to provide abstractions
+around `get` and `set` accessors.
 
-Classify is tested in IE 6+, Firefox 2+, Safari 3+, Chrome 3+, and Opera 10+.
+Classify is tested in IE 6+, Firefox 2+, Safari 3+, Chrome 3+, and Opera 10+, NodeJs.
 
 Usage
 --------------------------------------
@@ -179,26 +182,63 @@ Environments
 
 Classify is [CommonJS](http://commonjs.org) compliant and can be used in the browser scope or the server scope.
 
-### browser environment
-```javascript
+### In the browser:
+```html
 <script src="path/to/classify.js" type="text/javascript"></script>
 <!-- Classify() is now in the global context -->
-
-<script type="text/javascript">
-	var Foo = Classify(...);
-	var Bar = Classify(Foo, ...);
-	var bar = new Bar(...);
-</script>
 ```
 
-### server environment
+### In [NodeJs](http://nodejs.org/) environment:
+```bash
+npm install classifyjs
+```
+
 ```javascript
-var Classify = require('path/to/classify');
-
-var Foo = Classify(...);
+var Classify = require('classifyjs').Classify;
 ```
 
-Running the unit tests
+### With an AMD loader like [RequireJS](http://requirejs.org/):
+```javascript
+require({
+	'paths' : {
+		'benchmark' : 'path/to/classify'
+	}
+}, [ 'classify' ], function(Classify) {
+	console.log(Classify.version);
+});
+```
+
+Building the Source
 --------------------------------------
 
-`make unit`
+After installing NodeJs, just run:
+
+`./make.js`
+
+Running the unit tests: `./make.js unit`
+
+Running JsHint tests: `./make.js lint`
+
+Running JsPerf tests: `./make.js perf`
+
+Other options include: `clean`, `lint`, `unit`, `concat`, `min`, `size`, `perf`
+
+Changelog
+--------------------------------------
+
+Coming soon!
+
+About
+--------------------------------------
+
+Classify copyright 2011-2012 by [Wei Kin Huang](http://closedinterval.com/).
+
+Build Tools: 
+[QUnit](https://github.com/jquery/qunit),
+[Benchmark.js](https://github.com/bestiejs/benchmark.js),
+[UglifyJS](https://github.com/mishoo/UglifyJS),
+[JsHint](https://github.com/jshint/jshint).
+
+All code released under the [MIT License](http://mit-license.org/).
+
+Fork me to show support and help fix bugs!
