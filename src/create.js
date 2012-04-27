@@ -156,7 +156,7 @@ var create = function() {
 	}
 	// Constructor function
 	var klass = function() {
-		var prop;
+		var prop, tmp;
 		// We're not creating a instantiated object so we want to force a instantiation or call the invoke function
 		// we need to test for !this when in "use strict" mode
 		// we need to test for !this.init for quick check if this is a instance or a definition
@@ -171,7 +171,7 @@ var create = function() {
 			}
 		}
 		// just in case we want to do anything special like "new" keyword override (usually don't return anything)
-		var tmp = this.init.apply(this, arguments);
+		tmp = this.init.apply(this, arguments);
 		if (tmp !== undefined) {
 			return tmp;
 		}

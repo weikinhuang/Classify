@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.8.0
+ * Classify JavaScript Library v0.8.5
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Thu, 26 Apr 2012 22:27:57 GMT
+ * Date: Fri, 27 Apr 2012 02:45:41 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -296,7 +296,7 @@ var create = function() {
 	}
 	// Constructor function
 	var klass = function() {
-		var prop;
+		var prop, tmp;
 		// We're not creating a instantiated object so we want to force a instantiation or call the invoke function
 		// we need to test for !this when in "use strict" mode
 		// we need to test for !this.init for quick check if this is a instance or a definition
@@ -311,7 +311,7 @@ var create = function() {
 			}
 		}
 		// just in case we want to do anything special like "new" keyword override (usually don't return anything)
-		var tmp = this.init.apply(this, arguments);
+		tmp = this.init.apply(this, arguments);
 		if (tmp !== undefined) {
 			return tmp;
 		}
@@ -757,7 +757,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.8.0",
+	version : "0.8.5",
 
 	// direct access functions
 	create : create,
