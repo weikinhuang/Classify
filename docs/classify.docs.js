@@ -607,3 +607,15 @@ Classify.extend = function(base, args) {
  */
 Classify.provide = function(namespace, base) {
 };
+
+/**
+ * Utility function for web to avoid namespace issues with other libraries
+ *
+ * @static
+ * @memberOf Classify
+ * @returns {Classify}
+ * @type {Classify}
+ */
+Classify.noConflict = function() {
+	return Classify;
+};

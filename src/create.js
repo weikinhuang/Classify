@@ -4,6 +4,10 @@ var staticRegexp = /^__static_/,
 observableRegexp = /^__observable_/,
 // regex for keyword properties
 keywordRegexp = /^__static_(?:superclass|subclass|implement|observables|Extend|prototype|subclass|applicate|addProperty|removeProperty|addStaticProperty|addObservableProperty|removeObservableProperty)$/,
+// prefix for static properties
+staticPrefix = "__static_",
+// prefix for observable properties
+observablePrefix = "__observable_",
 // create the base object that everything extends from
 base = (function() {
 	var fn = function() {
@@ -41,21 +45,35 @@ addProperty = function(klass, parent, name, property) {
 		return;
 	}
 	if (staticRegexp.test(name)) {
-		// See if we are defining an static property, if we are, assign it to the class
-		klass[name.replace(staticRegexp, "")] = isFunction(property) ? store(function() {
-			// Force "this" to be a reference to the class itself to simulate "self"
-			return property.apply(klass, arguments);
-		}, property) : property;
+		if (name === staticPrefix) {
+			// if the name of the property is the static prefix, then iterate through the object
+			each(property, function(prop, key) {
+				addProperty(klass, parent, staticPrefix + key, prop);
+			});
+		} else {
+			// See if we are defining an static property, if we are, assign it to the class
+			klass[name.replace(staticRegexp, "")] = isFunction(property) ? store(function() {
+				// Force "this" to be a reference to the class itself to simulate "self"
+				return property.apply(klass, arguments);
+			}, property) : property;
+		}
 	} else if (observableRegexp.test(name)) {
-		name = name.replace(observableRegexp, "");
-		klass.observables[name] = property;
-		// we need to delete the observable property from all children as well as the current class
-		each(klass.subclass, function(k) {
-			// remove it only if it is equal to the parent class
-			if (!hasOwn.call(k.observables, name)) {
-				k.addObservableProperty(name, property);
-			}
-		});
+		// if the name of the property is the observable prefix, then iterate through the object
+		if (name === observablePrefix) {
+			each(property, function(prop, key) {
+				addProperty(klass, parent, observablePrefix + key, prop);
+			});
+		} else {
+			name = name.replace(observableRegexp, "");
+			klass.observables[name] = property;
+			// we need to delete the observable property from all children as well as the current class
+			each(klass.subclass, function(k) {
+				// remove it only if it is equal to the parent class
+				if (!hasOwn.call(k.observables, name)) {
+					k.addObservableProperty(name, property);
+				}
+			});
+		}
 	} else {
 		var parent_prototype = parent.prototype[name], self_prototype = klass.prototype;
 		// Else this is not a prefixed static property, so we're assigning it to the prototype
@@ -240,16 +258,16 @@ var create = function() {
 	};
 	// shortcut methods for adding and removing special properties
 	klass.addStaticProperty = function(name, property) {
-		return klass.addProperty(name, property, "__static_");
+		return klass.addProperty(name, property, staticPrefix);
 	};
 	klass.removeStaticProperty = function(name) {
-		return klass.removeProperty("__static_" + name);
+		return klass.removeProperty(staticPrefix + name);
 	};
 	klass.addObservableProperty = function(name, property) {
-		return klass.addProperty(name, property, "__observable_");
+		return klass.addProperty(name, property, observablePrefix);
 	};
 	klass.removeObservableProperty = function(name) {
-		return klass.removeProperty("__observable_" + name);
+		return klass.removeProperty(observablePrefix + name);
 	};
 	// Now implement each of the implemented objects before extending
 	if (implement.length !== 0) {

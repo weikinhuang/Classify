@@ -12,6 +12,7 @@
  * [`Classify.getGlobalNamespace`](#Classify.getGlobalNamespace)
  * [`Classify.extend`](#Classify.extend)
  * [`Classify.provide`](#Classify.provide)
+ * [`Classify.noConflict`](#Classify.noConflict)
 
 
 ## `Classify.Class`
@@ -176,6 +177,14 @@ Utility function to provide functionality to allow for name provisioning.
 
 ##### Returns
 `Object`
+
+### <a id="Classify.noConflict" href="#">`Classify.noConflict()`</a>
+Utility function for web to avoid namespace issues with other libraries.
+[&#9650;](#)
+
+
+##### Returns
+`Classify`
 
 
 

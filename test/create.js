@@ -186,6 +186,38 @@ QUnit.test("static properties", function() {
 	QUnit.equal((new test()).e(), 2, "Reading static property by using self within a class");
 });
 
+QUnit.test("static properties defined in container", function() {
+	QUnit.expect(4);
+	// testing class creation with static properties defined in container
+	var test = create({
+		__static_ : {
+			a : 2,
+			b : function() {
+				// the internal "this" reference should always point to the class definition in a static context
+				return this.a;
+			}
+		},
+		a : 1,
+		b : function() {
+			return this.a;
+		},
+		c : function() {
+			return test.a;
+		},
+		d : function() {
+			return this.self;
+		},
+		e : function() {
+			return this.self.a;
+		}
+	});
+
+	QUnit.equal(test.a, 2, "Reading static property of an class when defined within container");
+	QUnit.equal(test.b(), 2, "Invoking static function of a class when defined within container");
+	QUnit.equal((new test()).c(), 2, "Reading static property by name within a class when defined within container");
+	QUnit.equal((new test()).e(), 2, "Reading static property by using self within a class when defined within container");
+});
+
 QUnit.test("extending classes using inheritance", function() {
 	QUnit.expect(25);
 	// testing class for known properties in every defined class
