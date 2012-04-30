@@ -1,4 +1,4 @@
-# classify `v0.8.5`
+# classify `v0.9.0`
 ==================================================
 
 ## `Classify`
@@ -67,12 +67,16 @@
  * [`Classify.Observer#context`](#Classify.Observer.prototype.context)
  * [`Classify.Observer#name`](#Classify.Observer.prototype.name)
  * [`Classify.Observer#writable`](#Classify.Observer.prototype.writable)
+ * [`Classify.Observer#delay`](#Classify.Observer.prototype.delay)
+ * [`Classify.Observer#_debounce`](#Classify.Observer.prototype._debounce)
  * [`Classify.Observer#value`](#Classify.Observer.prototype.value)
  * [`Classify.Observer#events`](#Classify.Observer.prototype.events)
  * [`Classify.Observer#getter`](#Classify.Observer.prototype.getter)
  * [`Classify.Observer#setter`](#Classify.Observer.prototype.setter)
  * [`Classify.Observer#get`](#Classify.Observer.prototype.get)
  * [`Classify.Observer#set`](#Classify.Observer.prototype.set)
+ * [`Classify.Observer#emit`](#Classify.Observer.prototype.emit)
+ * [`Classify.Observer#triggerEmit`](#Classify.Observer.prototype.triggerEmit)
  * [`Classify.Observer#addListener`](#Classify.Observer.prototype.addListener)
  * [`Classify.Observer#removeListener`](#Classify.Observer.prototype.removeListener)
  * [`Classify.Observer#removeAllListeners`](#Classify.Observer.prototype.removeAllListeners)
@@ -185,6 +189,14 @@ Utility function for web to avoid namespace issues with other libraries.
 
 ##### Returns
 `Classify`
+
+##### Example
+```javascript
+(function(Classify) {
+// here you can use the Classify object and remove the global reference to it
+// this function is only available on browser environments
+})(Classify.noConflict());
+```
 
 
 
@@ -472,7 +484,7 @@ Gets the translated toString name of this object "[namespace Name]".
 
 ## `Classify.Observer`
 
-### <a id="Classify.Observer" href="#">`Classify.Observer(value, value.value[, value.writable=true][, value.getter][, value.setter])`</a>
+### <a id="Classify.Observer" href="#">`Classify.Observer(value, value.value[, value.writable=true][, value.delay=0][, value.getter][, value.setter])`</a>
 Wrapper object that allows for getter/setter/event listeners of object properties.
 [&#9650;](#)
 
@@ -485,8 +497,9 @@ Wrapper object that allows for getter/setter/event listeners of object propertie
 1. `value` `{Object}`: The internal value can be either an object or a value
 2. `value.value` `{Object}`: The internal value if the parameter was passed in as an object
 3. `[value.writable=true]` `{Boolean}`: Marks this object as writable or readonly
-4. `[value.getter]` `{Function}`: The internal get modifier
-5. `[value.setter]` `{Function}`: The internal set modifier
+4. `[value.delay=0]` `{Number}`: Only fire the event emitter after a delay of value.delay ms
+5. `[value.getter]` `{Function}`: The internal get modifier
+6. `[value.setter]` `{Function}`: The internal set modifier
 
 
 
@@ -514,6 +527,18 @@ Flag to check if this property is writable.
 [&#9650;](#)
 
 `Boolean`: Flag to check if this property is writable
+
+### <a id="Classify.Observer.prototype.delay" href="#">`Classify.Observer.prototype.delay`</a>
+Number of seconds to delay the event emitter, 0 will disable delays.
+[&#9650;](#)
+
+`Number`: Number of seconds to delay the event emitter, 0 will disable delays
+
+### <a id="Classify.Observer.prototype._debounce" href="#">`Classify.Observer.prototype._debounce`</a>
+Flag to hold the delay timer.
+[&#9650;](#)
+
+`Number`: Flag to hold the delay timer
 
 ### <a id="Classify.Observer.prototype.value" href="#">`Classify.Observer.prototype.value`</a>
 The internal value of this object.
@@ -568,6 +593,19 @@ Sets the value of the internal property.
 
 ##### Returns
 `Classify.Class`
+
+### <a id="Classify.Observer.prototype.emit" href="#">`Classify.Observer.prototype.emit()`</a>
+Starts the timers to call the registered event listeners.
+[&#9650;](#)
+
+
+##### Returns
+`Classify.Class`
+
+### <a id="Classify.Observer.prototype.triggerEmit" href="#">`Classify.Observer.prototype.triggerEmit()`</a>
+Fires the event listeners in the order they were added.
+[&#9650;](#)
+
 
 ### <a id="Classify.Observer.prototype.addListener" href="#">`Classify.Observer.prototype.addListener(listener)`</a>
 Add an event listener for when the internal value is changed.

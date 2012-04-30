@@ -359,6 +359,7 @@ Classify.Namespace.prototype.toString = function() {
  * @param {Object} value The internal value can be either an object or a value
  * @param {Object} value.value The internal value if the parameter was passed in as an object
  * @param {Boolean} [value.writable=true] Marks this object as writable or readonly
+ * @param {Number} [value.delay=0] Only fire the event emitter after a delay of value.delay ms
  * @param {Function} [value.getter] The internal get modifier
  * @param {Function} [value.setter] The internal set modifier
  * @memberOf Classify
@@ -393,6 +394,21 @@ Classify.Observer.prototype.name = "";
  * @type {Boolean}
  */
 Classify.Observer.prototype.writable = true;
+/**
+ * Number of seconds to delay the event emitter, 0 will disable delays
+ *
+ * @memberOf Classify.Observer
+ * @type {Number}
+ */
+Classify.Observer.prototype.delay = 0;
+/**
+ * Flag to hold the delay timer
+ *
+ * @private
+ * @memberOf Classify.Observer
+ * @type {Number}
+ */
+Classify.Observer.prototype._debounce = 0;
 /**
  * The internal value of this object
  *
@@ -452,6 +468,24 @@ Classify.Observer.prototype.get = function() {
  */
 Classify.Observer.prototype.set = function(value) {
 	return new Classify.Class();
+};
+/**
+ * Starts the timers to call the registered event listeners
+ *
+ * @memberOf Classify.Observer
+ * @returns {Classify.Class}
+ * @type {Classify.Class}
+ */
+Classify.Observer.prototype.emit = function() {
+	return new Classify.Class();
+};
+/**
+ * Fires the event listeners in the order they were added
+ *
+ * @private
+ * @memberOf Classify.Observer
+ */
+Classify.Observer.prototype.triggerEmit = function() {
 };
 /**
  * Add an event listener for when the internal value is changed
@@ -615,6 +649,12 @@ Classify.provide = function(namespace, base) {
  * @memberOf Classify
  * @returns {Classify}
  * @type {Classify}
+ * @example <code>
+ * (function(Classify) {
+ *     // here you can use the Classify object and remove the global reference to it
+ *     // this function is only available on browser environments
+ * })(Classify.noConflict());
+ * </code>
  */
 Classify.noConflict = function() {
 	return Classify;

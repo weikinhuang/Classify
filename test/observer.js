@@ -230,7 +230,7 @@ QUnit.test("observer called in context with class", function() {
 });
 
 QUnit.test("observer with bound setter event listeners", function() {
-	QUnit.expect(9);
+	QUnit.expect(8);
 	var test = create({
 		a : function() {
 			return 1;
@@ -246,13 +246,12 @@ QUnit.test("observer with bound setter event listeners", function() {
 	// create observer with writable flag true
 	var observer = new Observer(testinstance, "z", val);
 
-	var first_listener = function(value, original) {
+	var first_listener = function(value) {
 		QUnit.ok(true, "First bound event listener called.");
 		QUnit.equal(value, newvalue, "Set value passed to event listener as first parameter.");
-		QUnit.equal(original, val, "Original value passed to event listener as second parameter.");
 		QUnit.ok(this === testinstance, "Context of base object passed to event listener.");
 	};
-	var second_listener = function(value, original) {
+	var second_listener = function(value) {
 		QUnit.ok(true, "Second bound event listener called.");
 	};
 
@@ -269,7 +268,7 @@ QUnit.test("observer with bound setter event listeners", function() {
 	var observer2 = new Observer(testinstance, "y", val);
 
 	// add event listeners
-	observer2.addListener(function(value, original) {
+	observer2.addListener(function(value) {
 		throw new Error("Unmodified value should not call this listener");
 	});
 
@@ -300,10 +299,10 @@ QUnit.test("removing bound event listeners from observer", function() {
 	// create observer with writable flag true
 	var observer = new Observer(testinstance, "z", val);
 
-	var first_listener = function(value, original) {
+	var first_listener = function(value) {
 		throw new Error("First event listener called.");
 	};
-	var second_listener = function(value, original) {
+	var second_listener = function(value) {
 		QUnit.ok(true, "Second bound event listener called.");
 	};
 	// add event listener
@@ -325,7 +324,7 @@ QUnit.test("removing bound event listeners from observer", function() {
 	QUnit.equal(listeners[0], second_listener, "observers listeners method returned an array of bound listeners unmodified.");
 
 	// add event listener
-	observer.addListener(function(value, original) {
+	observer.addListener(function(value) {
 		throw new Error("Third event listener called.");
 	});
 
@@ -339,6 +338,45 @@ QUnit.test("removing bound event listeners from observer", function() {
 	var listeners = observer.listeners();
 	QUnit.ok(isArray(listeners), "observers listeners method returned an array of bound listeners.");
 	QUnit.equal(listeners.length, 0, "observers listeners method returned an array or proper number of events after removal of all listeners.");
+});
+
+QUnit.test("observer with bound setter event listeners and the delay flag set to true", function() {
+	QUnit.expect(3);
+	QUnit.stop();
+	var test = create({
+		a : function() {
+			return 1;
+		},
+		e : function() {
+			return this.constructor;
+		}
+	});
+	var testinstance = new test();
+
+	var val = 10;
+	var newvalue = 100;
+	// create observer with writable flag true
+	var observer = new Observer(testinstance, "z", {
+		value : val,
+		delay : 5
+	});
+
+	// flag to make sure we only fire events once
+	var fired = 0;
+
+	// add event listeners
+	observer.addListener(function(value) {
+		fired++;
+		QUnit.start();
+		QUnit.equal(value, newvalue * 100, "Final set value passed to delayed event listener as first parameter.");
+		QUnit.ok(this === testinstance, "Context of base object passed to delayed event listener.");
+		QUnit.equal(fired, 1, "Event listener only executed once.");
+	});
+
+	// trigger the event listeners
+	observer.set(newvalue);
+	observer.set(newvalue * 10);
+	observer.set(newvalue * 100);
 });
 
 QUnit.test("instantiating observer as part of object initialization", function() {
@@ -376,7 +414,7 @@ QUnit.test("instantiating observer as part of object initialization", function()
 	QUnit.equal(testinstance.y.get(), 10, "Calling observer from object context with setter referencing parent function.");
 
 	// add an event listener
-	testinstance.z.addListener(function(value, original) {
+	testinstance.z.addListener(function(value) {
 		this.b(value);
 	});
 	testinstance.z.set(1);
@@ -423,7 +461,7 @@ QUnit.test("instantiating observer as part of object initialization when defined
 	QUnit.equal(testinstance.y.get(), 10, "Calling observer from object context with setter referencing parent function.");
 
 	// add an event listener
-	testinstance.z.addListener(function(value, original) {
+	testinstance.z.addListener(function(value) {
 		this.b(value);
 	});
 	testinstance.z.set(1);

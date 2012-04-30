@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.8.5
+ * Classify JavaScript Library v0.9.0
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Mon, 30 Apr 2012 15:18:52 GMT
+ * Date: Mon, 30 Apr 2012 20:42:42 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -443,12 +443,17 @@ var Observer = create({
 		this.events = [];
 		// flag to check that this observer is writable
 		this.writable = true;
+		// flag to check if we need to debounce the event listener
+		this.delay = 0;
+		// flag to the debounce timer
+		this._debounce = null;
 		// if an object is passed in as value, the break it up into it's parts
 		if (value !== null && typeof value === "object") {
 			this.getter = isFunction(value.get) ? value.get : null;
 			this.setter = isFunction(value.set) ? value.set : null;
 			this.value = value.value;
 			this.writable = typeof value.writable === "boolean" ? value.writable : true;
+			this.delay = typeof value.delay === "number" ? value.delay : 0;
 		} else {
 			// otherwise only the value is passed in
 			this.value = value;
@@ -459,7 +464,7 @@ var Observer = create({
 		return this.getter ? this.getter.call(this.context, this.value) : this.value;
 	},
 	set : function(value) {
-		var i = 0, l = this.events.length, original = this.value;
+		var original = this.value;
 		// if this is not writable then we can't do anything
 		if (!this.writable) {
 			return this.context;
@@ -468,12 +473,32 @@ var Observer = create({
 		this.value = this.setter ? this.setter.call(this.context, value, original) : value;
 		// only fire event listeners if the value has changed
 		if (this.value !== original) {
-			// fire off all event listeners in the order they were added
-			for (; i < l; i++) {
-				this.events[i].call(this.context, value, original);
-			}
+			// emit the change event
+			this.emit();
 		}
 		return this.context;
+	},
+	emit : function() {
+		var self = this;
+		if (this.delay > 0) {
+			if (this._debounce !== null) {
+				root.clearTimeout(this._debounce);
+			}
+			this._debounce = root.setTimeout(function() {
+				this._debounce = null;
+				self.triggerEmit();
+			}, this.delay);
+		} else {
+			this.triggerEmit();
+		}
+		return this.context;
+	},
+	triggerEmit : function() {
+		var i = 0, l = this.events.length;
+		// fire off all event listeners in the order they were added
+		for (; i < l; i++) {
+			this.events[i].call(this.context, this.value);
+		}
 	},
 	addListener : function(listener) {
 		// event listeners can only be functions
@@ -775,7 +800,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.8.5",
+	version : "0.9.0",
 
 	// direct access functions
 	create : create,
