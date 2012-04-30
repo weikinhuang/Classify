@@ -1754,4 +1754,5 @@ if ( typeof exports !== "undefined" || typeof require !== "undefined" ) {
 }
 
 // get at whatever the global object is, like window in browsers
-}( (function() {return this;}.call()) ));
+// !NOTE: Script is in use strict mode, therefore "this" returns null and breaks nodejs
+}( (function() {return this;}.call(window)) ));
