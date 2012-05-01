@@ -358,7 +358,7 @@ QUnit.test("observer with bound setter event listeners and the delay flag set to
 	// create observer with writable flag true
 	var observer = new Observer(testinstance, "z", {
 		value : val,
-		delay : 5
+		delay : 1
 	});
 
 	// flag to make sure we only fire events once

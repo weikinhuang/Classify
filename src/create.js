@@ -215,7 +215,7 @@ var create = function() {
 	klass.implement = (parent.implement || []).concat(implement);
 	klass.observables = extend({}, parent.observables);
 	// Give this class the ability to create sub classes
-	klass.Extend = klass.prototype.Extend = function(p) {
+	klass.extend = klass.prototype.extend = function(p) {
 		return create(klass, p);
 	};
 

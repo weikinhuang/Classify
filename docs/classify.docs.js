@@ -117,6 +117,18 @@ Classify.Class.applicate = function(args) {
 	return new Classify.Class();
 };
 /**
+ * Creates a new class that is a child of the current class
+ *
+ * @param {Object} definition The description of the class to be created
+ * @static
+ * @memberOf Classify.Class
+ * @returns {Classify.Class}
+ * @type {Classify.Class}
+ */
+Classify.Class.extend = function(definition) {
+	return Classify.Class;
+};
+/**
  * Adds a new property to the object's prototype of base
  *
  * @param {String|Object} name The property name to add or if object is passed in then it will iterate through it to add properties
@@ -225,6 +237,18 @@ Classify.Class.prototype.init = function() {
  */
 Classify.Class.prototype.parent = function() {
 	return new Object();
+};
+/**
+ * Creates a new class that is a child of the current class
+ *
+ * @param {Object} definition The description of the class to be created
+ * @static
+ * @memberOf Classify.Class
+ * @returns {Classify.Class}
+ * @type {Classify.Class}
+ */
+Classify.Class.prototype.extend = function(definition) {
+	return Classify.Class;
 };
 
 /**

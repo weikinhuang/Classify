@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.9.0
+ * Classify JavaScript Library v0.9.3
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Mon, 30 Apr 2012 20:42:42 GMT
+ * Date: Tue, 01 May 2012 17:05:13 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -355,7 +355,7 @@ var create = function() {
 	klass.implement = (parent.implement || []).concat(implement);
 	klass.observables = extend({}, parent.observables);
 	// Give this class the ability to create sub classes
-	klass.Extend = klass.prototype.Extend = function(p) {
+	klass.extend = klass.prototype.extend = function(p) {
 		return create(klass, p);
 	};
 
@@ -800,7 +800,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.9.0",
+	version : "0.9.3",
 
 	// direct access functions
 	create : create,

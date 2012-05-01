@@ -1,4 +1,4 @@
-# classify `v0.9.0`
+# classify `v0.9.3`
 ==================================================
 
 ## `Classify`
@@ -24,6 +24,7 @@
  * [`Classify.Class.__isclass_`](#Classify.Class.__isclass_)
  * [`Classify.Class.invoke`](#Classify.Class.invoke)
  * [`Classify.Class.applicate`](#Classify.Class.applicate)
+ * [`Classify.Class.extend`](#Classify.Class.extend)
  * [`Classify.Class.addProperty`](#Classify.Class.addProperty)
  * [`Classify.Class.removeProperty`](#Classify.Class.removeProperty)
  * [`Classify.Class.addStaticProperty`](#Classify.Class.addStaticProperty)
@@ -38,6 +39,7 @@
  * [`Classify.Class#self`](#Classify.Class.prototype.self)
  * [`Classify.Class#init`](#Classify.Class.prototype.init)
  * [`Classify.Class#parent`](#Classify.Class.prototype.parent)
+ * [`Classify.Class#extend`](#Classify.Class.prototype.extend)
 
 
 ## `Classify.Namespace`
@@ -258,6 +260,17 @@ Create a new instance of the class using arguments passed in as an array.
 ##### Returns
 `Classify.Class`
 
+### <a id="Classify.Class.extend" href="#">`Classify.Class.extend(definition)`</a>
+Creates a new class that is a child of the current class.
+[&#9650;](#)
+
+
+##### Arguments
+1. `definition` `{Object}`: The description of the class to be created
+
+##### Returns
+`Classify.Class`
+
 ### <a id="Classify.Class.addProperty" href="#">`Classify.Class.addProperty(name[, property][, prefix=""])`</a>
 Adds a new property to the object's prototype of base.
 [&#9650;](#)
@@ -364,6 +377,17 @@ Internal reference property for methods that override a parent method, allow for
 
 ##### Returns
 `Object`
+
+### <a id="Classify.Class.prototype.extend" href="#">`Classify.Class.prototype.extend(definition)`</a>
+Creates a new class that is a child of the current class.
+[&#9650;](#)
+
+
+##### Arguments
+1. `definition` `{Object}`: The description of the class to be created
+
+##### Returns
+`Classify.Class`
 
 
 
