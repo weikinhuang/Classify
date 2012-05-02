@@ -1,0 +1,11 @@
+.settings
+*~
+*.diff
+*.patch
+.svn
+*/.svn
+.DS_Store
+.externalToolBuilders
+.buildpath
+.project
+build/.sizecache.json
