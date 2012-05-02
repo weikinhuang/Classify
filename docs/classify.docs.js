@@ -205,6 +205,19 @@ Classify.Class.removeObservableProperty = function(name) {
 	return Classify.Class;
 };
 /**
+ * Adds a aliased property to the object's prototype based on a existing prototype method
+ *
+ * @param {String} name The name of the alias for the new property
+ * @param {String} property The name of the property alias
+ * @static
+ * @memberOf Classify.Class
+ * @returns {Classify.Class}
+ * @type {Classify.Class}
+ */
+Classify.Class.addAliasedProperty = function(name, property) {
+	return Classify.Class;
+};
+/**
  * Reference to the constructor function of this object
  *
  * @memberOf Classify.Class

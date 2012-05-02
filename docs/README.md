@@ -31,6 +31,7 @@
  * [`Classify.Class.removeStaticProperty`](#Classify.Class.removeStaticProperty)
  * [`Classify.Class.addObservableProperty`](#Classify.Class.addObservableProperty)
  * [`Classify.Class.removeObservableProperty`](#Classify.Class.removeObservableProperty)
+ * [`Classify.Class.addAliasedProperty`](#Classify.Class.addAliasedProperty)
 
 
 ## `Classify.Class.prototype`
@@ -337,6 +338,18 @@ Removes a observable property to the object's prototype.
 
 ##### Arguments
 1. `name` `{String}`: The name of the observable property to remove
+
+##### Returns
+`Classify.Class`
+
+### <a id="Classify.Class.addAliasedProperty" href="#">`Classify.Class.addAliasedProperty(name, property)`</a>
+Adds a aliased property to the object's prototype based on a existing prototype method.
+[&#9650;](#)
+
+
+##### Arguments
+1. `name` `{String}`: The name of the alias for the new property
+2. `property` `{String}`: The name of the property alias
 
 ##### Returns
 `Classify.Class`
