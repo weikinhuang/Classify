@@ -1,4 +1,4 @@
-[Classify](http://www.closedinterval.com/classify)
+[Classify](http://www.closedinterval.com/classify) [![Build Status](https://secure.travis-ci.org/weikinhuang/Classify.png?branch=master)](http://travis-ci.org/weikinhuang/Classify)
 ==================================================
 
 Classify is a Javascript library that allows for cross platform and cross browser classical inheritance
