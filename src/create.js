@@ -55,8 +55,13 @@ addProperty = function(klass, parent, name, property) {
 				addProperty(klass, parent, staticPrefix + key, prop);
 			});
 		} else {
+			name = name.replace(staticRegexp, "");
+			// we don't want to override the special properties of these classes
+			if (keywordRegexp.test(name)) {
+				return;
+			}
 			// See if we are defining an static property, if we are, assign it to the class
-			klass[name.replace(staticRegexp, "")] = isFunction(property) ? store(function() {
+			klass[name] = isFunction(property) ? store(function() {
 				// Force "this" to be a reference to the class itself to simulate "self"
 				return property.apply(klass, arguments);
 			}, property) : property;
@@ -87,7 +92,7 @@ addProperty = function(klass, parent, name, property) {
 		} else {
 			name = name.replace(aliasedRegexp, "");
 			addProperty(klass, parent, name, function() {
-				return klass.prototype[property].apply(this, arguments);
+				return this[property].apply(this, arguments);
 			});
 		}
 	} else {
@@ -109,7 +114,7 @@ addProperty = function(klass, parent, name, property) {
 // removes a property from the chain
 removeProperty = function(klass, name) {
 	// we don't want to remove the core javascript properties or special properties
-	if ((klass[name] && klass[name] === objectPrototype[name]) || keywordRegexp.test(name.replace(staticRegexp, ""))) {
+	if ((klass.prototype[name] && klass.prototype[name] === objectPrototype[name]) || keywordRegexp.test(name.replace(staticRegexp, ""))) {
 		return;
 	}
 	// See if we are removing an static property, if we are just delete it

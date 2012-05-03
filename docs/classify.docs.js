@@ -255,13 +255,24 @@ Classify.Class.prototype.parent = function() {
  * Creates a new class that is a child of the current class
  *
  * @param {Object} definition The description of the class to be created
- * @static
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
  */
 Classify.Class.prototype.extend = function(definition) {
 	return Classify.Class;
+};
+/**
+ * Magic method that can invoke any of the parent methods
+ *
+ * @param {Object} name The name of the parent method to invoke
+ * @param {Array} args The arguments to pass through to invoke
+ * @memberOf Classify.Class
+ * @returns {Object}
+ * @type {Object}
+ */
+Classify.Class.prototype.invoke = function(name, args) {
+	return new Object();
 };
 
 /**

@@ -41,6 +41,7 @@
  * [`Classify.Class#init`](#Classify.Class.prototype.init)
  * [`Classify.Class#parent`](#Classify.Class.prototype.parent)
  * [`Classify.Class#extend`](#Classify.Class.prototype.extend)
+ * [`Classify.Class#invoke`](#Classify.Class.prototype.invoke)
 
 
 ## `Classify.Namespace`
@@ -401,6 +402,18 @@ Creates a new class that is a child of the current class.
 
 ##### Returns
 `Classify.Class`
+
+### <a id="Classify.Class.prototype.invoke" href="#">`Classify.Class.prototype.invoke(name, args)`</a>
+Magic method that can invoke any of the parent methods.
+[&#9650;](#)
+
+
+##### Arguments
+1. `name` `{Object}`: The name of the parent method to invoke
+2. `args` `{Array}`: The arguments to pass through to invoke
+
+##### Returns
+`Object`
 
 
 

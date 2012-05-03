@@ -1,7 +1,7 @@
 QUnit.module("core");
 
 QUnit.test("basic requirements", function() {
-	QUnit.expect(61);
+	QUnit.expect(63);
 	var test, empty;
 	// test basic properties of the base Object
 	QUnit.ok(Object.prototype, "Object prototype exists");
@@ -94,10 +94,10 @@ QUnit.test("basic requirements", function() {
 	(function() {
 		QUnit.deepEqual(argsToArray(arguments), [ 1, 2, 3 ], "converted arguments array");
 	})(1, 2, 3);
-	
+
 	// test indexOf
-	QUnit.equal(indexOf([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 11), -1, "Missing array element returns -1.");
-	QUnit.equal(indexOf([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 5), 4, "Found array element at proper index.");
+	QUnit.equal(indexOf([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ], 11), -1, "Missing array element returns -1.");
+	QUnit.equal(indexOf([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ], 5), 4, "Found array element at proper index.");
 
 	// test storing a original function into a new function
 	var fn = function() {
@@ -130,6 +130,27 @@ QUnit.test("basic requirements", function() {
 	each(test, function(v, i, o) {
 		QUnit.equal(this, test, "iteration context passed correctly when specified");
 	}, test);
+
+	// test that returning false stops the iteration
+	var iteration_index = 0;
+	each([ 1, 2, 3 ], function(v, i, o) {
+		QUnit.equal(iteration_index++, 0, "each iterator stops when false is returned from callback for arrays.");
+		return false;
+	});
+	var iteration_index = 0;
+	each({
+		a : 1,
+		b : 2,
+		c : 3
+	}, function(v, i, o) {
+		QUnit.equal(iteration_index++, 0, "each iterator stops when false is returned from callback for objects.");
+		return false;
+	});
+
+	// test that null is not iterated through
+	each(null, function(v, i, o) {
+		throw new Error("Null object iterated through in each function");
+	});
 
 	// mapping functionality
 	QUnit.deepEqual(map([ 1, 2, 3, 4, 5 ], function(v, i) {

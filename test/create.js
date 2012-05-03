@@ -219,7 +219,7 @@ QUnit.test("static properties defined in container", function() {
 });
 
 QUnit.test("extending classes using inheritance", function() {
-	QUnit.expect(25);
+	QUnit.expect(26);
 	// testing class for known properties in every defined class
 	var test = create({
 		z : 1,
@@ -329,6 +329,12 @@ QUnit.test("extending classes using inheritance", function() {
 	(new subsubclass()).f();
 	(new subsubclass()).g();
 
+	// extending objects using the extend function
+	var subsubclass_b = subsubclass_a.extend({
+		f : 1
+	});
+	QUnit.ok(new subsubclass_b() instanceof subsubclass_a, "Class created with class.extend inherts from parent class.");
+
 	// testing using the parent invoke method
 	var double, triple, single = create({
 		invoke : function() {
@@ -354,8 +360,45 @@ QUnit.test("extending classes using inheritance", function() {
 	triple();
 });
 
+QUnit.test("Calling parent methods with the invoke magic method", function() {
+	QUnit.expect(3);
+	// testing class for known properties in every defined class
+	var test = create({
+		z : 1,
+		a : function() {
+			return 1;
+		},
+		b : function() {
+			return 2;
+		},
+		d : function() {
+			return 4;
+		}
+	});
+	var subclass = create(test, {
+		b : function() {
+			return 5;
+		},
+		c : function() {
+			return 3;
+		},
+		d : function() {
+			return this.invoke("b");
+		}
+	});
+
+	QUnit.equal((new subclass()).d(), 2, "Calling invoke from within class invokes parent method.");
+	QUnit.equal((new subclass()).invoke("b"), 2, "Calling invoke from outside class invokes parent method.");
+
+	try {
+		(new subclass()).invoke("z");
+	} catch(e) {
+		QUnit.ok(e instanceof Error, "Attempts to invoke parent property that is not a function throws a error.");
+	}
+});
+
 QUnit.test("alias properties", function() {
-//	QUnit.expect(7);
+	QUnit.expect(8);
 	// testing basic alias methods
 	var test = create({
 		__alias_z : 'a',
@@ -403,10 +446,28 @@ QUnit.test("alias properties", function() {
 
 	// call aliased function
 	QUnit.equal(subclass_instance.z(), 3, "Calling alias calls original function's parent.");
+
+	// test aliases working against inheritance
+	var test2 = create({
+		__alias_ : {
+			z : 'a'
+		},
+		x : 0,
+		a : function() {
+			return ++this.x;
+		}
+	});
+
+	var test2_instance = new test2();
+	// call defined function
+	test2_instance.a();
+
+	// call aliased function
+	QUnit.equal(test2_instance.z(), 2, "Calling alias defined in object calls original function's parent.");
 });
 
 QUnit.test("adding new properties", function() {
-	QUnit.expect(11);
+	QUnit.expect(14);
 	// testing class for known properties in every defined class
 	var test = create({});
 
@@ -419,6 +480,13 @@ QUnit.test("adding new properties", function() {
 		return 1;
 	});
 	QUnit.equal((new test()).c(), 1, "invoking a method added using addProperty method");
+
+	var proto = Object.prototype.toString;
+	test.addProperty("toString", function() {
+		return "nothing";
+	});
+	test.addProperty("toString", proto);
+	QUnit.ok(test.prototype.toString !== Object.prototype.toString, "adding object properties do nothing");
 
 	// adding properties to the object
 	test.b = function() {
@@ -440,7 +508,6 @@ QUnit.test("adding new properties", function() {
 	// testing adding aliases
 	test.addAliasedProperty("j", "b");
 	QUnit.equal((new test()).j(), 1, "invoking a method added using addAliasedProperty method.");
-
 
 	// test adding multiple properties
 	test.addProperty({
@@ -485,10 +552,18 @@ QUnit.test("adding new properties", function() {
 	// testing adding aliases
 	test.addAliasedProperty("l", "b");
 	QUnit.equal((new subclass()).l(), 1, "invoking a method added using addAliasedProperty to parent prototype after definition with existing child method.");
+
+	// attempts to override special properties are forbidden
+	var temp_prop = subclass.superclass;
+	subclass.addStaticProperty("superclass", []);
+	QUnit.equal(subclass.superclass, temp_prop, "attempts to override special properties with addStaticProperty are forbidden.");
+
+	subclass.addProperty("__static_superclass", []);
+	QUnit.equal(subclass.superclass, temp_prop, "attempts to override special properties with addProperty are forbidden.");
 });
 
 QUnit.test("removing existing properties", function() {
-	QUnit.expect(7);
+	QUnit.expect(8);
 	// testing class for known properties in every defined class
 	var test = create({
 		__static_z : function() {
@@ -547,6 +622,12 @@ QUnit.test("removing existing properties", function() {
 	test2.removeProperty("b");
 	// trigger test for removing parent function overriden in child
 	(new subclass()).b();
+
+	// attempt to remove special properties fail
+	var test3 = create(subclass, {});
+	var temp_prop = test3.superclass;
+	test3.removeStaticProperty("superclass");
+	QUnit.equal(test3.superclass, temp_prop, "Attempting to remove special properties fail.");
 });
 
 QUnit.test("extending core Javascript objects using inheritance", function() {

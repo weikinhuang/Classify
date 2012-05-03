@@ -230,7 +230,7 @@ QUnit.test("observer called in context with class", function() {
 });
 
 QUnit.test("observer with bound setter event listeners", function() {
-	QUnit.expect(8);
+	QUnit.expect(9);
 	var test = create({
 		a : function() {
 			return 1;
@@ -280,10 +280,17 @@ QUnit.test("observer with bound setter event listeners", function() {
 	QUnit.ok(isArray(listeners), "observers listeners method returned an array of bound listeners.");
 	QUnit.equal(listeners.length, 2, "observers listeners method returned an array or proper number of events.");
 	QUnit.equal(listeners[0], first_listener, "observers listeners method returned an array of bound listeners unmodified.");
+
+	// attempting to add non function listener throws error
+	try {
+		observer2.addListener({});
+	} catch (e) {
+		QUnit.ok(e instanceof Error, "Attempt to bind non function listener throws error.");
+	}
 });
 
 QUnit.test("removing bound event listeners from observer", function() {
-	QUnit.expect(8);
+	QUnit.expect(10);
 	var test = create({
 		a : function() {
 			return 1;
@@ -323,10 +330,22 @@ QUnit.test("removing bound event listeners from observer", function() {
 	QUnit.equal(listeners.length, 1, "observers listeners method returned an array or proper number of events.");
 	QUnit.equal(listeners[0], second_listener, "observers listeners method returned an array of bound listeners unmodified.");
 
+	// attempting to remove non function listener throws error
+	try {
+		observer.removeListener({});
+	} catch (e) {
+		QUnit.ok(e instanceof Error, "Attempt to remove non function listener throws error.");
+	}
+
 	// add event listener
 	observer.addListener(function(value) {
 		throw new Error("Third event listener called.");
 	});
+
+	// attempt to remove non bound listener
+	observer.removeListener(function() {
+	});
+	QUnit.equal(observer.listeners().length, 2, "Attempting to remove non bound listener does nothing.");
 
 	// testing removing all event listeners
 	QUnit.ok(observer.removeAllListeners() === testinstance, "The return value of removeAllListeners is a chain of internal instance.");
