@@ -50,6 +50,7 @@ module.exports = (function(root) {
 			build : workdir + "/build",
 			dist : workdir + "/dist",
 			src : workdir + "/src",
+			coverage : workdir + "/coverage",
 			doc : workdir + "/docs"
 		};
 		build(steps, options);
