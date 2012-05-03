@@ -113,7 +113,7 @@ sandbox.QUnit.done((function() {
 
 //load source and tests into the sandbox
 function load(src, root) {
-	var files = []
+	var files = [];
 	// build up the source file
 	src.forEach(function(file) {
 		try {

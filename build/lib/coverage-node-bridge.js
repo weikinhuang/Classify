@@ -100,7 +100,8 @@ sandbox.QUnit.done((function() {
 		timeout = null;
 		process.send({
 			event : "done",
-			data : sandbox["_$jscoverage"]
+			data : data,
+			coverage : sandbox["_$jscoverage"]
 		});
 	};
 	return function(data) {
