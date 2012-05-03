@@ -7,7 +7,7 @@ path = require("path"),
 // quick reference to root dir
 workdir = path.dirname(path.dirname(__dirname)),
 // path the the src dir
-srcdir = workdir + "/src",
+coveragedir = workdir + "/coverage",
 // path the the test dir
 testdir = workdir + "/test",
 // read options from commandline
@@ -100,7 +100,8 @@ sandbox.QUnit.done((function() {
 		timeout = null;
 		process.send({
 			event : "done",
-			data : data
+			data : data,
+			coverage : sandbox["_$jscoverage"]
 		});
 	};
 	return function(data) {
@@ -137,7 +138,7 @@ function load(src, root) {
 load(options.depends || [], "");
 
 // load up the source files
-load(options.src, srcdir + "/");
+load(options.src, coveragedir + "/");
 
 // load up the test files
 load(options.tests, testdir + "/");

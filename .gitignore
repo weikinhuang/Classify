@@ -10,3 +10,5 @@
 .buildpath
 .project
 build/.sizecache.json
+build/.coveragecache.json
+coverage/*
