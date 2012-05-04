@@ -91,7 +91,7 @@ var Namespace = create({
 			// if it doesn't go that far, then forget deleting it
 			if (!ref[ns]) {
 				ref = null;
-				return this;
+				return false;
 			}
 			ref = ref[ns];
 		});
@@ -101,6 +101,10 @@ var Namespace = create({
 		}
 		// create a quick reference
 		c = ref[name];
+		// if there is nothing in this top level namespace, stop
+		if (!c) {
+			return this;
+		}
 		// recursively remove all inherited classes
 		each(c.subclass, function(v) {
 			self.destroy(v._namespace_);
@@ -145,7 +149,7 @@ var Namespace = create({
 	setAutoloader : function(callback) {
 		// make sure the callback is a function
 		if (!isFunction(callback)) {
-			return this;
+			throw new Error("Namespace.setAutoloader only takes instances of Function");
 		}
 		this.load = callback;
 		return this;
@@ -175,6 +179,10 @@ getNamespace = function(namespace) {
 
 // remove a namespace
 destroyNamespace = function(namespace) {
+	// if namespace passed in, get the name out of it
+	if (namespace instanceof Namespace) {
+		namespace = namespace.name;
+	}
 	// can't destroy the global namespace
 	if (namespace === global_namespace) {
 		return;

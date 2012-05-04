@@ -1,7 +1,7 @@
 QUnit.module("namespace");
 
 QUnit.test("retrieval and creation", function() {
-	QUnit.expect(6);
+	QUnit.expect(8);
 	var ns = getNamespace("Namespace1");
 
 	QUnit.ok(ns instanceof Namespace, "getNamespace returned a namespace");
@@ -11,10 +11,15 @@ QUnit.test("retrieval and creation", function() {
 	QUnit.equal(ns.get("A", function(c) {
 		QUnit.equal(c, null, "async call to get returns null as class doesn't yet exist");
 	}), ns, "get class returns the namespace for chaining and gives ability to load up a class in a async manner");
+
+	QUnit.equal(getNamespace(ns), ns, "Passing a instance of Namespace to getNamespace returns object as is.");
+
+	QUnit.equal(ns + "", "[namespace Namespace1]", "Namespace toString returns [namespace Name]");
+
 });
 
 QUnit.test("class creation", function() {
-	QUnit.expect(12);
+	QUnit.expect(13);
 	var ns = getNamespace("Namespace2");
 
 	QUnit.ok(!ns.exists("A"), "checking for existience of undefined class");
@@ -39,6 +44,8 @@ QUnit.test("class creation", function() {
 	});
 	QUnit.equal(c.getNamespace(), ns, "namespaced class has a getter for the current namespace");
 
+	QUnit.equal(c + "", "[object A]", "namespaced class has overriden toString method");
+
 	// creating nested classes
 	var d = ns.create("B.C", {
 		invoke : function() {
@@ -58,7 +65,7 @@ QUnit.test("class creation", function() {
 });
 
 QUnit.test("class extension and implementation using named references", function() {
-	QUnit.expect(8);
+	QUnit.expect(9);
 	var ns = getNamespace("Namespace3");
 
 	// extending a class with a named instance
@@ -101,10 +108,17 @@ QUnit.test("class extension and implementation using named references", function
 	QUnit.equal(g.prototype.d, f.d, "implementing a object with a named reference");
 	QUnit.equal(g.implement[0], c, "implement class reference stored internally");
 	QUnit.equal(g.implement[1], f, "implement object reference stored internally");
+
+	// attempt to extend a non defined class
+	try {
+		var h = ns.create("Z", "Y", {});
+	} catch (e) {
+		QUnit.ok(e instanceof Error, "attempt to extend a undefined class throws an error");
+	}
 });
 
 QUnit.test("removing named classes", function() {
-	QUnit.expect(7);
+	QUnit.expect(10);
 	var ns = getNamespace("Namespace4");
 	var ca = ns.create("A", {});
 	var cb = ns.create("B", {});
@@ -112,6 +126,8 @@ QUnit.test("removing named classes", function() {
 	var cd = ns.create("D", "A", {});
 	var ce = ns.create("A.E", "A", {});
 	var cf = ns.create("F", "A", {});
+	var cg = ns.create("G.a", {});
+
 
 	// destroy an individual class
 	ns.destroy("B");
@@ -138,10 +154,21 @@ QUnit.test("removing named classes", function() {
 	ns.get("F", function(k) {
 		QUnit.equal(k, null, "removed branch namespace that inherited from a removed branch");
 	});
+
+	// destroy an nested class
+	ns.destroy("G.a");
+	QUnit.equal(typeof ns.G.a, "undefined", "removing a nested class from the namespace");
+
+	ns.destroy("H");
+	QUnit.equal(typeof ns.H, "undefined", "removing a undefined top level class from the namespace does nothing");
+
+	ns.destroy("I.a");
+	QUnit.equal(typeof ns.I, "undefined", "removing a undefined class from the namespace does nothing");
+
 });
 
 QUnit.test("removing namespaces", function() {
-	QUnit.expect(1);
+	QUnit.expect(3);
 	var ns = getNamespace("Namespace5");
 	var ca = ns.create("A", {});
 	var cb = ns.create("B", {});
@@ -154,11 +181,20 @@ QUnit.test("removing namespaces", function() {
 
 	// try to retrieve another instance of the "Namespace5" namespace
 	var ns2 = getNamespace("Namespace5");
-	QUnit.ok(ns2 !== ns, "new instance of namespace is created");
+	QUnit.ok(ns2 !== ns, "new instance of namespace is created after destroyed by name");
+
+	// destroy namespace by object
+	destroyNamespace(ns2);
+	QUnit.ok(getNamespace("Namespace5") !== ns2, "new instance of namespace is created after destroyed by reference");
+
+	// attempts to remove global namespace
+	var global_ns = getGlobalNamespace();
+	destroyNamespace("GLOBAL");
+	QUnit.equal(getGlobalNamespace(), global_ns, "removing global namespace does nothing");
 });
 
 QUnit.test("class autoloading", function() {
-	QUnit.expect(4);
+	QUnit.expect(5);
 	var ns = getNamespace("Namespace6");
 
 	ns.get("A", function(k) {
@@ -169,7 +205,7 @@ QUnit.test("class autoloading", function() {
 	var ca = ns.create("A", {});
 
 	var temp = {};
-	// setting the autoloader fora specific namespace
+	// setting the autoloader for a specific namespace
 	ns.setAutoloader(function(name, callback) {
 		QUnit.equal(name, "B", "autoloader only being called if class doesn't exist.");
 		callback(temp);
@@ -182,6 +218,13 @@ QUnit.test("class autoloading", function() {
 	ns.get("A", function(k) {
 		QUnit.equal(k, ca, "retrieving class already existing class");
 	});
+
+	// attempt to set autoloader to a non function
+	try {
+		ns.setAutoloader([]);
+	} catch (e) {
+		QUnit.ok(e instanceof Error, "attempt to set non function autoloader throws an error");
+	}
 });
 
 QUnit.test("global namespace inheritance", function() {
@@ -201,4 +244,20 @@ QUnit.test("global namespace inheritance", function() {
 
 	// retrieval of named classes cascades into the global namespace
 	QUnit.equal(ns.get("X"), x, "retrieval of named class in namespace cascades into the global namespace");
+});
+
+QUnit.test("testing namespaces", function() {
+	QUnit.expect(4);
+	var ns = getNamespace("Namespace8");
+	var ns2 = getNamespace("Namespace8.Ns8a");
+
+	var ns3 = getNamespace("Namespace9");
+
+	QUnit.equal(testNamespace("Namespace10"), null, "Attempts to test non defined namespace returns null.");
+
+	QUnit.equal(testNamespace("Namespace8"), ns, "Attempts to test defined root level namespace returns namespacec.");
+
+	QUnit.equal(testNamespace("Namespace8.Ns8a"), ns2, "Attempts to test defined nested namespace returns namespace.");
+
+	QUnit.equal(testNamespace("Namespace9.a.b.c"), ns3, "Attempts to retieve non defined namespace returns parent namespace.");
 });

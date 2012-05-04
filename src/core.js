@@ -1,17 +1,9 @@
 // shortcut for minification compaction
 var prototype = "prototype", string = "string",
 // For IE, check if looping through objects works with toString & valueOf
-isEnumerationBuggy = (function() {
-	var p;
-	for (p in {
-		toString : 1
-	}) {
-		if (p === "toString") {
-			return false;
-		}
-	}
-	return true;
-})(),
+isEnumerationBuggy = !({
+	toString : 1
+}).propertyIsEnumerable("toString"),
 // gets the enumerated keys if necessary (bug in older ie < 9)
 enumeratedKeys = isEnumerationBuggy ? "hasOwnProperty,valueOf,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,constructor".split(",") : [],
 // quick reference to the enumerated items length

@@ -73,7 +73,7 @@ var Observer = create({
 	addListener : function(listener) {
 		// event listeners can only be functions
 		if (!isFunction(listener)) {
-			throw new Error('addListener only takes instances of Function');
+			throw new Error("Observer.addListener only takes instances of Function");
 		}
 		// add the event to the queue
 		this.events.push(listener);
@@ -82,7 +82,7 @@ var Observer = create({
 	removeListener : function(listener) {
 		// event listeners can only be functions
 		if (!isFunction(listener)) {
-			throw new Error('removeListener only takes instances of Function');
+			throw new Error("Observer.removeListener only takes instances of Function");
 		}
 		// remove the event listener if it exists
 		var i = indexOf(this.events, listener);

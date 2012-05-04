@@ -1,28 +1,20 @@
 /*!
- * Classify JavaScript Library v0.9.3
+ * Classify JavaScript Library v0.9.4
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Wed, 02 May 2012 22:00:31 GMT
+ * Date: Fri, 04 May 2012 03:06:48 GMT
  */
 (function( root, undefined ) {
 	"use strict";
 // shortcut for minification compaction
 var prototype = "prototype", string = "string",
 // For IE, check if looping through objects works with toString & valueOf
-isEnumerationBuggy = (function() {
-	var p;
-	for (p in {
-		toString : 1
-	}) {
-		if (p === "toString") {
-			return false;
-		}
-	}
-	return true;
-})(),
+isEnumerationBuggy = !({
+	toString : 1
+}).propertyIsEnumerable("toString"),
 // gets the enumerated keys if necessary (bug in older ie < 9)
 enumeratedKeys = isEnumerationBuggy ? "hasOwnProperty,valueOf,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,constructor".split(",") : [],
 // quick reference to the enumerated items length
@@ -195,8 +187,13 @@ addProperty = function(klass, parent, name, property) {
 				addProperty(klass, parent, staticPrefix + key, prop);
 			});
 		} else {
+			name = name.replace(staticRegexp, "");
+			// we don't want to override the special properties of these classes
+			if (keywordRegexp.test(name)) {
+				return;
+			}
 			// See if we are defining an static property, if we are, assign it to the class
-			klass[name.replace(staticRegexp, "")] = isFunction(property) ? store(function() {
+			klass[name] = isFunction(property) ? store(function() {
 				// Force "this" to be a reference to the class itself to simulate "self"
 				return property.apply(klass, arguments);
 			}, property) : property;
@@ -227,7 +224,7 @@ addProperty = function(klass, parent, name, property) {
 		} else {
 			name = name.replace(aliasedRegexp, "");
 			addProperty(klass, parent, name, function() {
-				return klass.prototype[property].apply(this, arguments);
+				return this[property].apply(this, arguments);
 			});
 		}
 	} else {
@@ -249,7 +246,7 @@ addProperty = function(klass, parent, name, property) {
 // removes a property from the chain
 removeProperty = function(klass, name) {
 	// we don't want to remove the core javascript properties or special properties
-	if ((klass[name] && klass[name] === objectPrototype[name]) || keywordRegexp.test(name.replace(staticRegexp, ""))) {
+	if ((klass.prototype[name] && klass.prototype[name] === objectPrototype[name]) || keywordRegexp.test(name.replace(staticRegexp, ""))) {
 		return;
 	}
 	// See if we are removing an static property, if we are just delete it
@@ -369,7 +366,7 @@ var create = function() {
 	klass.superclass = parent;
 	klass.subclass = [];
 	klass.implement = (parent.implement || []).concat(implement);
-	klass.observables = extend({}, parent.observables);
+	klass.observables = extend({}, parent.observables || {});
 	// Give this class the ability to create sub classes
 	klass.extend = klass.prototype.extend = function(p) {
 		return create(klass, p);
@@ -522,7 +519,7 @@ var Observer = create({
 	addListener : function(listener) {
 		// event listeners can only be functions
 		if (!isFunction(listener)) {
-			throw new Error('addListener only takes instances of Function');
+			throw new Error("Observer.addListener only takes instances of Function");
 		}
 		// add the event to the queue
 		this.events.push(listener);
@@ -531,7 +528,7 @@ var Observer = create({
 	removeListener : function(listener) {
 		// event listeners can only be functions
 		if (!isFunction(listener)) {
-			throw new Error('removeListener only takes instances of Function');
+			throw new Error("Observer.removeListener only takes instances of Function");
 		}
 		// remove the event listener if it exists
 		var i = indexOf(this.events, listener);
@@ -654,7 +651,7 @@ var Namespace = create({
 			// if it doesn't go that far, then forget deleting it
 			if (!ref[ns]) {
 				ref = null;
-				return this;
+				return false;
 			}
 			ref = ref[ns];
 		});
@@ -664,6 +661,10 @@ var Namespace = create({
 		}
 		// create a quick reference
 		c = ref[name];
+		// if there is nothing in this top level namespace, stop
+		if (!c) {
+			return this;
+		}
 		// recursively remove all inherited classes
 		each(c.subclass, function(v) {
 			self.destroy(v._namespace_);
@@ -708,7 +709,7 @@ var Namespace = create({
 	setAutoloader : function(callback) {
 		// make sure the callback is a function
 		if (!isFunction(callback)) {
-			return this;
+			throw new Error("Namespace.setAutoloader only takes instances of Function");
 		}
 		this.load = callback;
 		return this;
@@ -738,6 +739,10 @@ getNamespace = function(namespace) {
 
 // remove a namespace
 destroyNamespace = function(namespace) {
+	// if namespace passed in, get the name out of it
+	if (namespace instanceof Namespace) {
+		namespace = namespace.name;
+	}
 	// can't destroy the global namespace
 	if (namespace === global_namespace) {
 		return;
@@ -819,7 +824,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.9.3",
+	version : "0.9.4",
 
 	// direct access functions
 	create : create,
