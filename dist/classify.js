@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.9.4
+ * Classify JavaScript Library v0.9.5
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Fri, 04 May 2012 03:06:48 GMT
+ * Date: Tue, 08 May 2012 17:28:56 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -136,6 +136,8 @@ var staticRegexp = /^__static_/,
 observableRegexp = /^__observable_/,
 // regex for testing if property is an alias
 aliasedRegexp = /^__alias_/,
+// regex for testing if property is not to be wrapped
+nowrapRegexp = /^__nowrap_/,
 // regex for keyword properties
 keywordRegexp = /^(?:superclass|subclass|implement|observables|extend|prototype|subclass|applicate|addProperty|removeProperty|addStaticProperty|addObservableProperty|removeObservableProperty|addAliasedProperty)$/,
 // prefix for static properties
@@ -144,6 +146,8 @@ staticPrefix = "__static_",
 observablePrefix = "__observable_",
 // prefix for aliased properties
 aliasedPrefix = "__alias_",
+// prefix for unwrapped function properties
+nowrapPrefix = "__nowrap_",
 // create the base object that everything extends from
 base = (function() {
 	var fn = function() {
@@ -226,6 +230,15 @@ addProperty = function(klass, parent, name, property) {
 			addProperty(klass, parent, name, function() {
 				return this[property].apply(this, arguments);
 			});
+		}
+	} else if (nowrapRegexp.test(name)) {
+		// if the name of the property is the alias prefix, then iterate through the object
+		if (name === nowrapPrefix) {
+			each(property, function(prop, key) {
+				addProperty(klass, parent, nowrapPrefix + key, prop);
+			});
+		} else {
+			klass.prototype[name.replace(nowrapRegexp, "")] = property;
 		}
 	} else {
 		var parent_prototype = parent.prototype[name], self_prototype = klass.prototype;
@@ -424,6 +437,9 @@ var create = function() {
 	};
 	klass.addAliasedProperty = function(name, property) {
 		return klass.addProperty(name, property, aliasedPrefix);
+	};
+	klass.addUnwrappedProperty = function(name, property) {
+		return klass.addProperty(name, property, nowrapPrefix);
 	};
 	// Now implement each of the implemented objects before extending
 	if (implement.length !== 0) {
@@ -824,7 +840,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.9.4",
+	version : "0.9.5",
 
 	// direct access functions
 	create : create,

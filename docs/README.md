@@ -1,4 +1,4 @@
-# classify `v0.9.4`
+# classify `v0.9.5`
 ==================================================
 
 ## `Classify`
@@ -32,6 +32,7 @@
  * [`Classify.Class.addObservableProperty`](#Classify.Class.addObservableProperty)
  * [`Classify.Class.removeObservableProperty`](#Classify.Class.removeObservableProperty)
  * [`Classify.Class.addAliasedProperty`](#Classify.Class.addAliasedProperty)
+ * [`Classify.Class.addUnwrappedProperty`](#Classify.Class.addUnwrappedProperty)
 
 
 ## `Classify.Class.prototype`
@@ -351,6 +352,18 @@ Adds a aliased property to the object's prototype based on a existing prototype 
 ##### Arguments
 1. `name` `{String}`: The name of the alias for the new property
 2. `property` `{String}`: The name of the property alias
+
+##### Returns
+`Classify.Class`
+
+### <a id="Classify.Class.addUnwrappedProperty" href="#">`Classify.Class.addUnwrappedProperty(name, property)`</a>
+Adds a property to the object's prototype that is not wrapped in the parent method wrapper.
+[&#9650;](#)
+
+
+##### Arguments
+1. `name` `{String}`: The name of the new property
+2. `property` `{String}`: The name of the property to add
 
 ##### Returns
 `Classify.Class`

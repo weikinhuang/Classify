@@ -32,7 +32,7 @@ QUnit.test("simple class creation", function() {
 });
 
 QUnit.test("invocation and constructors", function() {
-	QUnit.expect(17);
+	QUnit.expect(18);
 	// testing class creation without a constructor
 	var test = create({
 		a : 1,
@@ -135,6 +135,7 @@ QUnit.test("invocation and constructors", function() {
 		}
 	});
 	QUnit.ok(new test_sub() instanceof test, "overriding the 'new' keyword within a class constructor");
+	QUnit.ok(test_sub.applicate([ "a" ]) instanceof test, "overriding the 'new' keyword within a class constructor called with applicate");
 });
 
 QUnit.test("known properties", function() {
@@ -216,6 +217,42 @@ QUnit.test("static properties defined in container", function() {
 	QUnit.equal(test.b(), 2, "Invoking static function of a class when defined within container");
 	QUnit.equal((new test()).c(), 2, "Reading static property by name within a class when defined within container");
 	QUnit.equal((new test()).e(), 2, "Reading static property by using self within a class when defined within container");
+});
+
+QUnit.test("non wrapped properties", function() {
+	QUnit.expect(3);
+	// testing class creation with static properties
+	var test = create({
+		__nowrap_a : 2,
+		__nowrap_b : Array.prototype.push,
+		length : 0
+	});
+
+	QUnit.equal((new test()).a, 2, "Reading non wrapped property of an class");
+	QUnit.equal((new test()).b, Array.prototype.push, "Reading non wrapped method of an class");
+	// calling non wrapped property
+	var test_instance = new test();
+	test_instance.b("a");
+	QUnit.equal(test_instance[0], "a", "Invoking non wrapped function is called within instance context");
+});
+
+QUnit.test("non wrapped properties defined in container", function() {
+	QUnit.expect(3);
+	// testing class creation with static properties
+	var test = create({
+		__nowrap_ : {
+			a : 2,
+			b : Array.prototype.push
+		},
+		length : 0
+	});
+
+	QUnit.equal((new test()).a, 2, "Reading non wrapped property of an class when defined within container");
+	QUnit.equal((new test()).b, Array.prototype.push, "Reading non wrapped method of an class when defined within container");
+	// calling non wrapped property
+	var test_instance = new test();
+	test_instance.b("a");
+	QUnit.equal(test_instance[0], "a", "Invoking non wrapped function is called within instance context when defined within container");
 });
 
 QUnit.test("extending classes using inheritance", function() {
@@ -392,7 +429,7 @@ QUnit.test("Calling parent methods with the invoke magic method", function() {
 
 	try {
 		(new subclass()).invoke("z");
-	} catch(e) {
+	} catch (e) {
 		QUnit.ok(e instanceof Error, "Attempts to invoke parent property that is not a function throws a error.");
 	}
 });
@@ -467,7 +504,7 @@ QUnit.test("alias properties", function() {
 });
 
 QUnit.test("adding new properties", function() {
-	QUnit.expect(14);
+	QUnit.expect(15);
 	// testing class for known properties in every defined class
 	var test = create({});
 
@@ -508,6 +545,11 @@ QUnit.test("adding new properties", function() {
 	// testing adding aliases
 	test.addAliasedProperty("j", "b");
 	QUnit.equal((new test()).j(), 1, "invoking a method added using addAliasedProperty method.");
+
+	// testing adding non wrapped properties
+	test.addUnwrappedProperty("m", Array.prototype.push);
+	QUnit.equal((new test()).m, Array.prototype.push, "testing a method added using addUnwrappedProperty method.");
+
 
 	// test adding multiple properties
 	test.addProperty({

@@ -218,6 +218,19 @@ Classify.Class.addAliasedProperty = function(name, property) {
 	return Classify.Class;
 };
 /**
+ * Adds a property to the object's prototype that is not wrapped in the parent method wrapper
+ *
+ * @param {String} name The name of the new property
+ * @param {String} property The name of the property to add
+ * @static
+ * @memberOf Classify.Class
+ * @returns {Classify.Class}
+ * @type {Classify.Class}
+ */
+Classify.Class.addUnwrappedProperty = function(name, property) {
+	return Classify.Class;
+};
+/**
  * Reference to the constructor function of this object
  *
  * @memberOf Classify.Class
