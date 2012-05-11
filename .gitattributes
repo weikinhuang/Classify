@@ -1,4 +1,4 @@
-*     eol=lf
+*				eol=lf
 
 .gitattributes	export-ignore
 .gitignore		export-ignore
