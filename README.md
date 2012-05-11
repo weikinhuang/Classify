@@ -1,7 +1,7 @@
 [Classify.js](http://www.closedinterval.com/classify) [![Build Status](https://secure.travis-ci.org/weikinhuang/Classify.png?branch=master)](http://travis-ci.org/weikinhuang/Classify)
 ==================================================
 
-Classify.js is a Javascript library that allows for cross platform and cross browser Object Oriented
+Classify.js is a library that allows for cross platform and cross browser Object Oriented Javascript
 class definitions using classical inheritance and namespaces behind the prototype syntax in an easy to
 use interface function. Classify also provides "observable" properties that can be assigned getters and
 setters and onchange listeners to provide abstractions around `get` and `set` accessors.
@@ -221,7 +221,7 @@ Running JsHint tests: `./make.js lint`
 
 Running JsPerf tests: `./make.js perf`
 
-Other options include: `clean`, `lint`, `unit`, `concat`, `min`, `size`, `perf`
+Other options include: `clean`, `lint`, `unit`, `concat`, `min`, `size`, `perf`, `doc`
 
 Changelog
 --------------------------------------

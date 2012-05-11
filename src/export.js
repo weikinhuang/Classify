@@ -9,7 +9,7 @@ Classify = create({
 			return getNamespace();
 		}
 		// if the first parameter is a string
-		if (typeof args[0] === string) {
+		if (typeof args[0] === "string") {
 			// and there is only 1 arguments
 			if (length === 1) {
 				tmp = args[0].split(namespace_separator);
@@ -22,7 +22,7 @@ Classify = create({
 				return ns;
 			}
 			// if we passed in 2 arguments of strings then we want a class within a namespace
-			if (length === 2 && typeof args[1] === string) {
+			if (length === 2 && typeof args[1] === "string") {
 				return getNamespace(args[0]).get(args[1]);
 			}
 			// otherwise we will assume the first parameter is the namespace

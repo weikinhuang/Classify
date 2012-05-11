@@ -18,7 +18,7 @@ provide = function(namespace, base) {
 // ability to de-reference string into it's classes
 dereference = function(base, arg, ref) {
 	// Allow parent classes to be passed in as a string for lookup
-	if (typeof arg === string) {
+	if (typeof arg === "string") {
 		ref = base[arg] || getGlobalNamespace().get(arg) || null;
 		if (!ref) {
 			throw new Error("Invalid parent class [" + arg + "] specified.");

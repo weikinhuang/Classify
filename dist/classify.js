@@ -5,12 +5,12 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Tue, 08 May 2012 17:28:56 GMT
+ * Date: Fri, 11 May 2012 02:59:20 GMT
  */
 (function( root, undefined ) {
 	"use strict";
 // shortcut for minification compaction
-var prototype = "prototype", string = "string",
+var prototype = "prototype",
 // For IE, check if looping through objects works with toString & valueOf
 isEnumerationBuggy = !({
 	toString : 1
@@ -594,7 +594,7 @@ provide = function(namespace, base) {
 // ability to de-reference string into it's classes
 dereference = function(base, arg, ref) {
 	// Allow parent classes to be passed in as a string for lookup
-	if (typeof arg === string) {
+	if (typeof arg === "string") {
 		ref = base[arg] || getGlobalNamespace().get(arg) || null;
 		if (!ref) {
 			throw new Error("Invalid parent class [" + arg + "] specified.");
@@ -792,7 +792,7 @@ Classify = create({
 			return getNamespace();
 		}
 		// if the first parameter is a string
-		if (typeof args[0] === string) {
+		if (typeof args[0] === "string") {
 			// and there is only 1 arguments
 			if (length === 1) {
 				tmp = args[0].split(namespace_separator);
@@ -805,7 +805,7 @@ Classify = create({
 				return ns;
 			}
 			// if we passed in 2 arguments of strings then we want a class within a namespace
-			if (length === 2 && typeof args[1] === string) {
+			if (length === 2 && typeof args[1] === "string") {
 				return getNamespace(args[0]).get(args[1]);
 			}
 			// otherwise we will assume the first parameter is the namespace
