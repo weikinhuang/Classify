@@ -15,7 +15,7 @@ module.exports = (function(root) {
 		var commentRegexp = /^\/\*\*[\S\s]+?\s*(\*\s+@|\*\/$)/;
 		var returnsRegexp = /@returns\s+([\S\s]+?)\s*(\*\s+@|\*\/$)/;
 		var paramsRegexp = /@param\s+([\S\s]+?)\s*(?:\*\s*@|\*\/$)/;
-		var exampleRegexp = /@example\s+[\S\s]+$/g;
+		var exampleRegexp = /@example\s+<code>([\S\s]+?)<\/code>/g;
 		var staticRegexp = /@static\b/;
 		var privateRegexp = /@private\b/;
 		var constructorRegexp = /@constructor\b/;
@@ -44,8 +44,8 @@ module.exports = (function(root) {
 			}
 			// parse example if any
 			var exampleMatch = exampleRegexp.exec(block.doc);
-			if (exampleMatch && exampleMatch[0]) {
-				doc.example = trim(trim(exampleMatch[0].replace(/\s*\*\/$/, "").replace(/^\s*\*\s*/gm, "").replace(/^\s*\*\s*@\s*$/gm, "").replace(/^\s*@example/, "")).replace(/^\<code\>/, "").replace(/\<\/code\>$/, ""));
+			if (exampleMatch && exampleMatch[1]) {
+				doc.example = trim(trim(exampleMatch[1]).replace(/^\s*\* ?/gm, "").replace(/\t/g, "    "));
 			}
 
 			var memberOfMatch = memberOfRegexp.exec(block.doc);
