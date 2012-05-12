@@ -249,8 +249,8 @@ var create = function() {
 	klass.implement = (parent.implement || []).concat(implement);
 	klass.observables = extend({}, parent.observables || {});
 	// Give this class the ability to create sub classes
-	klass.extend = klass.prototype.extend = function(p) {
-		return create(klass, p);
+	klass.extend = klass.prototype.extend = function() {
+		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
 	};
 
 	// This method allows for the constructor to not be called when making a new subclass

@@ -5,7 +5,7 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Fri, 11 May 2012 02:59:20 GMT
+ * Date: Sat, 12 May 2012 01:54:30 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -381,8 +381,8 @@ var create = function() {
 	klass.implement = (parent.implement || []).concat(implement);
 	klass.observables = extend({}, parent.observables || {});
 	// Give this class the ability to create sub classes
-	klass.extend = klass.prototype.extend = function(p) {
-		return create(klass, p);
+	klass.extend = klass.prototype.extend = function() {
+		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
 	};
 
 	// This method allows for the constructor to not be called when making a new subclass
@@ -637,6 +637,12 @@ var Namespace = create({
 		// Assign the magic properties of the class's name and namespace
 		c._name_ = name;
 		c._namespace_ = fullname;
+		// fix the issue with the extends function referencing string classes
+		c.extend = c.prototype.extend = function() {
+			return create.apply(null, [ c ].concat(map(arguments, function(v) {
+				return dereference(deref, v);
+			})));
+		};
 		// give classes the ability to always store the namespace for chaining
 		c.getNamespace = function() {
 			return self;

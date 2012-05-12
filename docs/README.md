@@ -335,13 +335,14 @@ Create a new instance of the class using arguments passed in as an array.
 ##### Returns
 `Classify.Class`
 
-### <a id="Classify.Class.extend" href="#">`Classify.Class.extend(definition)`</a>
+### <a id="Classify.Class.extend" href="#">`Classify.Class.extend([implement], definition)`</a>
 Creates a new class that is a child of the current class.
 [&#9650;](#)
 
 
 ##### Arguments
-1. `definition` `{Object}`: The description of the class to be created
+1. `[implement]` `{Object[]}`: Optional parameter defines where to implement traits from
+2. `definition` `{Object}`: The description of the class to be created
 
 ##### Returns
 `Classify.Class`
@@ -477,13 +478,14 @@ Internal reference property for methods that override a parent method, allow for
 ##### Returns
 `Object`
 
-### <a id="Classify.Class.prototype.extend" href="#">`Classify.Class.prototype.extend(definition)`</a>
+### <a id="Classify.Class.prototype.extend" href="#">`Classify.Class.prototype.extend([implement], definition)`</a>
 Creates a new class that is a child of the current class.
 [&#9650;](#)
 
 
 ##### Arguments
-1. `definition` `{Object}`: The description of the class to be created
+1. `[implement]` `{Object[]}`: Optional parameter defines where to implement traits from
+2. `definition` `{Object}`: The description of the class to be created
 
 ##### Returns
 `Classify.Class`

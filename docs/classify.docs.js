@@ -177,7 +177,8 @@ Classify.Class.invoke = function() {
 /**
  * Create a new instance of the class using arguments passed in as an array
  *
- * @param {Array} args Array of arguments to construct the object with
+ * @param {Array}
+ *            args Array of arguments to construct the object with
  * @static
  * @memberOf Classify.Class
  * @returns {Classify.Class}
@@ -189,21 +190,27 @@ Classify.Class.applicate = function(args) {
 /**
  * Creates a new class that is a child of the current class
  *
- * @param {Object} definition The description of the class to be created
+ * @param {Object[]}
+ *            [implement] Optional parameter defines where to implement traits from
+ * @param {Object}
+ *            definition The description of the class to be created
  * @static
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
  */
-Classify.Class.extend = function(definition) {
+Classify.Class.extend = function(implement, definition) {
 	return Classify.Class;
 };
 /**
  * Adds a new property to the object's prototype of base
  *
- * @param {String|Object} name The property name to add or if object is passed in then it will iterate through it to add properties
- * @param {Object} [property] The property to add to the class
- * @param {String} [prefix=""] Prefix of the property name if any
+ * @param {String|Object}
+ *            name The property name to add or if object is passed in then it will iterate through it to add properties
+ * @param {Object}
+ *            [property] The property to add to the class
+ * @param {String}
+ *            [prefix=""] Prefix of the property name if any
  * @static
  * @memberOf Classify.Class
  * @returns {Classify.Class}
@@ -215,7 +222,8 @@ Classify.Class.addProperty = function(name, property, prefix) {
 /**
  * Removes a property from the object's prototype or base
  *
- * @param {String} name The name of the property to remove
+ * @param {String}
+ *            name The name of the property to remove
  * @static
  * @memberOf Classify.Class
  * @returns {Classify.Class}
@@ -227,8 +235,10 @@ Classify.Class.removeProperty = function(name) {
 /**
  * Adds a static property to the object's base
  *
- * @param {String} name The name of the property to add
- * @param {Object} property The property to store into the object's base
+ * @param {String}
+ *            name The name of the property to add
+ * @param {Object}
+ *            property The property to store into the object's base
  * @static
  * @memberOf Classify.Class
  * @returns {Classify.Class}
@@ -240,7 +250,8 @@ Classify.Class.addStaticProperty = function(name, property) {
 /**
  * Removes a static property from the object's base
  *
- * @param {String} name The name of the property to remove
+ * @param {String}
+ *            name The name of the property to remove
  * @static
  * @memberOf Classify.Class
  * @returns {Classify.Class}
@@ -252,8 +263,10 @@ Classify.Class.removeStaticProperty = function(name) {
 /**
  * Adds a new observable property to the object's prototype
  *
- * @param {String} name The name of the observable property to add
- * @param {Object} property The descriptor of the observable property
+ * @param {String}
+ *            name The name of the observable property to add
+ * @param {Object}
+ *            property The descriptor of the observable property
  * @static
  * @memberOf Classify.Class
  * @returns {Classify.Class}
@@ -265,7 +278,8 @@ Classify.Class.addObservableProperty = function(name, property) {
 /**
  * Removes a observable property to the object's prototype
  *
- * @param {String} name The name of the observable property to remove
+ * @param {String}
+ *            name The name of the observable property to remove
  * @static
  * @memberOf Classify.Class
  * @returns {Classify.Class}
@@ -277,8 +291,10 @@ Classify.Class.removeObservableProperty = function(name) {
 /**
  * Adds a aliased property to the object's prototype based on a existing prototype method
  *
- * @param {String} name The name of the alias for the new property
- * @param {String} property The name of the property alias
+ * @param {String}
+ *            name The name of the alias for the new property
+ * @param {String}
+ *            property The name of the property alias
  * @static
  * @memberOf Classify.Class
  * @returns {Classify.Class}
@@ -290,8 +306,10 @@ Classify.Class.addAliasedProperty = function(name, property) {
 /**
  * Adds a property to the object's prototype that is not wrapped in the parent method wrapper
  *
- * @param {String} name The name of the new property
- * @param {String} property The name of the property to add
+ * @param {String}
+ *            name The name of the new property
+ * @param {String}
+ *            property The name of the property to add
  * @static
  * @memberOf Classify.Class
  * @returns {Classify.Class}
@@ -337,19 +355,24 @@ Classify.Class.prototype.parent = function() {
 /**
  * Creates a new class that is a child of the current class
  *
- * @param {Object} definition The description of the class to be created
+ * @param {Object[]}
+ *            [implement] Optional parameter defines where to implement traits from
+ * @param {Object}
+ *            definition The description of the class to be created
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
  */
-Classify.Class.prototype.extend = function(definition) {
+Classify.Class.prototype.extend = function(implement, definition) {
 	return Classify.Class;
 };
 /**
  * Magic method that can invoke any of the parent methods
  *
- * @param {Object} name The name of the parent method to invoke
- * @param {Array} args The arguments to pass through to invoke
+ * @param {Object}
+ *            name The name of the parent method to invoke
+ * @param {Array}
+ *            args The arguments to pass through to invoke
  * @memberOf Classify.Class
  * @returns {Object}
  * @type {Object}
@@ -364,7 +387,8 @@ Classify.Class.prototype.invoke = function(name, args) {
  * @constructor
  * @augments {Classify.Class}
  * @super {Classify.Class}
- * @param {String} name The name of the namespace to construct with
+ * @param {String}
+ *            name The name of the namespace to construct with
  * @memberOf Classify
  */
 Classify.Namespace = function(name) {
@@ -394,11 +418,14 @@ Classify.Namespace.prototype.ref = new Object();
 /**
  * Creates a new class within this namespace
  *
- * @param {String} name The name of the created class within the namespace
- * @param {String|Classify.Class} [parent] Optional second parameter defines what object to inherit from, can be a string referencing a class within any
- *            namespace
- * @param {Object[]} [implement] Optional third parameter defines where to implement traits from
- * @param {Object} definition The description of the class to be created
+ * @param {String}
+ *            name The name of the created class within the namespace
+ * @param {String|Classify.Class}
+ *            [parent] Optional second parameter defines what object to inherit from, can be a string referencing a class within any namespace
+ * @param {Object[]}
+ *            [implement] Optional third parameter defines where to implement traits from
+ * @param {Object}
+ *            definition The description of the class to be created
  * @memberOf Classify.Namespace
  * @returns {Classify.Class}
  * @type {Classify.Class}
@@ -408,7 +435,8 @@ Classify.Namespace.prototype.create = function(name, parent, implement, definiti
 /**
  * Removes a defined class from this namespace and it's children classes
  *
- * @param {String} classname Name of class to remove from this namespace
+ * @param {String}
+ *            classname Name of class to remove from this namespace
  * @memberOf Classify.Namespace
  * @returns {Classify.Namespace}
  * @type {Classify.Namespace}
@@ -419,7 +447,8 @@ Classify.Namespace.prototype.destroy = function(classname) {
 /**
  * Checks if a class exists within this namespace
  *
- * @param {String} classname Name of class to check if it has already been defined
+ * @param {String}
+ *            classname Name of class to check if it has already been defined
  * @memberOf Classify.Namespace
  * @returns {Boolean}
  * @type {Boolean}
@@ -430,8 +459,10 @@ Classify.Namespace.prototype.exists = function(classname) {
 /**
  * Attempt to retrieve a class within this namespace or the global one
  *
- * @param {String} name The name of the class to retrieve
- * @param {Function} [callback] If passed in the first parameter will the found class
+ * @param {String}
+ *            name The name of the class to retrieve
+ * @param {Function}
+ *            [callback] If passed in the first parameter will the found class
  * @memberOf Classify.Namespace
  * @return {Classify.Class}
  * @type {Classify.Class}
@@ -442,8 +473,10 @@ Classify.Namespace.prototype.get = function(name, callback) {
 /**
  * Default loader function that loads the internal classes from
  *
- * @param {String} name The name of the class to load
- * @param {Function} callback The function to call when the class has loaded
+ * @param {String}
+ *            name The name of the class to load
+ * @param {Function}
+ *            callback The function to call when the class has loaded
  * @memberOf Classify.Namespace
  * @returns {Classify.Namespace}
  * @type {Classify.Namespace}
@@ -454,7 +487,8 @@ Classify.Namespace.prototype.load = function(name, callback) {
 /**
  * Sets the internal autoloader by overriding the Classify.Namespace.prototype.load method
  *
- * @param {Function} callback The function to call when a class that doesn't exist needs to be loaded
+ * @param {Function}
+ *            callback The function to call when a class that doesn't exist needs to be loaded
  * @memberOf Classify.Namespace
  * @returns {Classify.Namespace}
  * @type {Classify.Namespace}
@@ -487,12 +521,18 @@ Classify.Namespace.prototype.toString = function() {
  * @constructor
  * @augments {Classify.Class}
  * @super {Classify.Class}
- * @param {Object} value The internal value can be either an object or a value
- * @param {Object} value.value The internal value if the parameter was passed in as an object
- * @param {Boolean} [value.writable=true] Marks this object as writable or readonly
- * @param {Number} [value.delay=0] Only fire the event emitter after a delay of value.delay ms
- * @param {Function} [value.getter] The internal get modifier
- * @param {Function} [value.setter] The internal set modifier
+ * @param {Object}
+ *            value The internal value can be either an object or a value
+ * @param {Object}
+ *            value.value The internal value if the parameter was passed in as an object
+ * @param {Boolean}
+ *            [value.writable=true] Marks this object as writable or readonly
+ * @param {Number}
+ *            [value.delay=0] Only fire the event emitter after a delay of value.delay ms
+ * @param {Function}
+ *            [value.getter] The internal get modifier
+ * @param {Function}
+ *            [value.setter] The internal set modifier
  * @memberOf Classify
  */
 Classify.Observer = function(value) {
@@ -557,7 +597,8 @@ Classify.Observer.prototype.events = new Array();
 /**
  * Internal getter method that modifies the internal value being returned by the Classify.Observer.prototype.get method
  *
- * @param {Object} value The internal value of this object
+ * @param {Object}
+ *            value The internal value of this object
  * @private
  * @memberOf Classify.Observer
  * @returns {Object}
@@ -569,8 +610,10 @@ Classify.Observer.prototype.getter = function(value) {
 /**
  * Internal setter method that modifies the internal value being set by the Classify.Observer.prototype.set method
  *
- * @param {Object} value The new value that will be set
- * @param {Object} original The original internal value of this object
+ * @param {Object}
+ *            value The new value that will be set
+ * @param {Object}
+ *            original The original internal value of this object
  * @private
  * @memberOf Classify.Observer
  * @returns {Object}
@@ -592,7 +635,8 @@ Classify.Observer.prototype.get = function() {
 /**
  * Sets the value of the internal property
  *
- * @param {Object} value Mixed value to store internally
+ * @param {Object}
+ *            value Mixed value to store internally
  * @memberOf Classify.Observer
  * @returns {Classify.Class}
  * @type {Classify.Class}
@@ -621,7 +665,8 @@ Classify.Observer.prototype.triggerEmit = function() {
 /**
  * Add an event listener for when the internal value is changed
  *
- * @param {Function} listener The event listener to add
+ * @param {Function}
+ *            listener The event listener to add
  * @throws Error
  * @memberOf Classify.Observer
  * @returns {Classify.Class}
@@ -633,7 +678,8 @@ Classify.Observer.prototype.addListener = function(listener) {
 /**
  * Remove an event listener from being fired when the internal value is changed
  *
- * @param {Function} listener The event listener to remove
+ * @param {Function}
+ *            listener The event listener to remove
  * @throws Error
  * @memberOf Classify.Observer
  * @returns {Classify.Class}
@@ -686,9 +732,12 @@ Classify.Observer.prototype.toString = function() {
 /**
  * Creates a new Classify class
  *
- * @param {Classify.Class} [parent] Optional first parameter defines what object to inherit from
- * @param {Object[]} [implement] Optional second parameter defines where to implement traits from
- * @param {Object} definition The description of the class to be created
+ * @param {Classify.Class}
+ *            [parent] Optional first parameter defines what object to inherit from
+ * @param {Object[]}
+ *            [implement] Optional second parameter defines where to implement traits from
+ * @param {Object}
+ *            definition The description of the class to be created
  * @static
  * @memberOf Classify
  * @returns {Classify.Class}
@@ -701,7 +750,8 @@ Classify.create = function(parent, implement, definition) {
 /**
  * Retrieves a namespace and creates if it it doesn't already exist
  *
- * @param {String} namespace Dot separated namespace string
+ * @param {String}
+ *            namespace Dot separated namespace string
  * @static
  * @memberOf Classify
  * @returns {Classify.Namespace}
@@ -714,7 +764,8 @@ Classify.getNamespace = function(namespace) {
 /**
  * Destroy an existing namespace
  *
- * @param {String} namespace Dot separated namespace string
+ * @param {String}
+ *            namespace Dot separated namespace string
  * @static
  * @memberOf Classify
  */
@@ -724,7 +775,8 @@ Classify.destroyNamespace = function(namespace) {
 /**
  * Retrieves the first namespace that matches the namespace chain "Ns1.ns2.ns3.ns4"
  *
- * @param {String} namespace Dot separated namespace string
+ * @param {String}
+ *            namespace Dot separated namespace string
  * @static
  * @memberOf Classify
  * @returns {Classify.Namespace}
@@ -749,8 +801,10 @@ Classify.getGlobalNamespace = function() {
 /**
  * Utility function to provide functionality to quickly add properties to objects
  *
- * @param {Object} base The base object to copy properties into
- * @param {Object[]} args Set of objects to copy properties from
+ * @param {Object}
+ *            base The base object to copy properties into
+ * @param {Object[]}
+ *            args Set of objects to copy properties from
  * @static
  * @memberOf Classify
  * @returns {Object}
@@ -763,8 +817,10 @@ Classify.extend = function(base, args) {
 /**
  * Utility function to provide functionality to allow for name provisioning
  *
- * @param {String} namespace The dot separated namespace tree to create
- * @param {Object} base The object to create the namespace tree within
+ * @param {String}
+ *            namespace The dot separated namespace tree to create
+ * @param {Object}
+ *            base The object to create the namespace tree within
  * @static
  * @memberOf Classify
  * @returns {Object}

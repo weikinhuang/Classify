@@ -61,6 +61,12 @@ var Namespace = create({
 		// Assign the magic properties of the class's name and namespace
 		c._name_ = name;
 		c._namespace_ = fullname;
+		// fix the issue with the extends function referencing string classes
+		c.extend = c.prototype.extend = function() {
+			return create.apply(null, [ c ].concat(map(arguments, function(v) {
+				return dereference(deref, v);
+			})));
+		};
 		// give classes the ability to always store the namespace for chaining
 		c.getNamespace = function() {
 			return self;

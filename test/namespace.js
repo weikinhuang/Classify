@@ -65,7 +65,7 @@ QUnit.test("class creation", function() {
 });
 
 QUnit.test("class extension and implementation using named references", function() {
-	QUnit.expect(9);
+	QUnit.expect(11);
 	var ns = getNamespace("Namespace3");
 
 	// extending a class with a named instance
@@ -115,6 +115,15 @@ QUnit.test("class extension and implementation using named references", function
 	} catch (e) {
 		QUnit.ok(e instanceof Error, "attempt to extend a undefined class throws an error");
 	}
+
+	// using the extend function
+	var i = ns.C.extend([ "B" ], {
+		c : function() {
+			return this;
+		}
+	});
+	QUnit.equal(i.prototype.a, c.prototype.a, "implementing a class using a named reference with extend");
+	QUnit.equal(i.prototype.b, d.prototype.b, "implementing a object with a named reference with extend");
 });
 
 QUnit.test("removing named classes", function() {
