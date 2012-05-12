@@ -226,7 +226,78 @@ Other options include: `clean`, `lint`, `unit`, `concat`, `min`, `size`, `perf`,
 Changelog
 --------------------------------------
 
-Coming soon!
+#### v0.9.5
+	Added ability to add non wrapped methods to the class prototype
+
+#### v0.9.4
+	Adding Travis-ci config file
+	Fix issue with IE6-9 when extending from non CLassify classes
+	General bug fixes, removing support for IE<6
+
+#### v0.9.3
+	Renaming Class.Extend to Class.extend
+
+#### v0.9.2
+	Ability to delay event listeners from being triggered in observers
+
+#### v0.9.0
+	Ability to add statics and observers in a container
+
+#### v0.8.5
+	Fix issue with adding overriding functions to a parent prototype
+
+#### v0.8.0
+	Only fire observer listeners when the value has changed
+
+#### v0.7.5
+	fixing parent invocation using applicate in default invoke method
+
+#### v0.7.0
+	Ability to inherit from objects that are not created with Classify.create.
+	Allow Classify to be AMD compatible.
+	extend utility function that "extends" objects with properties from other objects in a shallow manner
+	fix issue with class invocation of "invoke" when class is a direct property of a namespace
+	"get" in namespace cascades into "GLOBAL" namespace classes
+	groundwork for ability to extend native and non create objects
+	Removing check for native objects (IE doesn't allow extending native objects).
+	throw Error objects instead of strings
+
+#### v0.6.0
+	better detection of parameters for using Classify function ("namespace/classname" for retrieval)
+	minification optimizations
+	quicker access to the GLOBAL namespace
+
+#### v0.4.0
+	ability to inherit the parent invoke method if not defined
+	exporting provide to the Classify object
+	GLOBAL namespace that all namespaced classes can inherit from
+
+#### v0.3.5
+	ability to get a class definition synchronously and asynchronously in Classify
+	ability to test if a namespace exists
+	adding Classify.noConflict for conflict free usage of Classify
+
+#### v0.3.0
+	using more standardized nomenclature
+	"_construct_" => "init"
+	"_invoke_" => "invoke"
+	"_apply_" => "applicate"
+	"_parent_" => "parent"
+	"_self_" => "self"
+
+#### v0.2.0
+	ability to create and destory classes created within namespaces
+	better checking of enumerable keys in IE < 9
+	bugfix on Extend functionality
+	Classify function endpoint has ability to to get namespace and create classes within the namespace
+	fixing issue with adding multiple properties to a class with the addProperty call
+	"get" in namespace takes in a callback and passes in the class
+	global references
+	namespacing functionality
+	only export classify to root object if it's a browser
+	pulled out the body of invoke to apply and default invoke will call apply
+	the exported object is created using the internal Create method
+	updated to "use strict";
 
 About
 --------------------------------------
@@ -237,7 +308,8 @@ Build Tools:
 [QUnit](https://github.com/jquery/qunit),
 [Benchmark.js](https://github.com/bestiejs/benchmark.js),
 [UglifyJS](https://github.com/mishoo/UglifyJS),
-[JsHint](https://github.com/jshint/jshint).
+[JsHint](https://github.com/jshint/jshint),
+[JsCoverage](http://siliconforks.com/jscoverage).
 
 All code released under the [MIT License](http://mit-license.org/).
 
