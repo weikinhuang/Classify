@@ -219,6 +219,29 @@ QUnit.test("static properties defined in container", function() {
 	QUnit.equal((new test()).e(), 2, "Reading static property by using self within a class when defined within container");
 });
 
+QUnit.test("static properties that are instances of a class", function() {
+	QUnit.expect(3);
+	// create a class
+	var prop = create({
+		g : 2,
+		__static_a : 1,
+		__static_f : function() {
+			return this.a;
+		}
+	});
+	// testing class creation with static properties
+	var test = create({
+		__static_b : prop,
+		d : function() {
+			return this.self;
+		}
+	});
+
+	QUnit.equal(test.b, prop, "Static property of a class is an unwrapped class");
+	QUnit.equal(test.b.f(), 1, "Static property of an internal class is set defined properly");
+	QUnit.equal((new test.b()).g, 2, "Instantiating static class defined within another class");
+});
+
 QUnit.test("non wrapped properties", function() {
 	QUnit.expect(3);
 	// testing class creation with static properties
@@ -549,7 +572,6 @@ QUnit.test("adding new properties", function() {
 	// testing adding non wrapped properties
 	test.addUnwrappedProperty("m", Array.prototype.push);
 	QUnit.equal((new test()).m, Array.prototype.push, "testing a method added using addUnwrappedProperty method.");
-
 
 	// test adding multiple properties
 	test.addProperty({

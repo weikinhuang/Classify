@@ -1,7 +1,7 @@
 module.exports = {
 	name : "classify",
 	pkg : "package.json",
-	version : "0.9.5",
+	version : "0.9.6",
 	wrap : {
 		copy : [ "copyright.js" ],
 		intro : [ "intro.js" ],

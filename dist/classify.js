@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.9.5
+ * Classify JavaScript Library v0.9.6
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Sat, 12 May 2012 01:54:30 GMT
+ * Date: Tue, 15 May 2012 19:31:25 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -197,7 +197,7 @@ addProperty = function(klass, parent, name, property) {
 				return;
 			}
 			// See if we are defining an static property, if we are, assign it to the class
-			klass[name] = isFunction(property) ? store(function() {
+			klass[name] = (isFunction(property) && !property.__isclass_) ? store(function() {
 				// Force "this" to be a reference to the class itself to simulate "self"
 				return property.apply(klass, arguments);
 			}, property) : property;
@@ -243,7 +243,7 @@ addProperty = function(klass, parent, name, property) {
 	} else {
 		var parent_prototype = parent.prototype[name], self_prototype = klass.prototype;
 		// Else this is not a prefixed static property, so we're assigning it to the prototype
-		self_prototype[name] = isFunction(property) && isFunction(parent_prototype) ? wrapParentProperty(parent_prototype, property) : property;
+		self_prototype[name] = (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property;
 
 		// Wrap all child implementation with the parent wrapper
 		if (isFunction(property)) {
@@ -846,7 +846,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.9.5",
+	version : "0.9.6",
 
 	// direct access functions
 	create : create,

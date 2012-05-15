@@ -65,7 +65,7 @@ addProperty = function(klass, parent, name, property) {
 				return;
 			}
 			// See if we are defining an static property, if we are, assign it to the class
-			klass[name] = isFunction(property) ? store(function() {
+			klass[name] = (isFunction(property) && !property.__isclass_) ? store(function() {
 				// Force "this" to be a reference to the class itself to simulate "self"
 				return property.apply(klass, arguments);
 			}, property) : property;
@@ -111,7 +111,7 @@ addProperty = function(klass, parent, name, property) {
 	} else {
 		var parent_prototype = parent.prototype[name], self_prototype = klass.prototype;
 		// Else this is not a prefixed static property, so we're assigning it to the prototype
-		self_prototype[name] = isFunction(property) && isFunction(parent_prototype) ? wrapParentProperty(parent_prototype, property) : property;
+		self_prototype[name] = (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property;
 
 		// Wrap all child implementation with the parent wrapper
 		if (isFunction(property)) {
