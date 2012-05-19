@@ -8,7 +8,7 @@ module.exports = {
 		outro : [ "outro.js" ]
 	},
 	src : [ "core.js", "create.js", "mutator.static.js", "mutator.nowrap.js", "mutator.alias.js", "observer.js", "mutator.observable.js", "namespace.js", "export.js" ],
-	unit : [ "core.js", "create.js", "observer.js", "mutator.observable.js", "namespace.js", "export.js" ],
+	unit : [ "core.js", "create.js", "mutator.static.js", "mutator.nowrap.js", "mutator.alias.js", "observer.js", "mutator.observable.js", "namespace.js", "export.js" ],
 	perf : [],
 	docs : [ "classify.docs.js" ],
 	env : {
