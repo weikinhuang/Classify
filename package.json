@@ -1,6 +1,6 @@
 {
 	"name" : "classifyjs",
-	"description" : "Classify is a Javascript library that allows for cross platform classical inheritance and namespaces behind the prototype syntax in an easy to use interface function.",
+	"description" : "Classify.js is a library that allows for cross platform and cross browser Object Oriented Javascript class definitions using classical inheritance and namespaces behind the prototype syntax in an easy to use interface function.",
 	"keywords" : [ "util", "functional", "server", "client", "browser", "prototype", "object-oriented", "class", "classes", "inheritance", "abstraction" ],
 	"author" : "Wei Kin Huang <wei@closedinterval.com>",
 	"version" : "0.9.6",
