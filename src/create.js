@@ -1,5 +1,5 @@
 // regex for keyword properties
-var keywordRegexp = /^(?:superclass|subclass|implement|observable|extend|prototype|subclass|applicate|addProperty|removeProperty|addStaticProperty|addObservableProperty|removeObservableProperty|addAliasedProperty)$/,
+var keywordRegexp = /^(?:superclass|subclass|implement|observable|extend|prototype|applicate|(?:add|remove)(?:Static|Observable|Aliased)Property)$/,
 // reference to existing mutators
 mutators = {},
 // array of mutators that will get called when a class is created

@@ -67,6 +67,8 @@ extend(Classify, {
 	testNamespace : testNamespace,
 	getGlobalNamespace : getGlobalNamespace,
 	Observer : Observer,
+	addMutator : addMutator,
+	removeMutator : removeMutator,
 
 	// utility function to provide functionality to quickly add properties to objects
 	extend : extend,
