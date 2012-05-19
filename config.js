@@ -7,7 +7,7 @@ module.exports = {
 		intro : [ "intro.js" ],
 		outro : [ "outro.js" ]
 	},
-	src : [ "core.js", "create.js", "observer.js", "namespace.js", "export.js" ],
+	src : [ "core.js", "create.js", "mutator.js", "observer.js", "namespace.js", "export.js" ],
 	unit : [ "core.js", "create.js", "observer.js", "namespace.js", "export.js" ],
 	perf : [],
 	docs : [ "classify.docs.js" ],

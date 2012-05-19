@@ -5,7 +5,7 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Tue, 15 May 2012 19:31:25 GMT
+ * Date: Sat, 19 May 2012 03:12:25 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -130,24 +130,18 @@ extend = function() {
 	});
 	return base;
 };
-// regex for testing if property is static
-var staticRegexp = /^__static_/,
-// regex for testing if property is observable
-observableRegexp = /^__observable_/,
-// regex for testing if property is an alias
-aliasedRegexp = /^__alias_/,
-// regex for testing if property is not to be wrapped
-nowrapRegexp = /^__nowrap_/,
 // regex for keyword properties
-keywordRegexp = /^(?:superclass|subclass|implement|observables|extend|prototype|subclass|applicate|addProperty|removeProperty|addStaticProperty|addObservableProperty|removeObservableProperty|addAliasedProperty)$/,
-// prefix for static properties
-staticPrefix = "__static_",
-// prefix for observable properties
-observablePrefix = "__observable_",
-// prefix for aliased properties
-aliasedPrefix = "__alias_",
-// prefix for unwrapped function properties
-nowrapPrefix = "__nowrap_",
+var keywordRegexp = /^(?:superclass|subclass|implement|extend|prototype|subclass|applicate|addProperty|removeProperty|addStaticProperty|addObservableProperty|removeObservableProperty|addAliasedProperty)$/,
+// reference to existing mutators
+mutators = {},
+// array of mutators that will get called when a class is created
+createMutator = [],
+// array of mutators that will get called when a property is added to the class
+propAddMutator = [],
+// array of mutators that will get called when a property is removed from the class
+propRemoveMutator = [],
+// array of mutators that will get called when a class is instantiated
+initMutator = [],
 // create the base object that everything extends from
 base = (function() {
 	var fn = function() {
@@ -158,7 +152,6 @@ base = (function() {
 	fn.superclass = null;
 	fn.subclass = [];
 	fn.implement = [];
-	fn.observables = {};
 	fn.prototype.constructor = base;
 	fn.prototype.self = base;
 	fn.__isclass_ = true;
@@ -178,135 +171,110 @@ wrapParentProperty = function(parentPrototype, property) {
 		return ret;
 	}, property);
 },
+// function to add external mutators to modify the class with certain hooks
+addMutator = function(mutator) {
+	var name = mutator.name;
+	if (mutators[name]) {
+		throw new Error("Adding duplicate mutator \"" + name + "\".");
+	}
+	mutators[name] = mutator;
+	mutator.propTest = new RegExp("^__" + name + "_");
+	mutator.propPrefix = "__" + name + "_";
+	if (mutator.onCreate) {
+		createMutator.push(mutator);
+	}
+	if (mutator.onPropAdd) {
+		propAddMutator.push(mutator);
+	}
+	if (mutator.onPropRemove) {
+		propRemoveMutator.push(mutator);
+	}
+	if (mutator.onInit) {
+		initMutator.push(mutator);
+	}
+},
+// function to remove external mutators
+removeMutator = function(mutator) {
+
+},
 // adds a property to an existing class taking into account parent
 addProperty = function(klass, parent, name, property) {
 	// we don't want to re-add the core javascript properties, it's redundant
 	if (property === objectPrototype[name]) {
 		return;
 	}
-	if (staticRegexp.test(name)) {
-		if (name === staticPrefix) {
-			// if the name of the property is the static prefix, then iterate through the object
-			each(property, function(prop, key) {
-				addProperty(klass, parent, staticPrefix + key, prop);
-			});
-		} else {
-			name = name.replace(staticRegexp, "");
-			// we don't want to override the special properties of these classes
-			if (keywordRegexp.test(name)) {
-				return;
-			}
-			// See if we are defining an static property, if we are, assign it to the class
-			klass[name] = (isFunction(property) && !property.__isclass_) ? store(function() {
-				// Force "this" to be a reference to the class itself to simulate "self"
-				return property.apply(klass, arguments);
-			}, property) : property;
-		}
-	} else if (observableRegexp.test(name)) {
-		// if the name of the property is the observable prefix, then iterate through the object
-		if (name === observablePrefix) {
-			each(property, function(prop, key) {
-				addProperty(klass, parent, observablePrefix + key, prop);
-			});
-		} else {
-			name = name.replace(observableRegexp, "");
-			klass.observables[name] = property;
-			// we need to add the observable property from all children as well as the current class
-			each(klass.subclass, function(k) {
-				// add it only if it is not redefined in the child classes
-				if (!hasOwn.call(k.observables, name)) {
-					k.addObservableProperty(name, property);
-				}
-			});
-		}
-	} else if (aliasedRegexp.test(name)) {
-		// if the name of the property is the alias prefix, then iterate through the object
-		if (name === aliasedPrefix) {
-			each(property, function(prop, key) {
-				addProperty(klass, parent, aliasedPrefix + key, prop);
-			});
-		} else {
-			name = name.replace(aliasedRegexp, "");
-			addProperty(klass, parent, name, function() {
-				return this[property].apply(this, arguments);
-			});
-		}
-	} else if (nowrapRegexp.test(name)) {
-		// if the name of the property is the alias prefix, then iterate through the object
-		if (name === nowrapPrefix) {
-			each(property, function(prop, key) {
-				addProperty(klass, parent, nowrapPrefix + key, prop);
-			});
-		} else {
-			klass.prototype[name.replace(nowrapRegexp, "")] = property;
-		}
-	} else {
-		var parent_prototype = parent.prototype[name], self_prototype = klass.prototype;
-		// Else this is not a prefixed static property, so we're assigning it to the prototype
-		self_prototype[name] = (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property;
 
-		// Wrap all child implementation with the parent wrapper
-		if (isFunction(property)) {
-			each(klass.subclass, function(k) {
-				// add only if it's not already wrapped
-				if (isFunction(k.prototype[name]) && !k.prototype[name].__original_) {
-					k.prototype[name] = wrapParentProperty(self_prototype[name], k.prototype[name]);
-				}
-			});
+	var foundMutator = false;
+	each(propAddMutator, function(mutator) {
+		if (mutator.propTest.test(name)) {
+			if (name === mutator.propPrefix) {
+				each(property, function(prop, key) {
+					mutator.onPropAdd.call(mutator, klass, parent, key, prop);
+				});
+			} else {
+				mutator.onPropAdd.call(mutator, klass, parent, name.replace(mutator.propTest, ""), property);
+			}
+			foundMutator = true;
+			return false;
 		}
+	});
+	if (foundMutator) {
+		return;
+	}
+
+	var parent_prototype = parent.prototype[name], self_prototype = klass.prototype;
+	// Else this is not a prefixed static property, so we're assigning it to the prototype
+	self_prototype[name] = (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property;
+
+	// Wrap all child implementation with the parent wrapper
+	if (isFunction(property)) {
+		each(klass.subclass, function(k) {
+			// add only if it's not already wrapped
+			if (isFunction(k.prototype[name]) && !k.prototype[name].__original_) {
+				k.prototype[name] = wrapParentProperty(self_prototype[name], k.prototype[name]);
+			}
+		});
 	}
 },
 // removes a property from the chain
 removeProperty = function(klass, name) {
 	// we don't want to remove the core javascript properties or special properties
-	if ((klass.prototype[name] && klass.prototype[name] === objectPrototype[name]) || keywordRegexp.test(name.replace(staticRegexp, ""))) {
+	if (klass.prototype[name] && klass.prototype[name] === objectPrototype[name]) {
 		return;
 	}
-	// See if we are removing an static property, if we are just delete it
-	if (staticRegexp.test(name)) {
-		name = name.replace(staticRegexp, "");
-		klass[name] = null;
-		try {
-			delete klass[name];
-		} catch (e) {
+
+	var foundMutator = false;
+	each(propRemoveMutator, function(mutator) {
+		if (mutator.propTest.test(name)) {
+			mutator.onPropRemove.call(mutator, klass, name.replace(mutator.propTest, ""));
+			foundMutator = true;
+			return false;
 		}
-	} else if (observableRegexp.test(name)) {
-		name = name.replace(observableRegexp, "");
-		var tmp = klass.observables[name];
-		// we need to delete the observable property from all children as well as the current class
-		each(klass.subclass, function(k) {
-			// remove it only if it is equal to the parent class
-			if (k.observables[name] === tmp) {
-				k.removeObservableProperty(name);
-			}
-		});
-		klass.observables[name] = null;
-		try {
-			delete klass.observables[name];
-		} catch (e) {
-		}
-	} else {
-		// if we are not removing a function from the prototype chain, then just delete it
-		if (!isFunction(klass.prototype[name])) {
-			klass.prototype[name] = null;
-			try {
-				delete klass.prototype[name];
-			} catch (e) {
-			}
-			return;
-		}
-		// we need to delete the observable property from all children as well as the current class
-		each(klass.subclass, function(k) {
-			// remove the parent function wrapper for child classes
-			if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].__original_)) {
-				k.prototype[name] = k.prototype[name].__original_;
-			}
-		});
+	});
+	if (foundMutator) {
+		return;
+	}
+
+	// if we are not removing a function from the prototype chain, then just delete it
+	if (!isFunction(klass.prototype[name])) {
 		klass.prototype[name] = null;
 		try {
 			delete klass.prototype[name];
 		} catch (e) {
 		}
+		return;
+	}
+	// we need to delete the observable property from all children as well as the current class
+	each(klass.subclass, function(k) {
+		// remove the parent function wrapper for child classes
+		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].__original_)) {
+			k.prototype[name] = k.prototype[name].__original_;
+		}
+	});
+	klass.prototype[name] = null;
+	try {
+		delete klass.prototype[name];
+	} catch (e) {
 	}
 };
 
@@ -340,7 +308,7 @@ var create = function() {
 	}
 	// Constructor function
 	var klass = function() {
-		var prop, tmp;
+		var tmp, i, l;
 		// We're not creating a instantiated object so we want to force a instantiation or call the invoke function
 		// we need to test for !this when in "use strict" mode
 		// we need to test for !this.init for quick check if this is a instance or a definition
@@ -348,11 +316,8 @@ var create = function() {
 		if (!this || !this.init || !(this instanceof klass)) {
 			return klass.invoke.apply(klass, arguments);
 		}
-		// initialize the observable properties if any
-		for (prop in klass.observables) {
-			if (hasOwn.call(klass.observables, prop)) {
-				this[prop] = new Observer(this, prop, klass.observables[prop]);
-			}
+		for (i = 0, l = initMutator.length; i < l; i++) {
+			initMutator[i].onInit.call(initMutator[i], this, klass);
 		}
 		// just in case we want to do anything special like "new" keyword override (usually don't return anything)
 		tmp = this.init.apply(this, arguments);
@@ -379,7 +344,6 @@ var create = function() {
 	klass.superclass = parent;
 	klass.subclass = [];
 	klass.implement = (parent.implement || []).concat(implement);
-	klass.observables = extend({}, parent.observables || {});
 	// Give this class the ability to create sub classes
 	klass.extend = klass.prototype.extend = function() {
 		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
@@ -422,25 +386,7 @@ var create = function() {
 		removeProperty(klass, name);
 		return klass;
 	};
-	// shortcut methods for adding and removing special properties
-	klass.addStaticProperty = function(name, property) {
-		return klass.addProperty(name, property, staticPrefix);
-	};
-	klass.removeStaticProperty = function(name) {
-		return klass.removeProperty(staticPrefix + name);
-	};
-	klass.addObservableProperty = function(name, property) {
-		return klass.addProperty(name, property, observablePrefix);
-	};
-	klass.removeObservableProperty = function(name) {
-		return klass.removeProperty(observablePrefix + name);
-	};
-	klass.addAliasedProperty = function(name, property) {
-		return klass.addProperty(name, property, aliasedPrefix);
-	};
-	klass.addUnwrappedProperty = function(name, property) {
-		return klass.addProperty(name, property, nowrapPrefix);
-	};
+
 	// Now implement each of the implemented objects before extending
 	if (implement.length !== 0) {
 		each(implement, function(impl) {
@@ -453,6 +399,11 @@ var create = function() {
 		});
 	}
 
+	// call each of the onCreate mutators to modify this class
+	each(createMutator, function(mutator) {
+		mutator.onCreate.call(mutator, klass, parent);
+	});
+
 	// Now extend each of those methods and allow for a parent accessor
 	klass.addProperty(methods);
 	klass.prototype.constructor = klass;
@@ -460,6 +411,82 @@ var create = function() {
 	klass.__isclass_ = true;
 	return klass;
 };
+// mutator for adding static properties to a class
+addMutator({
+	// the special identifier is "__static_"
+	name : "static",
+	onCreate : function(klass, parent) {
+		var mutatorPrefix = this.propPrefix;
+		// shortcut method for adding static properties
+		klass.addStaticProperty = function(name, property) {
+			return klass.addProperty(name, property, mutatorPrefix);
+		};
+		// shortcut method for removing static properties
+		klass.removeStaticProperty = function(name) {
+			return klass.removeProperty(mutatorPrefix + name);
+		};
+	},
+	onPropAdd : function(klass, parent, name, property) {
+		// we don't want to override the reserved properties of these classes
+		if (keywordRegexp.test(name)) {
+			return;
+		}
+		// See if we are defining an static property, if we are, assign it to the class
+		klass[name] = (isFunction(property) && !property.__isclass_) ? store(function() {
+			// Force "this" to be a reference to the class itself to simulate "self"
+			return property.apply(klass, arguments);
+		}, property) : property;
+	},
+	onPropRemove : function(klass, name) {
+		// prevent removing reserved static properties created with "create"
+		if (keywordRegexp.test(name)) {
+			return;
+		}
+		// garbage collection
+		klass[name] = null;
+		// then try to remove the property
+		try {
+			delete klass[name];
+		} catch (e) {
+		}
+	}
+});
+
+// mutator for adding unwrapped function properties to a class
+addMutator({
+	// the special identifier is "__nowrap_"
+	name : "nowrap",
+	onCreate : function(klass, parent) {
+		var mutatorPrefix = this.propPrefix;
+		// shortcut method for adding unwrapped properties
+		klass.addUnwrappedProperty = function(name, property) {
+			return klass.addProperty(name, property, mutatorPrefix);
+		};
+	},
+	onPropAdd : function(klass, parent, name, property) {
+		// unwrapped properties are simply added to the prototype
+		klass.prototype[name] = property;
+	}
+});
+
+// mutator for adding aliased function properties to a class
+addMutator({
+	// the special identifier is "__alias_"
+	name : "alias",
+	onCreate : function(klass, parent) {
+		var mutatorPrefix = this.propPrefix;
+		// shortcut method for adding aliased properties
+		klass.addAliasedProperty = function(name, property) {
+			return klass.addProperty(name, property, mutatorPrefix);
+		};
+	},
+	onPropAdd : function(klass, parent, name, property) {
+		// alias properties are simply function wrappers
+		addProperty(klass, parent, name, function() {
+			return this[property].apply(this, arguments);
+		});
+	}
+});
 // Observer class that handles an abstraction layer to class properties (getter and setter methods)
 var Observer = create({
 	init : function(context, name, value) {
@@ -572,6 +599,67 @@ var Observer = create({
 	toString : function() {
 		// overriden toString function to say this is an instance of an observer
 		return "[observer " + this.name + "]";
+	}
+});
+
+// mutator for adding observable properties to a class
+addMutator({
+	// the special identifier is "__observable_"
+	name : "observable",
+	onCreate : function(klass, parent) {
+		var mutator = this;
+		// re-assign the observable so that it produces copies across child classes
+		klass.observable = extend({}, parent.observable || {});
+		// shortcut method for adding observable properties
+		klass.addObservableProperty = function(name, property) {
+			return klass.addProperty(name, property, mutator.propPrefix);
+		};
+		// shortcut method for removing observable properties
+		klass.removeObservableProperty = function(name) {
+			return klass.removeProperty(mutator.propPrefix + name);
+		};
+	},
+	onPropAdd : function(klass, parent, name, property) {
+		// add the observable to the internal observable array
+		klass.observable[name] = property;
+		// we need to add the observable property from all children as well as the current class
+		each(klass.subclass, function(k) {
+			// add it only if it is not redefined in the child classes
+			if (!hasOwn.call(k.observable, name)) {
+				k.addObservableProperty(name, property);
+			}
+		});
+	},
+	onPropRemove : function(klass, name) {
+		// keep a reference to the current observable property
+		var tmp = klass.observable[name];
+		// we need to delete the observable property from all children as well as the current class
+		each(klass.subclass, function(k) {
+			// remove it only if it is equal to the parent class
+			if (k.observable[name] === tmp) {
+				k.removeObservableProperty(name);
+			}
+		});
+		// garbage collection
+		klass.observable[name] = null;
+		// then try to remove the property
+		try {
+			delete klass.observable[name];
+		} catch (e) {
+		}
+	},
+	onInit : function(instance, klass) {
+		var prop, observables = klass.observable || null;
+		// if there are no observable properties, just continue
+		if (observables === null) {
+			return;
+		}
+		// initialize the observable properties if any
+		for (prop in observables) {
+			if (hasOwn.call(observables, prop)) {
+				instance[prop] = new Observer(instance, prop, observables[prop]);
+			}
+		}
 	}
 });
 // global container containing all the namespace references

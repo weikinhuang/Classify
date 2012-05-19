@@ -226,6 +226,9 @@ Other options include: `clean`, `lint`, `unit`, `concat`, `min`, `size`, `perf`,
 Changelog
 --------------------------------------
 
+#### v0.9.6
+	Fix case where classes are added as properties of other classes
+
 #### v0.9.5
 	Added ability to add non wrapped methods to the class prototype
 
