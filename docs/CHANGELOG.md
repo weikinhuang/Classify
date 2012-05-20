@@ -1,3 +1,7 @@
+#### v0.9.7
+	Refactoring internals so that adding and removing mutators can be externalized
+	Added mutator to auto bind functions to a class instance
+
 #### v0.9.6
 	Fix case where classes are added as properties of other classes
 

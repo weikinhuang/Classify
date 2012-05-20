@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.9.6
+ * Classify JavaScript Library v0.9.7
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Sat, 19 May 2012 03:12:25 GMT
+ * Date: Sun, 20 May 2012 16:36:12 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -131,7 +131,7 @@ extend = function() {
 	return base;
 };
 // regex for keyword properties
-var keywordRegexp = /^(?:superclass|subclass|implement|extend|prototype|subclass|applicate|addProperty|removeProperty|addStaticProperty|addObservableProperty|removeObservableProperty|addAliasedProperty)$/,
+var keywordRegexp = /^(?:superclass|subclass|implement|observable|bindings|extend|prototype|applicate|(?:add|remove)(?:Static|Observable|Aliased|Bound)Property)$/,
 // reference to existing mutators
 mutators = {},
 // array of mutators that will get called when a class is created
@@ -142,6 +142,10 @@ propAddMutator = [],
 propRemoveMutator = [],
 // array of mutators that will get called when a class is instantiated
 initMutator = [],
+// quick reference to the mutator arrays
+refMutator = [ createMutator, propAddMutator, propRemoveMutator, initMutator ],
+// Array of mutator methods that correspond to the mutator quick reference
+refMutatorOrder = [ "onCreate", "onPropAdd", "onPropRemove", "onInit" ],
 // create the base object that everything extends from
 base = (function() {
 	var fn = function() {
@@ -172,30 +176,40 @@ wrapParentProperty = function(parentPrototype, property) {
 	}, property);
 },
 // function to add external mutators to modify the class with certain hooks
-addMutator = function(mutator) {
-	var name = mutator.name;
+addMutator = function(name, mutator) {
 	if (mutators[name]) {
 		throw new Error("Adding duplicate mutator \"" + name + "\".");
 	}
 	mutators[name] = mutator;
+	mutator.name = name;
 	mutator.propTest = new RegExp("^__" + name + "_");
 	mutator.propPrefix = "__" + name + "_";
-	if (mutator.onCreate) {
-		createMutator.push(mutator);
-	}
-	if (mutator.onPropAdd) {
-		propAddMutator.push(mutator);
-	}
-	if (mutator.onPropRemove) {
-		propRemoveMutator.push(mutator);
-	}
-	if (mutator.onInit) {
-		initMutator.push(mutator);
-	}
+	each(refMutatorOrder, function(v, i) {
+		if (mutator[v]) {
+			refMutator[i].push(mutator);
+		}
+	});
 },
 // function to remove external mutators
-removeMutator = function(mutator) {
-
+removeMutator = function(name) {
+	var mutator = mutators[name];
+	if (!mutator) {
+		throw new Error("Removing unknown mutator.");
+	}
+	each(refMutatorOrder, function(v, i) {
+		if (mutator[v]) {
+			// remove the event listener if it exists
+			var idx = indexOf(refMutator[i], mutator);
+			if (idx > -1) {
+				refMutator[i].splice(idx, 1);
+			}
+		}
+	});
+	mutators[name] = null;
+	try {
+		delete mutators[name];
+	} catch (e) {
+	}
 },
 // adds a property to an existing class taking into account parent
 addProperty = function(klass, parent, name, property) {
@@ -238,11 +252,6 @@ addProperty = function(klass, parent, name, property) {
 },
 // removes a property from the chain
 removeProperty = function(klass, name) {
-	// we don't want to remove the core javascript properties or special properties
-	if (klass.prototype[name] && klass.prototype[name] === objectPrototype[name]) {
-		return;
-	}
-
 	var foundMutator = false;
 	each(propRemoveMutator, function(mutator) {
 		if (mutator.propTest.test(name)) {
@@ -412,9 +421,8 @@ var create = function() {
 	return klass;
 };
 // mutator for adding static properties to a class
-addMutator({
+addMutator("static", {
 	// the special identifier is "__static_"
-	name : "static",
 	onCreate : function(klass, parent) {
 		var mutatorPrefix = this.propPrefix;
 		// shortcut method for adding static properties
@@ -451,11 +459,9 @@ addMutator({
 		}
 	}
 });
-
 // mutator for adding unwrapped function properties to a class
-addMutator({
+addMutator("nowrap", {
 	// the special identifier is "__nowrap_"
-	name : "nowrap",
 	onCreate : function(klass, parent) {
 		var mutatorPrefix = this.propPrefix;
 		// shortcut method for adding unwrapped properties
@@ -468,11 +474,9 @@ addMutator({
 		klass.prototype[name] = property;
 	}
 });
-
 // mutator for adding aliased function properties to a class
-addMutator({
+addMutator("alias", {
 	// the special identifier is "__alias_"
-	name : "alias",
 	onCreate : function(klass, parent) {
 		var mutatorPrefix = this.propPrefix;
 		// shortcut method for adding aliased properties
@@ -484,6 +488,63 @@ addMutator({
 		// alias properties are simply function wrappers
 		addProperty(klass, parent, name, function() {
 			return this[property].apply(this, arguments);
+		});
+	}
+});
+// mutator for adding bound properties to a class
+addMutator("bind", {
+	// the special identifier is "__bind_"
+	onCreate : function(klass, parent) {
+		var mutator = this;
+		// re-assign the bindings so that it produces copies across child classes
+		klass.bindings = (parent.bindings || []).slice(0);
+		// shortcut method for adding observable properties
+		klass.addBoundProperty = function(name, property) {
+			return klass.addProperty(name, property, mutator.propPrefix);
+		};
+		// shortcut method for removing observable properties
+		klass.removeBoundProperty = function(name) {
+			return klass.removeProperty(mutator.propPrefix + name);
+		};
+	},
+	onPropAdd : function(klass, parent, name, property) {
+		// add to the bindings array only if not already added and is not an definition of a class
+		var i = indexOf(klass.bindings, name);
+		if (i < 0 && isFunction(property) && !property.__isclass_) {
+			// add the property name to the internal bindings array
+			klass.bindings.push(name);
+		}
+		// add the property normally
+		addProperty(klass, parent, name, property);
+	},
+	onPropRemove : function(klass, name) {
+		// remove the bindings if it exists
+		var i = indexOf(klass.bindings, name);
+		if (i < 0) {
+			return;
+		}
+		klass.bindings.splice(i, 1);
+
+		// we need to delete the bound property from all children as well as the current class
+		each(klass.subclass, function(k) {
+			if (indexOf(k.bindings, name) > -1 && !k.prototype.hasOwnProperty(name)) {
+				k.removeBoundProperty(name);
+			}
+		});
+		// remove the property normally
+		removeProperty(klass, name);
+	},
+	onInit : function(instance, klass) {
+		var bindings = klass.bindings || null;
+		// if there are no observable properties, just continue
+		if (bindings === null || bindings.length === 0) {
+			return;
+		}
+		// wrap all prototypes that needs to be bound to the instance
+		each(bindings, function(prop) {
+			instance[prop] = function() {
+				return klass.prototype[prop].apply(instance, arguments);
+			};
 		});
 	}
 });
@@ -601,11 +662,9 @@ var Observer = create({
 		return "[observer " + this.name + "]";
 	}
 });
-
 // mutator for adding observable properties to a class
-addMutator({
+addMutator("observable", {
 	// the special identifier is "__observable_"
-	name : "observable",
 	onCreate : function(klass, parent) {
 		var mutator = this;
 		// re-assign the observable so that it produces copies across child classes
@@ -934,7 +993,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.9.6",
+	version : "0.9.7",
 
 	// direct access functions
 	create : create,
@@ -944,6 +1003,8 @@ extend(Classify, {
 	testNamespace : testNamespace,
 	getGlobalNamespace : getGlobalNamespace,
 	Observer : Observer,
+	addMutator : addMutator,
+	removeMutator : removeMutator,
 
 	// utility function to provide functionality to quickly add properties to objects
 	extend : extend,
