@@ -10,6 +10,10 @@ propAddMutator = [],
 propRemoveMutator = [],
 // array of mutators that will get called when a class is instantiated
 initMutator = [],
+// quick reference to the mutator arrays
+refMutator = [ createMutator, propAddMutator, propRemoveMutator, initMutator ],
+// Array of mutator methods that correspond to the mutator quick reference
+refMutatorOrder = [ "onCreate", "onPropAdd", "onPropRemove", "onInit" ],
 // create the base object that everything extends from
 base = (function() {
 	var fn = function() {
@@ -48,22 +52,34 @@ addMutator = function(mutator) {
 	mutators[name] = mutator;
 	mutator.propTest = new RegExp("^__" + name + "_");
 	mutator.propPrefix = "__" + name + "_";
-	if (mutator.onCreate) {
-		createMutator.push(mutator);
-	}
-	if (mutator.onPropAdd) {
-		propAddMutator.push(mutator);
-	}
-	if (mutator.onPropRemove) {
-		propRemoveMutator.push(mutator);
-	}
-	if (mutator.onInit) {
-		initMutator.push(mutator);
-	}
+	each(refMutatorOrder, function(v, i) {
+		if (mutator[v]) {
+			refMutator[i].push(mutator);
+		}
+	});
 },
 // function to remove external mutators
 removeMutator = function(mutator) {
-
+	if (typeof mutator === "string") {
+		mutator = mutators[mutator];
+	}
+	if (!mutator) {
+		throw new Error("Removing unknown mutator.");
+	}
+	each(refMutatorOrder, function(v, i) {
+		if (mutator[v]) {
+			// remove the event listener if it exists
+			var idx = indexOf(refMutator[i], mutator);
+			if (idx > -1) {
+				refMutator[i].splice(idx, 1);
+			}
+		}
+	});
+	mutators[mutator.name] = null;
+	try {
+		delete mutators[mutator.name];
+	} catch (e) {
+	}
 },
 // adds a property to an existing class taking into account parent
 addProperty = function(klass, parent, name, property) {

@@ -626,3 +626,145 @@ QUnit.test("implementing methods in classes from other objects", function() {
 	QUnit.equal(test_ei.superclass, extens, "implemented subclass' reference is stored");
 	QUnit.equal(test_ei.implement[0], inf_subclass, "implemented subclass' reference is stored");
 });
+
+QUnit.test("adding and removing mutators", function() {
+	QUnit.expect(2);
+
+	addMutator({
+		name : "test"
+	});
+
+	// adding duplicate mutators will throw an error
+	try {
+		addMutator({
+			name : "test"
+		});
+	} catch (e) {
+		QUnit.ok(e instanceof Error, "Attempts to add an existing mutator throws a error.");
+	}
+
+	removeMutator("test");
+	try {
+		removeMutator("test");
+	} catch (e) {
+		QUnit.ok(e instanceof Error, "Attempts to remove an non existing mutator throws a error.");
+	}
+});
+
+QUnit.test("adding and removing mutators to the on create hook", function() {
+	QUnit.expect(3);
+
+	addMutator({
+		name : "test",
+		onCreate : function(klass, parent) {
+			klass.a = 1;
+			QUnit.ok(true, "onCreate in mutator was called when the class is created");
+		}
+	});
+
+	var test = create({});
+	QUnit.equal(test.a, 1, "onCreate mutator modified the class during creation");
+
+	removeMutator("test");
+
+	// after removal, hooks are no longer called
+	var test2 = create({});
+	QUnit.ok(!test2.hasOwnProperty("a"), "removed onCreate mutator is no longer called during creation");
+});
+
+QUnit.test("adding and removing mutators to the on property add hook", function() {
+	QUnit.expect(7);
+
+	addMutator({
+		name : "test",
+		onPropAdd : function(klass, parent, name, property) {
+			klass.prototype[name] = property * 2;
+			QUnit.ok(true, "onPropAdd in mutator is called when a property is added");
+		}
+	});
+
+	var test = create({
+		__test_a : 1
+	});
+	QUnit.equal((new test()).a, 2, "onPropAdd mutator modified a value during property addition");
+
+	var test2 = create({
+		__test_ : {
+			b : 2
+		}
+	});
+	QUnit.equal((new test2()).b, 4, "onPropAdd mutator modified a value during property addition when defined in object");
+
+	test2.addProperty("__test_c", 3);
+	QUnit.equal((new test2()).c, 6, "onPropAdd mutator modified a value during property addition after class definition");
+
+	removeMutator("test");
+
+	// after removal, hooks are no longer called
+	var test3 = create({
+		__test_a : 4
+	});
+	QUnit.equal((new test3()).__test_a, 4, "removed onPropAdd mutator is no longer called during creation");
+});
+
+QUnit.test("adding and removing mutators to the on property remove hook", function() {
+	QUnit.expect(3);
+
+	addMutator({
+		name : "test",
+		onPropRemove : function(klass, name) {
+			klass.m = klass.m ? klass.m++ : 1;
+			try {
+				delete klass.prototype[name];
+			} catch (e) {
+			}
+			QUnit.ok(true, "onPropRemove in mutator is called when a property is removed");
+		}
+	});
+
+	var test = create({
+		__test_a : 1
+	});
+
+	test.removeProperty("__test_a");
+	QUnit.equal(test.m, 1, "onPropRemove mutator modified a value during property removal");
+
+	removeMutator("test");
+
+	// after removal, hooks are no longer called
+	var test3 = create({
+		__test_a : 4
+	});
+	test.removeProperty("__test_a");
+	QUnit.ok(!test3.hasOwnProperty("m"), "removed onPropRemove mutator is no longer called during property removal");
+});
+
+QUnit.test("adding and removing mutators to the on initialize hook", function() {
+	QUnit.expect(6);
+
+	addMutator({
+		name : "test",
+		onInit : function(instance, klass) {
+			if(klass.count == null) {
+				klass.count = 0;
+			}
+			instance.a = 1;
+			klass.count++;
+			QUnit.ok(true, "onInit in mutator is called when a property is initialized");
+		}
+	});
+
+	var test = create({});
+	(new test());
+	(new test());
+	QUnit.equal(test.count, 2, "onInit mutator called during each class initialization");
+	QUnit.equal((new test()).a, 1, "onInit mutator called during class initialization and modified instance value");
+
+
+	removeMutator("test");
+
+	// after removal, hooks are no longer called
+	var test2 = create({});
+	(new test2());
+	QUnit.ok(!test2.hasOwnProperty("count"), "removed onInit mutator is no longer called during instantiation");
+});
