@@ -148,6 +148,14 @@ Classify.Class.subclass = new Array();
  */
 Classify.Class.implement = new Array();
 /**
+ * Array containing the list of all the bound properties that is wrapped during object initialization
+ *
+ * @static
+ * @memberOf Classify.Class
+ * @type {Array}
+ */
+Classify.Class.bindings = new Array();
+/**
  * Hashtable containing the definitions of all the observable properties that is implemented by this object
  *
  * @static
@@ -258,6 +266,34 @@ Classify.Class.addStaticProperty = function(name, property) {
  * @type {Classify.Class}
  */
 Classify.Class.removeStaticProperty = function(name) {
+	return Classify.Class;
+};
+/**
+ * Adds a context bound property to the object's prototype
+ *
+ * @param {String}
+ *            name The name of the property to add
+ * @param {Function}
+ *            property The property to always bind the object's context with
+ * @static
+ * @memberOf Classify.Class
+ * @returns {Classify.Class}
+ * @type {Classify.Class}
+ */
+Classify.Class.addBoundProperty = function(name, property) {
+	return Classify.Class;
+};
+/**
+ * Removes a context bound property from the object's base
+ *
+ * @param {String}
+ *            name The name of the property to remove
+ * @static
+ * @memberOf Classify.Class
+ * @returns {Classify.Class}
+ * @type {Classify.Class}
+ */
+Classify.Class.removeBoundProperty = function(name) {
 	return Classify.Class;
 };
 /**
@@ -796,6 +832,40 @@ Classify.testNamespace = function(namespace) {
  */
 Classify.getGlobalNamespace = function() {
 	return new Classify.Namespace();
+};
+
+/**
+ * Adds a global class mutator that modifies the defined classes at different points with hooks
+ *
+ * @param {String}
+ *            name The name of the mutator reference to add
+ * @param {Object}
+ *            mutator The mutator definition with optional hooks
+ * @param {Function}
+ *            [mutator.onCreate] The hook to be called when a class is defined
+ * @param {Function}
+ *            [mutator.onPropAdd] The hook to be called when a property with the __name_ prefix is added
+ * @param {Function}
+ *            [mutator.onPropRemove] The hook to be called when a property with the __name_ prefix is removed
+ * @param {Function}
+ *            [mutator.onInit] The hook to be called during each object's initialization
+ * @throws Error
+ * @static
+ * @memberOf Classify
+ */
+Classify.addMutator = function(name, mutator) {
+};
+
+/**
+ * Removes a global class mutator that modifies the defined classes at different points
+ *
+ * @param {String}
+ *            name The name of the mutator to be removed
+ * @throws Error
+ * @static
+ * @memberOf Classify
+ */
+Classify.removeMutator = function(name) {
 };
 
 /**

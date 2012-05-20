@@ -1,7 +1,6 @@
 // mutator for adding static properties to a class
-addMutator({
+addMutator("static", {
 	// the special identifier is "__static_"
-	name : "static",
 	onCreate : function(klass, parent) {
 		var mutatorPrefix = this.propPrefix;
 		// shortcut method for adding static properties

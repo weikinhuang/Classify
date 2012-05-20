@@ -84,7 +84,7 @@ QUnit.test("static properties that are instances of a class", function() {
 	});
 
 	QUnit.equal(test.b, prop, "Static property of a class is an unwrapped class");
-	QUnit.equal(test.b.f(), 1, "Static property of an internal class is set defined properly");
+	QUnit.equal(test.b.f(), 1, "Static property of an internal class is defined properly");
 	QUnit.equal((new test.b()).g, 2, "Instantiating static class defined within another class");
 });
 

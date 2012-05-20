@@ -1,5 +1,5 @@
 // regex for keyword properties
-var keywordRegexp = /^(?:superclass|subclass|implement|observable|extend|prototype|applicate|(?:add|remove)(?:Static|Observable|Aliased)Property)$/,
+var keywordRegexp = /^(?:superclass|subclass|implement|observable|bindings|extend|prototype|applicate|(?:add|remove)(?:Static|Observable|Aliased|Bound)Property)$/,
 // reference to existing mutators
 mutators = {},
 // array of mutators that will get called when a class is created
@@ -44,12 +44,12 @@ wrapParentProperty = function(parentPrototype, property) {
 	}, property);
 },
 // function to add external mutators to modify the class with certain hooks
-addMutator = function(mutator) {
-	var name = mutator.name;
+addMutator = function(name, mutator) {
 	if (mutators[name]) {
 		throw new Error("Adding duplicate mutator \"" + name + "\".");
 	}
 	mutators[name] = mutator;
+	mutator.name = name;
 	mutator.propTest = new RegExp("^__" + name + "_");
 	mutator.propPrefix = "__" + name + "_";
 	each(refMutatorOrder, function(v, i) {
@@ -59,10 +59,8 @@ addMutator = function(mutator) {
 	});
 },
 // function to remove external mutators
-removeMutator = function(mutator) {
-	if (typeof mutator === "string") {
-		mutator = mutators[mutator];
-	}
+removeMutator = function(name) {
+	var mutator = mutators[name];
 	if (!mutator) {
 		throw new Error("Removing unknown mutator.");
 	}
@@ -75,9 +73,9 @@ removeMutator = function(mutator) {
 			}
 		}
 	});
-	mutators[mutator.name] = null;
+	mutators[name] = null;
 	try {
-		delete mutators[mutator.name];
+		delete mutators[name];
 	} catch (e) {
 	}
 },
@@ -122,11 +120,6 @@ addProperty = function(klass, parent, name, property) {
 },
 // removes a property from the chain
 removeProperty = function(klass, name) {
-	// we don't want to remove the core javascript properties or special properties
-	if (klass.prototype[name] && klass.prototype[name] === objectPrototype[name]) {
-		return;
-	}
-
 	var foundMutator = false;
 	each(propRemoveMutator, function(mutator) {
 		if (mutator.propTest.test(name)) {

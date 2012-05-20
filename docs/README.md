@@ -10,6 +10,8 @@
  * [`Classify.destroyNamespace`](#Classify.destroyNamespace)
  * [`Classify.testNamespace`](#Classify.testNamespace)
  * [`Classify.getGlobalNamespace`](#Classify.getGlobalNamespace)
+ * [`Classify.addMutator`](#Classify.addMutator)
+ * [`Classify.removeMutator`](#Classify.removeMutator)
  * [`Classify.extend`](#Classify.extend)
  * [`Classify.provide`](#Classify.provide)
  * [`Classify.noConflict`](#Classify.noConflict)
@@ -20,6 +22,7 @@
  * [`Classify.Class.superclass`](#Classify.Class.superclass)
  * [`Classify.Class.subclass`](#Classify.Class.subclass)
  * [`Classify.Class.implement`](#Classify.Class.implement)
+ * [`Classify.Class.bindings`](#Classify.Class.bindings)
  * [`Classify.Class.observables`](#Classify.Class.observables)
  * [`Classify.Class.__isclass_`](#Classify.Class.__isclass_)
  * [`Classify.Class.invoke`](#Classify.Class.invoke)
@@ -29,6 +32,8 @@
  * [`Classify.Class.removeProperty`](#Classify.Class.removeProperty)
  * [`Classify.Class.addStaticProperty`](#Classify.Class.addStaticProperty)
  * [`Classify.Class.removeStaticProperty`](#Classify.Class.removeStaticProperty)
+ * [`Classify.Class.addBoundProperty`](#Classify.Class.addBoundProperty)
+ * [`Classify.Class.removeBoundProperty`](#Classify.Class.removeBoundProperty)
  * [`Classify.Class.addObservableProperty`](#Classify.Class.addObservableProperty)
  * [`Classify.Class.removeObservableProperty`](#Classify.Class.removeObservableProperty)
  * [`Classify.Class.addAliasedProperty`](#Classify.Class.addAliasedProperty)
@@ -235,6 +240,27 @@ Retieves the globally named namespace.
 ##### Returns
 `Classify.Namespace`
 
+### <a id="Classify.addMutator" href="#">`Classify.addMutator(name, mutator[, mutator.onCreate][, mutator.onPropAdd][, mutator.onPropRemove][, mutator.onInit])`</a>
+Adds a global class mutator that modifies the defined classes at different points with hooks.
+[&#9650;](#)
+
+
+##### Arguments
+1. `name` `{String}`: The name of the mutator reference to add
+2. `mutator` `{Object}`: The mutator definition with optional hooks
+3. `[mutator.onCreate]` `{Function}`: The hook to be called when a class is defined
+4. `[mutator.onPropAdd]` `{Function}`: The hook to be called when a property with the __name_ prefix is added
+5. `[mutator.onPropRemove]` `{Function}`: The hook to be called when a property with the __name_ prefix is removed
+6. `[mutator.onInit]` `{Function}`: The hook to be called during each object's initialization
+
+### <a id="Classify.removeMutator" href="#">`Classify.removeMutator(name)`</a>
+Removes a global class mutator that modifies the defined classes at different points.
+[&#9650;](#)
+
+
+##### Arguments
+1. `name` `{String}`: The name of the mutator to be removed
+
 ### <a id="Classify.extend" href="#">`Classify.extend(base, args)`</a>
 Utility function to provide functionality to quickly add properties to objects.
 [&#9650;](#)
@@ -303,6 +329,12 @@ Array containing all the objects and classes that this object implements methods
 [&#9650;](#)
 
 `Array`: Array containing all the objects and classes that this object implements methods and properties from
+
+### <a id="Classify.Class.bindings" href="#">`Classify.Class.bindings`</a>
+Array containing the list of all the bound properties that is wrapped during object initialization.
+[&#9650;](#)
+
+`Array`: Array containing the list of all the bound properties that is wrapped during object initialization
 
 ### <a id="Classify.Class.observables" href="#">`Classify.Class.observables`</a>
 Hashtable containing the definitions of all the observable properties that is implemented by this object.
@@ -385,6 +417,29 @@ Adds a static property to the object's base.
 
 ### <a id="Classify.Class.removeStaticProperty" href="#">`Classify.Class.removeStaticProperty(name)`</a>
 Removes a static property from the object's base.
+[&#9650;](#)
+
+
+##### Arguments
+1. `name` `{String}`: The name of the property to remove
+
+##### Returns
+`Classify.Class`
+
+### <a id="Classify.Class.addBoundProperty" href="#">`Classify.Class.addBoundProperty(name, property)`</a>
+Adds a context bound property to the object's prototype.
+[&#9650;](#)
+
+
+##### Arguments
+1. `name` `{String}`: The name of the property to add
+2. `property` `{Function}`: The property to always bind the object's context with
+
+##### Returns
+`Classify.Class`
+
+### <a id="Classify.Class.removeBoundProperty" href="#">`Classify.Class.removeBoundProperty(name)`</a>
+Removes a context bound property from the object's base.
 [&#9650;](#)
 
 

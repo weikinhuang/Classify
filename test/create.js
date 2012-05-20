@@ -630,15 +630,11 @@ QUnit.test("implementing methods in classes from other objects", function() {
 QUnit.test("adding and removing mutators", function() {
 	QUnit.expect(2);
 
-	addMutator({
-		name : "test"
-	});
+	addMutator("test", {});
 
 	// adding duplicate mutators will throw an error
 	try {
-		addMutator({
-			name : "test"
-		});
+		addMutator("test", {});
 	} catch (e) {
 		QUnit.ok(e instanceof Error, "Attempts to add an existing mutator throws a error.");
 	}
@@ -654,8 +650,7 @@ QUnit.test("adding and removing mutators", function() {
 QUnit.test("adding and removing mutators to the on create hook", function() {
 	QUnit.expect(3);
 
-	addMutator({
-		name : "test",
+	addMutator("test", {
 		onCreate : function(klass, parent) {
 			klass.a = 1;
 			QUnit.ok(true, "onCreate in mutator was called when the class is created");
@@ -675,8 +670,7 @@ QUnit.test("adding and removing mutators to the on create hook", function() {
 QUnit.test("adding and removing mutators to the on property add hook", function() {
 	QUnit.expect(7);
 
-	addMutator({
-		name : "test",
+	addMutator("test", {
 		onPropAdd : function(klass, parent, name, property) {
 			klass.prototype[name] = property * 2;
 			QUnit.ok(true, "onPropAdd in mutator is called when a property is added");
@@ -710,8 +704,7 @@ QUnit.test("adding and removing mutators to the on property add hook", function(
 QUnit.test("adding and removing mutators to the on property remove hook", function() {
 	QUnit.expect(3);
 
-	addMutator({
-		name : "test",
+	addMutator("test", {
 		onPropRemove : function(klass, name) {
 			klass.m = klass.m ? klass.m++ : 1;
 			try {
@@ -742,8 +735,7 @@ QUnit.test("adding and removing mutators to the on property remove hook", functi
 QUnit.test("adding and removing mutators to the on initialize hook", function() {
 	QUnit.expect(6);
 
-	addMutator({
-		name : "test",
+	addMutator("test", {
 		onInit : function(instance, klass) {
 			if(klass.count == null) {
 				klass.count = 0;

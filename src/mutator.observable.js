@@ -1,7 +1,6 @@
 // mutator for adding observable properties to a class
-addMutator({
+addMutator("observable", {
 	// the special identifier is "__observable_"
-	name : "observable",
 	onCreate : function(klass, parent) {
 		var mutator = this;
 		// re-assign the observable so that it produces copies across child classes
