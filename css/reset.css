@@ -1,0 +1,424 @@
+/******************************************************************************************
+	MASTER RESET OF BROWSER STYLES @http://meyerweb.com/eric/tools/css/reset/index.html
+******************************************************************************************/
+/****************************
+	Base
+*****************************/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6,
+p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img,
+ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, input, textarea, select, option, optgroup,
+button, button:active, button:focus,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
+	background:transparent;
+	border:0;
+	font-family:inherit;
+	font-size:100%;
+	font-style:normal;
+	font-weight:inherit;
+	margin:0;
+	outline:0;
+	padding:0;
+	text-align:left;
+	vertical-align:baseline;
+}
+div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6,
+p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img,
+ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center,
+dl, dt, dd, ol, ul, li, fieldset, form, label, legend, input, textarea, select, option, optgroup,
+button, button:active, button:focus,
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
+	position:relative;
+}
+table, caption, tbody, tfoot, thead, tr, th, td {
+	
+}
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+	display:block;
+}
+body {
+	line-height:1;
+}
+ol, ul {
+	list-style:none none;
+}
+blockquote, q {
+	quotes:none;
+}
+blockquote:before, blockquote:after, q:before, q:after {
+	content:'';
+	content:none;
+}
+:focus {
+	outline:0;
+}
+ins {
+	text-decoration:none;
+}
+del {
+	text-decoration:line-through;
+}
+table {
+	border-collapse:collapse;
+	border-spacing:0;
+	empty-cells:show;
+	width: 100%;
+}
+iframe {
+	display: none;
+}
+thead {
+	display: table-header-group;
+}
+tfoot {
+	display: table-footer-group;
+}
+
+/****************************
+	Hacks
+*****************************/
+/* IE6 */
+*html input.button {
+	overflow: visible; /* remove padding from left/right */
+	width: 0;  /*remove the remaining space in IE6*/
+}
+
+/* IE7 */
+*:first-child+html input.button {
+	overflow: visible; /* remove padding from left/right */
+	width: auto !important;
+}
+
+/* IE9+ Attempt to remove all filters (they're hacks anyways) */
+.msie9 * {
+	filter: none !important;
+	-ms-filter: none !important;
+}
+
+/****************************
+	Remainder
+*****************************/
+input[type=text], input[type=password], textarea, select {
+	background:#fff;
+	border:1px solid #666;
+	padding:1px;
+}
+button, button:active, button:focus {
+	background:transparent;
+	cursor:pointer;
+	overflow:visible;
+	text-align:left;
+	user-select:text;
+	width:auto;
+}
+input[disabled], input[disabled], textarea[disabled], select[disabled] {
+	background:#fafafa;
+	border:1px solid #999;
+	color:#999;
+}
+input[readonly], input[readonly], textarea[readonly], select[readonly] {
+	color:#666;
+}
+button[disabled], button[disabled]:hover, button[disabled]:active, button[disabled]:focus {
+	background:transparent;
+	color:#999;
+	cursor:pointer;
+}
+
+/******************************************************************************************
+	OPTIMIZATIONS @http://html5boilerplate.com/
+******************************************************************************************/
+/****************************
+	Html 5 Elements
+*****************************/
+audio, canvas, video {
+	display: inline-block;
+	*display: inline;
+	*zoom: 1;
+}
+audio:not([controls]) {
+	display: none;
+}
+
+/****************************
+	Base
+*****************************/
+html {
+	font-size: 100%;
+	overflow-y: scroll; /* Force a scrollbar so there not content sliding */
+	-webkit-tap-highlight-color: rgba(0,0,0,0.2);
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust: 100%;
+}
+/* 
+ * These selection declarations have to be separate
+ * No text-shadow: twitter.com/miketaylr/status/12228805301
+ */
+::-moz-selection {
+	background-color: #333;
+	background-color: rgba(0,0,0,0.3);
+	color: #fff;
+	text-shadow: none;
+}
+::selection {
+	background-color: #333;
+	background-color: rgba(0,0,0,0.3);
+	color: #fff;
+	text-shadow: none;
+}
+
+/****************************
+	Links
+*****************************/
+/*
+ * Improve readability when focused and hovered in all browsers
+ * people.opera.com/patrickl/experiments/keyboard/test
+ */
+a:hover, a:active {
+	outline: 0;
+}
+
+/****************************
+	Typography
+*****************************/
+hr {
+	border: 0;
+	border-top: 1px solid #ccc;
+	display: block;
+	height: 1px;
+	margin: 1em 0;
+	padding: 0;
+}
+ins {
+	background: #ff9;
+	color: #000;
+	text-decoration: none;
+}
+mark {
+	background: #ff0;
+	color: #000;
+	font-style: italic;
+	font-weight: bold;
+}
+/* Redeclare monospace font family: en.wikipedia.org/wiki/User:Davidgothberg/Test59 */
+pre, code, kbd, samp {
+	font-family: monospace, serif;
+	_font-family: 'courier new', monospace;
+	font-size: 1em;
+}
+/* Improve readability of pre-formatted text in all browsers */
+pre {
+	white-space: pre;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
+/****************************
+	Embedded content
+*****************************/
+/*
+ * 1. Improve image quality when scaled in IE7 http://h5bp.com/d
+ * 2. Remove the gap between images and borders on image containers http://h5bp.com/e 
+ */
+img {
+	border: 0;
+	-ms-interpolation-mode: bicubic;
+	vertical-align: middle;
+}
+/*
+ * Ensure that images don't overflow out of the frame only on smaller screens
+ */
+@media screen and (max-device-width: 480px) {
+	img {
+		max-width: 100%;
+		height: auto;
+		box-sizing: border-box;
+	}
+}
+/*
+ * Correct overflow displayed oddly in IE9 
+ */
+svg:not(:root) {
+	overflow: hidden;
+}
+
+/****************************
+	Forms
+*****************************/
+/* Indicate that 'label' will shift focus to the associated form element */
+label {
+	cursor: pointer;
+}
+/* 
+ * 1. Correct color not inheriting in IE6/7/8/9 
+ * 2. Correct alignment displayed oddly in IE6/7 
+ */
+legend {
+	border: 0;
+	*margin-left: -7px;
+	padding: 0;
+}
+/*
+ * 1. Correct font-size not inheriting in all browsers
+ * 2. Remove margins in FF3/4 S5 Chrome
+ * 3. Define consistent vertical alignment display in all browsers
+ */
+button, input, select, textarea {
+	font-size: 100%;
+	margin: 0;
+	vertical-align: baseline;
+	*vertical-align: middle;
+}
+/*
+ * 1. Define line-height as normal to match FF3/4 (set using !important in the UA stylesheet)
+ * 2. Correct inner spacing displayed oddly in IE6/7
+ */
+button, input {
+	line-height: normal;
+	*overflow: visible;
+}
+/*
+ * Reintroduce inner spacing in 'table' to avoid overlap and whitespace issues in IE6/7
+ */
+table button, table input {
+	*overflow: auto;
+}
+/*
+ * 1. Display hand cursor for clickable form elements
+ * 2. Allow styling of clickable form elements in iOS
+ */
+button, input[type="button"], input[type="reset"], input[type="submit"] {
+	cursor: pointer;
+	-webkit-appearance: button;
+}
+/*
+ * Remove input shadows on mobile webkit and mobile firefox
+ * Using this rule removes input shadows overall
+ */
+input[type="text"], input[type="email"], input[type="search"], input[type="password"], textarea {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+/*
+	-webkit-appearance: caret;
+	-moz-appearance: caret;
+*/
+}
+/*
+ * Consistent box sizing and appearance
+ */
+input[type="checkbox"], input[type="radio"] {
+	box-sizing: border-box;
+	padding: 0;
+}
+input[type="search"] {
+	-moz-box-sizing: content-box;
+	-webkit-box-sizing: content-box;
+	box-sizing: content-box;
+}
+/* 
+ * Remove inner padding and border in FF3/4
+ * www.sitepen.com/blog/2008/05/14/the-devils-in-the-details-fixing-dojos-toolbar-buttons/ 
+ */
+button::-moz-focus-inner, input::-moz-focus-inner {
+	border: 0;
+	padding: 0;
+}
+/* 
+ * 1. Remove default vertical scrollbar in IE6/7/8/9 
+ * 2. Allow only vertical resizing
+ */
+textarea {
+	overflow: auto;
+	vertical-align: top;
+	resize: vertical;
+}
+/*
+ * Placeholder text styling for inputs
+ */
+::-webkit-input-placeholder {
+	color:#999;
+}
+input:-moz-placeholder {
+	color:#999;
+}
+
+/*
+ * Hide only visually, but have it available for screenreaders: by Jon Neal.
+ * www.webaim.org/techniques/css/invisiblecontent/  &  j.mp/visuallyhidden
+ */
+.visuallyhidden {
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+}
+
+/*
+ * Extends the .visuallyhidden class to allow the element to be focusable
+ * when navigated to via the keyboard: drupal.org/node/897638
+ */
+.visuallyhidden.focusable:active, .visuallyhidden.focusable:focus {
+	clip: auto;
+	height: auto;
+	margin: 0;
+	overflow: visible;
+	position: static;
+	width: auto;
+}
+
+/* Hide visually and from screenreaders, but maintain layout */
+.invisible {
+	visibility: hidden;
+}
+
+.texthidden {
+	text-indent: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+/* Clearfix for clearing floated elements */
+.clearfix {
+	zoom: 1;
+}
+.clearfix:after {
+	clear: both;
+	content: ".";
+	display: block;
+	font-size: 0;
+	height: 0;
+	visibility: hidden;
+}
+
+/* Ensure the word wrapping is automatic */
+.word-wrap {
+	white-space: pre;			/* CSS 2.0 */
+	white-space: pre-wrap;		/* CSS 2.1 */
+	white-space: pre-line;		/* CSS 3.0 */
+	white-space: -pre-wrap;		/* Opera 4-6 */
+	white-space: -o-pre-wrap;	/* Opera 7 */
+	white-space: -moz-pre-wrap;	/* Mozilla */
+	white-space: -hp-pre-wrap;	/* HP Printers */
+	word-wrap: break-word;		/* IE 5+ */
+}
+
+/* Vertical alignment of unknown height elements */
+.valign-middle:before {
+	content: "";
+	display: inline-block;
+	height: 100%;
+	margin-right: -0.25em;		/* Adjusts for spacing */
+	vertical-align: middle;
+}
+.valign-middle > .valign-middle-child {
+	display: inline-block;
+	vertical-align: middle;
+}

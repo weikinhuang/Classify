@@ -16,6 +16,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <!-- chrome stylesheets -->
+<link href="css/reset.css" media="screen" rel="stylesheet" type="text/css" />
 <link href="css/all.css" media="screen" rel="stylesheet" type="text/css" />
 <link href="css/shCore.css" media="screen" rel="stylesheet" type="text/css" />
 <link href="css/shCoreDefault.css" media="screen" rel="stylesheet" type="text/css" />
@@ -26,16 +27,109 @@
 <!-- [MAIN CONTENT] -->
 <div id="viewport" class="body-wrapper clearfix">
 
-	<a href="https://github.com/weikinhuang/Classify"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
-	
 <!-- [HEADER] -->
 	<div id="header-wrapper" class="clearfix">
+		<div id="header" class="header clearfix">
+			<h1>Classify.js</h1>
+		</div>
 	</div>
 <!-- [/HEADER] -->
 
+<!-- [BANNER] -->
+	<div>
+		<a href="https://github.com/weikinhuang/Classify" class="github-fork-banner texthidden">Fork me on GitHub!</a>
+	</div>
+<!-- [/BANNER] -->
+
 <!-- [BODY] -->
+	<div id="sidebar" class="sidebar lnk clearfix">
+		<nav>
+			<ul>
+				<li>
+					<h4><a href="#introduction">Introduction</a></h4>
+					<ul>
+						<li><a href="#intro-source">Source Code</a></li>
+						<li><a href="#intro-download">Downloads</a></li>
+					</ul>
+				</li>
+				<li>
+					<h4><a href="#documentation">Documentation</a></h4>
+					<ul>
+						<li>
+							<h5><a href="#doc-Classify">Classify</a></h5>
+							<ul>
+								<li><a href="#doc-Classify-create">Creating Classes</a></li>
+								<li><a href="#doc-Classify-inherit">Inheritance</a></li>
+								<li><a href="#doc-Classify-static">Static Methods</a></li>
+								<li><a href="#doc-Classify-bind">Bound Methods</a></li>
+								<li><a href="#doc-Classify-nowrap">Unwrapped Methods</a></li>
+							</ul>
+						</li>
+						<li><a href="#doc-Classify.Class">Classify.Class</a></li>
+						<li><a href="#doc-Classify.Namespace">Classify.Namespace</a></li>
+						<li><a href="#doc-Classify.Observer">Classify.Observer</a></li>
+					</ul>
+				</li>
+				<li>
+					<h4><a href="#changelog">Changelog</a></h4>
+				</li>
+			</ul>
+		</nav>
+	</div>
+	
 	<div id="body" class="body lnk clearfix">
-		Classify is a Javascript library that allows for cross platform and cross browser classical inheritance and namespaces behind the prototype syntax in an easy to use interface function.
+		<div>
+			<h2>Classify.js</h2>
+			<p>
+				Classify.js is a library that allows for cross browser and cross platform
+				Object Oriented Javascript class definitions using classical inheritance patterns
+				and namespaces behind the prototype syntax of javascript in an easy to use
+				interface function.
+			</p>
+			<p>
+				Classify.js was created to simplify the creation of reusable objects in a manner
+				much like the traditional C based languages. It is a wrapper to the Javascript
+				prototype syntax of class object creation, instead classes are defined in object
+				notation much similar to single instance javascript objects.
+			</p>
+			<p>
+				Classify.js also provides utilities methods that are useful to javascript classes,
+				such as auto binding methods without adding Function.bind, observable properties
+				with getters, setters, and event listeners, and namespacing that can be easily accessed
+				and externalized.
+			</p>
+			<p>
+				This project is hosted on GitHub.
+				You can report bugs and discuss features on the issues page.
+			</p>
+			<p>
+				A complete Test Suite is available in the repository by running <code>node make.js unit</code>.
+			</p>
+		</div>
+
+		<div>
+			<h2>Downloads (Right-click, and use "Save As")</h2>
+			<p>
+				Classify.js is distributed under the MIT license.
+			</p>
+			<table>
+				<tr>
+					<td>Development Version (v@VERSION)</td>
+					<td>@FULLSIZE,  Uncompressed and Fully Commented</td>
+				</tr>
+				<tr>
+					<td>Development Version (v@VERSION)</td>
+					<td>@MINSIZE, Minified and Gzipped</td>
+				</tr>
+			</table>
+		</div>
+		
+		
+		<div>
+			<h2>Change Log</h2>
+			@CHANGELOG
+		</div>
+		
 	</div>
 <!-- [/BODY] -->
 
