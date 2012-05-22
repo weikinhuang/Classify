@@ -3,10 +3,34 @@ module.exports = (function(root) {
 	// include the fs mmodule
 	var fs = require("fs"),
 	// include the path module
-	path = require("path");
+	path = require("path"),
+	// execute system commands
+	exec = require("child_process");
 
 	function trim(str) {
 		return str.replace(/^\s*/, "").replace(/\s*$/, "");
+	}
+
+	function roundFileSize(b, d) {
+		var i = 0;
+		while ((b / 1000) > 1) {
+			b /= 1000;
+			i++;
+		}
+		return b.toFixed(d === 0 || d ? d : 2) + " " + [ "b", "kb", "Mb", "Gb", "Tb" ][i];
+	}
+
+	function gzip(data, callback) {
+		var gzip = exec.spawn("gzip", [ "-c", "-q", "-" ]), output = "";
+		// Promise events
+		gzip.stdout.setEncoding("utf-8");
+		gzip.stdout.on("data", function(stdout) {
+			output += stdout.toString();
+		});
+		gzip.on("exit", function(code) {
+			callback(output, output.length);
+		});
+		gzip.stdin.end((data || "").toString(), "utf-8");
 	}
 
 	function parseDocs(source) {
@@ -163,7 +187,7 @@ module.exports = (function(root) {
 		return sortedGroups;
 	}
 
-	function createMarkdown(options, docGroups) {
+	function createMarkdown(options, source, docGroups, callback) {
 		var markdown = [];
 		markdown.push("# " + options.name + " `v" + options.version + "`");
 		markdown.push("==================================================");
@@ -216,7 +240,7 @@ module.exports = (function(root) {
 			markdown.push("");
 			markdown.push("");
 		});
-		return trim(markdown.join("\n"));
+		callback(trim(markdown.join("\n")));
 	}
 
 	function outputMarkdownBlock(block, messages) {
@@ -301,23 +325,214 @@ module.exports = (function(root) {
 		messages.push("");
 	}
 
+	function parseChangelog(options) {
+		var changelog_doc = fs.readFileSync(options.dir.doc + "/CHANGELOG.md", "utf8");
+		changelog_doc = changelog_doc.replace(/\r/g, "");
+		var changegroups = changelog_doc.split("####");
+		var changelog = {};
+		changegroups.forEach(function(group) {
+			group = trim(group);
+			if (!group) {
+				return;
+			}
+			var changes = group.split("\n");
+			var version = changes.shift();
+			var changedata = [];
+			changes.forEach(function(change) {
+				var c = trim(change);
+				if (c) {
+					changedata.push(c);
+				}
+			});
+			if (changedata.length > 0) {
+				changelog[version] = changedata;
+			}
+		});
+		return changelog;
+	}
+
+	function outputHtmlChangelogBlock(options, changelog) {
+		var changetemplate = [];
+		Object.keys(changelog).forEach(function(version) {
+			changetemplate.push("<div class=\"changelog\">");
+			changetemplate.push("<b class=\"changelog-header\">" + version + "</b>");
+			changetemplate.push("<ul class=\"changelog-list\">");
+			changelog[version].forEach(function(change) {
+				changetemplate.push("<li>" + change + "</li>");
+			});
+			changetemplate.push("</ul>");
+			changetemplate.push("</div>");
+		});
+		return changetemplate.join("\n");
+	}
+
+	function createHtmlDoc(options, docGroups) {
+		var markdown = [];
+
+		Object.keys(docGroups).forEach(function(key) {
+			var group = docGroups[key];
+			// section header
+			markdown.push("<h3 id=\"doc-header-" + key + "\">" + key + "</h3>");
+			if (group.base) {
+				outputHtmlDocBlock(group.base, markdown);
+			}
+			if (group.statics.length > 0) {
+				group.statics.forEach(function(doc) {
+					outputHtmlDocBlock(doc, markdown);
+				});
+			}
+			if (group.prototypes.length > 0) {
+				group.prototypes.forEach(function(doc) {
+					outputHtmlDocBlock(doc, markdown);
+				});
+			}
+		});
+		return trim(markdown.join("\n"));
+	}
+
+	function outputHtmlDocBlock(block, messages) {
+		var name = block.name;
+		if (block.varType === "function") {
+			name += "(";
+			if (block.params && block.params.length > 0) {
+				block.params.forEach(function(param, i) {
+					var param_str = "";
+					if (i > 0) {
+						param_str += ", ";
+					}
+					param_str += param.name;
+					if (param.isOptional) {
+						if (param.value) {
+							param_str += "=" + param.value;
+						}
+						param_str = "[" + param_str + "]";
+					}
+					name += param_str;
+				});
+			}
+			name += ")";
+		}
+		messages.push("<div id=\"doc-" + block.name + "\" class=\"doc-block doc-type-" + block.varType + "\">");
+
+		messages.push("<h4 id=\"def-" + block.name + "\">" + block.name + "</h4>");
+		messages.push("<code class=\"def-definition\">" + name + "</code>");
+
+		messages.push("<div class=\"doc-comment\">");
+		messages.push(block.comment.replace(/\.$/, "").replace(/\n/g, "<br />\n") + ".");
+		messages.push("</div>");
+
+		if (block.varType === "function") {
+			if (block.isConstructor) {
+				messages.push("<div class=\"def-constructor\">Constructor method</div>");
+			}
+			if (block.superClass || block.augments) {
+				messages.push("<div class=\"def-extends\">Extends <code>" + (block.superClass || block.augments) + "</code></div>");
+			}
+			if (block.params && block.params.length > 0) {
+				messages.push("<div class=\"type-args\">");
+				messages.push("<b>Arguments</b>");
+				messages.push("<ol>");
+				block.params.forEach(function(param, i) {
+					var param_str = "";
+					param_str += param.name;
+					if (param.isOptional) {
+						if (param.value) {
+							param_str += "=" + param.value;
+						}
+						param_str = "[" + param_str + "]";
+					}
+					name += param_str;
+					var param_line = "<code>" + param_str + "</code> <code>{" + param.type + "}</code>";
+					if (param.comment) {
+						param_line += " " + param.comment;
+					}
+					messages.push("<li>");
+					messages.push("<span class=\"def-arg-count\">" + (i + 1) + ".</span>");
+					messages.push(param_line);
+					messages.push("</li>");
+				});
+				messages.push("</ol>");
+				messages.push("</div>");
+			}
+
+			if (block.returns) {
+				messages.push("<div class=\"type-return\">");
+				messages.push("<b>Returns</b>");
+				if (block.returns.comment) {
+					messages.push("<code>" + block.returns.type + "</code> " + block.returns.comment);
+				} else {
+					messages.push("<code>" + block.returns.type + "</code>");
+				}
+				messages.push("</div>");
+			}
+		} else {
+			if (block.comment) {
+				messages.push("<code class=\"def-type\">" + block.type + "</code> " + block.comment);
+			} else {
+				messages.push("<code class=\"def-type\">" + block.type + "</code>");
+			}
+		}
+
+		messages.push("</div>");
+
+		if (block.example) {
+			messages.push("<pre class=\"code-block javascript\">");
+			messages.push(block.example);
+			messages.push("</pre>");
+		}
+	}
+
+	function createHtmlIndex(options, source, docGroups, callback) {
+		var htmlInputName = typeof options.doc.html === "string" ? options.doc.html : options.name;
+		var template = fs.readFileSync(options.dir.doc + "/" + htmlInputName + ".html", "utf8");
+		template = template.replace(/@VERSION\b/g, options.version);
+		template = template.replace(/@FULLSIZE\b/g, roundFileSize(source.source.length));
+		template = template.replace(/@MINSIZE\b/g, roundFileSize(source.gzipSource.length));
+		template = template.replace(/@CHANGELOG\b/g, outputHtmlChangelogBlock(options, parseChangelog(options)));
+		template = template.replace(/@DOCUMENTATION\b/g, createHtmlDoc(options, docGroups));
+		callback(template);
+	}
+
 	return function(options, source, callback) {
 		if (options.docs.length === 0) {
 			callback();
 			return;
 		}
-		var docsfile = [];
+		var docsfile = [], num_processed = 0;
 		options.docs.forEach(function(file) {
 			docsfile.push(fs.readFileSync(options.dir.doc + "/" + file, "utf8").replace(/\r/g, ""));
 		});
 		var docblocks = parseDocs(docsfile.join("\n"));
 		var groups = groupByMembers(docblocks);
 
-		if (options.doc.markdown) {
-			var markdownOutputName = typeof options.doc.markdown === "string" ? options.doc.markdown : options.name;
-			fs.writeFileSync(options.dir.doc + "/" + markdownOutputName + ".md", createMarkdown(options, groups), "utf8");
-		}
+		gzip(source.minSource, function(data, length) {
+			source.gzipSource = data;
 
-		callback();
+			if (options.doc.markdown) {
+				num_processed++;
+				var markdownOutputName = typeof options.doc.markdown === "string" ? options.doc.markdown : options.name;
+				createMarkdown(options, source, groups, function(doc) {
+					fs.writeFileSync(options.dir.doc + "/" + markdownOutputName + ".md", doc, "utf8");
+					setTimeout(function() {
+						if (--num_processed === 0) {
+							callback();
+						}
+					}, 1);
+				});
+			}
+
+			if (options.doc.html) {
+				num_processed++;
+				var htmlOutputName = typeof options.doc.html === "string" ? options.doc.html : options.name;
+				createHtmlIndex(options, source, groups, function(doc) {
+					fs.writeFileSync(options.dir.doc + "/" + htmlOutputName + ".out.html", doc, "utf8");
+					setTimeout(function() {
+						if (--num_processed === 0) {
+							callback();
+						}
+					}, 1);
+				});
+			}
+		});
 	};
 })(global);
