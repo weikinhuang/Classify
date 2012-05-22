@@ -126,20 +126,1370 @@
 			</p>
 			<table>
 				<tr>
-					<td>Development Version (v@VERSION)</td>
-					<td>@FULLSIZE,  Uncompressed and Fully Commented</td>
+					<td>Development Version (v0.9.7)</td>
+					<td>33.45 kb,  Uncompressed and Fully Commented</td>
 				</tr>
 				<tr>
-					<td>Development Version (v@VERSION)</td>
-					<td>@MINSIZE, Minified and Gzipped</td>
+					<td>Production Version (v0.9.7)</td>
+					<td>3.59 kb, Minified and Gzipped</td>
 				</tr>
 			</table>
 		</div>
 		
 		<div>
+			<h2>Documentation</h2>
+			<div>
+				<h3 id="doc-header-Classify">Classify</h3>
+<div id="doc-Classify" class="doc-block doc-type-function">
+<h4 id="def-Classify">Classify</h4>
+<code class="def-definition">Classify()</code>
+<div class="doc-comment">
+The Main interface function that returns namespaces and creates objects.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<pre class="code-block javascript">
+// Different ways to call Classify
+
+// Calling Classify with a string returns a namespace
+// @see Classify.getNamespace
+Classify("Life") === Classify.getNamespace("Life");
+
+// Calling Classify with a string ending in a "/" returns a namespace
+// @see Classify.getNamespace
+Classify("Life/") === Classify.getNamespace("Life");
+
+// Calling Classify with a string separated by "/" returns a defined class within a namespace
+// @see Classify.Namespace.get
+Classify("Life/Eukaryotes") === Classify.getNamespace("Life").get("Eukaryotes");
+
+// Calling Classify with 2 string parameters returns a defined class within a namespace
+// @see Classify.Namespace.get
+Classify("Life", "Eukaryotes") === Classify.getNamespace("Life").get("Eukaryotes");
+
+// Calling Classify with first parameter as a string, and second parameter as an object, creates
+// a class within the namespace
+var Eukaryotes = Classify("Life/Eukaryotes", {
+    init : function() {
+    }
+});
+// Calling Classify with first parameter as a string, second parameter as a string, and third
+// parameter as an object, creates a class within the namespace
+var Eukaryotes = Classify("Life", "Eukaryotes", {
+    init : function() {
+    }
+});
+// The above 2 statements are the same as the following statement to create classes
+// @see Classify.Namespace.create
+var Eukaryotes = Classify.getNamespace("Life").create("Eukaryotes", {
+    init : function() {
+    }
+});
+
+// To inherit from other classes, the first parameter is the class name, second parameter is the
+// parent (can be from other namespaces with "Namespace/Class"), third parameter is the descriptor
+var Plantae = Classify("Life/Plantae", "Eukaryotes", {
+    init : function() {
+    }
+});
+// The same can be achieved with the following signature
+var Plantae = Classify("Life", "Plantae", "Eukaryotes", {
+    init : function() {
+    }
+});
+// The above 2 statements are the same as the following statement to create classes
+// @see Classify.Namespace.create
+var Plantae = Classify.getNamespace("Life").create("Plantae", "Eukaryotes", {
+    init : function() {
+    }
+});
+
+// Calling Classify with objects with create classes with the object descriptor.
+// Using the Classify method in this manner is analogous to calling Classify.create()
+// Please see Classify.create for documentation
+// @see Classify.create
+var Embryophytes = Classify({
+    init : function() {
+    }
+});
+// The above statement is the same as
+var Embryophytes = Classify.create({
+    init : function() {
+    }
+});
+</pre>
+<div id="doc-Classify.version" class="doc-block doc-type-var">
+<h4 id="def-Classify.version">Classify.version</h4>
+<code class="def-definition">Classify.version</code>
+<div class="doc-comment">
+The version number of this file.
+</div>
+<code class="def-type">String</code> The version number of this file
+</div>
+<div id="doc-Classify.Classify" class="doc-block doc-type-var">
+<h4 id="def-Classify.Classify">Classify.Classify</h4>
+<code class="def-definition">Classify.Classify</code>
+<div class="doc-comment">
+Circular reference to itself.
+</div>
+<code class="def-type">Function</code> Circular reference to itself
+</div>
+<div id="doc-Classify.create" class="doc-block doc-type-function">
+<h4 id="def-Classify.create">Classify.create</h4>
+<code class="def-definition">Classify.create([parent][, implement], definition)</code>
+<div class="doc-comment">
+Creates a new Classify class.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>[parent]</code> <code>{Classify.Class}</code> Optional first parameter defines what object to inherit from
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>[implement]</code> <code>{Object[]}</code> Optional second parameter defines where to implement traits from
+</li>
+<li>
+<span class="def-arg-count">3.</span>
+<code>definition</code> <code>{Object}</code> The description of the class to be created
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.getNamespace" class="doc-block doc-type-function">
+<h4 id="def-Classify.getNamespace">Classify.getNamespace</h4>
+<code class="def-definition">Classify.getNamespace(namespace)</code>
+<div class="doc-comment">
+Retrieves a namespace and creates if it it doesn't already exist.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>namespace</code> <code>{String}</code> Dot separated namespace string
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Namespace</code>
+</div>
+</div>
+<div id="doc-Classify.destroyNamespace" class="doc-block doc-type-function">
+<h4 id="def-Classify.destroyNamespace">Classify.destroyNamespace</h4>
+<code class="def-definition">Classify.destroyNamespace(namespace)</code>
+<div class="doc-comment">
+Destroy an existing namespace.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>namespace</code> <code>{String}</code> Dot separated namespace string
+</li>
+</ol>
+</div>
+</div>
+<div id="doc-Classify.testNamespace" class="doc-block doc-type-function">
+<h4 id="def-Classify.testNamespace">Classify.testNamespace</h4>
+<code class="def-definition">Classify.testNamespace(namespace)</code>
+<div class="doc-comment">
+Retrieves the first namespace that matches the namespace chain "Ns1.ns2.ns3.ns4".
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>namespace</code> <code>{String}</code> Dot separated namespace string
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Namespace</code>
+</div>
+</div>
+<div id="doc-Classify.getGlobalNamespace" class="doc-block doc-type-function">
+<h4 id="def-Classify.getGlobalNamespace">Classify.getGlobalNamespace</h4>
+<code class="def-definition">Classify.getGlobalNamespace()</code>
+<div class="doc-comment">
+Retieves the globally named namespace.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Namespace</code>
+</div>
+</div>
+<div id="doc-Classify.addMutator" class="doc-block doc-type-function">
+<h4 id="def-Classify.addMutator">Classify.addMutator</h4>
+<code class="def-definition">Classify.addMutator(name, mutator[, mutator.onCreate][, mutator.onPropAdd][, mutator.onPropRemove][, mutator.onInit])</code>
+<div class="doc-comment">
+Adds a global class mutator that modifies the defined classes at different points with hooks.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the mutator reference to add
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>mutator</code> <code>{Object}</code> The mutator definition with optional hooks
+</li>
+<li>
+<span class="def-arg-count">3.</span>
+<code>[mutator.onCreate]</code> <code>{Function}</code> The hook to be called when a class is defined
+</li>
+<li>
+<span class="def-arg-count">4.</span>
+<code>[mutator.onPropAdd]</code> <code>{Function}</code> The hook to be called when a property with the __name_ prefix is added
+</li>
+<li>
+<span class="def-arg-count">5.</span>
+<code>[mutator.onPropRemove]</code> <code>{Function}</code> The hook to be called when a property with the __name_ prefix is removed
+</li>
+<li>
+<span class="def-arg-count">6.</span>
+<code>[mutator.onInit]</code> <code>{Function}</code> The hook to be called during each object's initialization
+</li>
+</ol>
+</div>
+</div>
+<div id="doc-Classify.removeMutator" class="doc-block doc-type-function">
+<h4 id="def-Classify.removeMutator">Classify.removeMutator</h4>
+<code class="def-definition">Classify.removeMutator(name)</code>
+<div class="doc-comment">
+Removes a global class mutator that modifies the defined classes at different points.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the mutator to be removed
+</li>
+</ol>
+</div>
+</div>
+<div id="doc-Classify.extend" class="doc-block doc-type-function">
+<h4 id="def-Classify.extend">Classify.extend</h4>
+<code class="def-definition">Classify.extend(base, args)</code>
+<div class="doc-comment">
+Utility function to provide functionality to quickly add properties to objects.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>base</code> <code>{Object}</code> The base object to copy properties into
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>args</code> <code>{Object[]}</code> Set of objects to copy properties from
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Object</code>
+</div>
+</div>
+<div id="doc-Classify.provide" class="doc-block doc-type-function">
+<h4 id="def-Classify.provide">Classify.provide</h4>
+<code class="def-definition">Classify.provide(namespace, base)</code>
+<div class="doc-comment">
+Utility function to provide functionality to allow for name provisioning.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>namespace</code> <code>{String}</code> The dot separated namespace tree to create
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>base</code> <code>{Object}</code> The object to create the namespace tree within
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Object</code>
+</div>
+</div>
+<div id="doc-Classify.noConflict" class="doc-block doc-type-function">
+<h4 id="def-Classify.noConflict">Classify.noConflict</h4>
+<code class="def-definition">Classify.noConflict()</code>
+<div class="doc-comment">
+Utility function for web to avoid namespace issues with other libraries.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify</code>
+</div>
+</div>
+<pre class="code-block javascript">
+(function(Classify) {
+    // here you can use the Classify object and remove the global reference to it
+    // this function is only available on browser environments
+})(Classify.noConflict());
+</pre>
+<h3 id="doc-header-Classify.Class">Classify.Class</h3>
+<div id="doc-Classify.Class" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class">Classify.Class</h4>
+<code class="def-definition">Classify.Class()</code>
+<div class="doc-comment">
+Placeholder for class descriptors created with the create method.
+</div>
+<div class="def-constructor">Constructor method</div>
+</div>
+<div id="doc-Classify.Class.superclass" class="doc-block doc-type-var">
+<h4 id="def-Classify.Class.superclass">Classify.Class.superclass</h4>
+<code class="def-definition">Classify.Class.superclass</code>
+<div class="doc-comment">
+Reference to the parent that this object extends from.
+</div>
+<code class="def-type">Classify.Class</code> Reference to the parent that this object extends from
+</div>
+<div id="doc-Classify.Class.subclass" class="doc-block doc-type-var">
+<h4 id="def-Classify.Class.subclass">Classify.Class.subclass</h4>
+<code class="def-definition">Classify.Class.subclass</code>
+<div class="doc-comment">
+Array containing a reference to all the children that inherit from this object.
+</div>
+<code class="def-type">Array</code> Array containing a reference to all the children that inherit from this object
+</div>
+<div id="doc-Classify.Class.implement" class="doc-block doc-type-var">
+<h4 id="def-Classify.Class.implement">Classify.Class.implement</h4>
+<code class="def-definition">Classify.Class.implement</code>
+<div class="doc-comment">
+Array containing all the objects and classes that this object implements methods and properties from.
+</div>
+<code class="def-type">Array</code> Array containing all the objects and classes that this object implements methods and properties from
+</div>
+<div id="doc-Classify.Class.bindings" class="doc-block doc-type-var">
+<h4 id="def-Classify.Class.bindings">Classify.Class.bindings</h4>
+<code class="def-definition">Classify.Class.bindings</code>
+<div class="doc-comment">
+Array containing the list of all the bound properties that is wrapped during object initialization.
+</div>
+<code class="def-type">Array</code> Array containing the list of all the bound properties that is wrapped during object initialization
+</div>
+<div id="doc-Classify.Class.observables" class="doc-block doc-type-var">
+<h4 id="def-Classify.Class.observables">Classify.Class.observables</h4>
+<code class="def-definition">Classify.Class.observables</code>
+<div class="doc-comment">
+Hashtable containing the definitions of all the observable properties that is implemented by this object.
+</div>
+<code class="def-type">Object</code> Hashtable containing the definitions of all the observable properties that is implemented by this object
+</div>
+<div id="doc-Classify.Class.__isclass_" class="doc-block doc-type-var">
+<h4 id="def-Classify.Class.__isclass_">Classify.Class.__isclass_</h4>
+<code class="def-definition">Classify.Class.__isclass_</code>
+<div class="doc-comment">
+Flag to determine if this object is created by Classify.create.
+</div>
+<code class="def-type">Boolean</code> Flag to determine if this object is created by Classify.create
+</div>
+<div id="doc-Classify.Class.invoke" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.invoke">Classify.Class.invoke</h4>
+<code class="def-definition">Classify.Class.invoke()</code>
+<div class="doc-comment">
+Default invocation function when the defined class is called without the "new" keyword. The default behavior is to return a new instance of itself.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.applicate" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.applicate">Classify.Class.applicate</h4>
+<code class="def-definition">Classify.Class.applicate(args)</code>
+<div class="doc-comment">
+Create a new instance of the class using arguments passed in as an array.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>args</code> <code>{Array}</code> Array of arguments to construct the object with
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.extend" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.extend">Classify.Class.extend</h4>
+<code class="def-definition">Classify.Class.extend([implement], definition)</code>
+<div class="doc-comment">
+Creates a new class that is a child of the current class.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>[implement]</code> <code>{Object[]}</code> Optional parameter defines where to implement traits from
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>definition</code> <code>{Object}</code> The description of the class to be created
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.addProperty" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.addProperty">Classify.Class.addProperty</h4>
+<code class="def-definition">Classify.Class.addProperty(name[, property][, prefix=""])</code>
+<div class="doc-comment">
+Adds a new property to the object's prototype of base.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String|Object}</code> The property name to add or if object is passed in then it will iterate through it to add properties
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>[property]</code> <code>{Object}</code> The property to add to the class
+</li>
+<li>
+<span class="def-arg-count">3.</span>
+<code>[prefix=""]</code> <code>{String}</code> Prefix of the property name if any
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.removeProperty" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.removeProperty">Classify.Class.removeProperty</h4>
+<code class="def-definition">Classify.Class.removeProperty(name)</code>
+<div class="doc-comment">
+Removes a property from the object's prototype or base.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the property to remove
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.addStaticProperty" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.addStaticProperty">Classify.Class.addStaticProperty</h4>
+<code class="def-definition">Classify.Class.addStaticProperty(name, property)</code>
+<div class="doc-comment">
+Adds a static property to the object's base.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the property to add
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>property</code> <code>{Object}</code> The property to store into the object's base
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.removeStaticProperty" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.removeStaticProperty">Classify.Class.removeStaticProperty</h4>
+<code class="def-definition">Classify.Class.removeStaticProperty(name)</code>
+<div class="doc-comment">
+Removes a static property from the object's base.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the property to remove
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.addBoundProperty" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.addBoundProperty">Classify.Class.addBoundProperty</h4>
+<code class="def-definition">Classify.Class.addBoundProperty(name, property)</code>
+<div class="doc-comment">
+Adds a context bound property to the object's prototype.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the property to add
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>property</code> <code>{Function}</code> The property to always bind the object's context with
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.removeBoundProperty" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.removeBoundProperty">Classify.Class.removeBoundProperty</h4>
+<code class="def-definition">Classify.Class.removeBoundProperty(name)</code>
+<div class="doc-comment">
+Removes a context bound property from the object's base.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the property to remove
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.addObservableProperty" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.addObservableProperty">Classify.Class.addObservableProperty</h4>
+<code class="def-definition">Classify.Class.addObservableProperty(name, property)</code>
+<div class="doc-comment">
+Adds a new observable property to the object's prototype.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the observable property to add
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>property</code> <code>{Object}</code> The descriptor of the observable property
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.removeObservableProperty" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.removeObservableProperty">Classify.Class.removeObservableProperty</h4>
+<code class="def-definition">Classify.Class.removeObservableProperty(name)</code>
+<div class="doc-comment">
+Removes a observable property to the object's prototype.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the observable property to remove
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.addAliasedProperty" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.addAliasedProperty">Classify.Class.addAliasedProperty</h4>
+<code class="def-definition">Classify.Class.addAliasedProperty(name, property)</code>
+<div class="doc-comment">
+Adds a aliased property to the object's prototype based on a existing prototype method.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the alias for the new property
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>property</code> <code>{String}</code> The name of the property alias
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.addUnwrappedProperty" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.addUnwrappedProperty">Classify.Class.addUnwrappedProperty</h4>
+<code class="def-definition">Classify.Class.addUnwrappedProperty(name, property)</code>
+<div class="doc-comment">
+Adds a property to the object's prototype that is not wrapped in the parent method wrapper.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the new property
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>property</code> <code>{String}</code> The name of the property to add
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.prototype" class="doc-block doc-type-var">
+<h4 id="def-Classify.Class.prototype">Classify.Class.prototype</h4>
+<code class="def-definition">Classify.Class.prototype</code>
+<div class="doc-comment">
+Prototype chain for Classify.Class.
+</div>
+<code class="def-type">Object</code> Prototype chain for Classify.Class
+</div>
+<div id="doc-Classify.Class.prototype.constructor" class="doc-block doc-type-var">
+<h4 id="def-Classify.Class.prototype.constructor">Classify.Class.prototype.constructor</h4>
+<code class="def-definition">Classify.Class.prototype.constructor</code>
+<div class="doc-comment">
+Reference to the constructor function of this object.
+</div>
+<code class="def-type">Classify.Class</code> Reference to the constructor function of this object
+</div>
+<div id="doc-Classify.Class.prototype.self" class="doc-block doc-type-var">
+<h4 id="def-Classify.Class.prototype.self">Classify.Class.prototype.self</h4>
+<code class="def-definition">Classify.Class.prototype.self</code>
+<div class="doc-comment">
+Reference to the constructor function of this object.
+</div>
+<code class="def-type">Classify.Class</code> Reference to the constructor function of this object
+</div>
+<div id="doc-Classify.Class.prototype.init" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.prototype.init">Classify.Class.prototype.init</h4>
+<code class="def-definition">Classify.Class.prototype.init()</code>
+<div class="doc-comment">
+True constructor method for this object, will be called when object is called with the "new" keyword.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.prototype.parent" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.prototype.parent">Classify.Class.prototype.parent</h4>
+<code class="def-definition">Classify.Class.prototype.parent()</code>
+<div class="doc-comment">
+Internal reference property for methods that override a parent method, allow for access to the parent version of the function.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Object</code>
+</div>
+</div>
+<div id="doc-Classify.Class.prototype.extend" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.prototype.extend">Classify.Class.prototype.extend</h4>
+<code class="def-definition">Classify.Class.prototype.extend([implement], definition)</code>
+<div class="doc-comment">
+Creates a new class that is a child of the current class.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>[implement]</code> <code>{Object[]}</code> Optional parameter defines where to implement traits from
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>definition</code> <code>{Object}</code> The description of the class to be created
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Class.prototype.invoke" class="doc-block doc-type-function">
+<h4 id="def-Classify.Class.prototype.invoke">Classify.Class.prototype.invoke</h4>
+<code class="def-definition">Classify.Class.prototype.invoke(name, args)</code>
+<div class="doc-comment">
+Magic method that can invoke any of the parent methods.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{Object}</code> The name of the parent method to invoke
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>args</code> <code>{Array}</code> The arguments to pass through to invoke
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Object</code>
+</div>
+</div>
+<h3 id="doc-header-Classify.Namespace">Classify.Namespace</h3>
+<div id="doc-Classify.Namespace" class="doc-block doc-type-function">
+<h4 id="def-Classify.Namespace">Classify.Namespace</h4>
+<code class="def-definition">Classify.Namespace(name)</code>
+<div class="doc-comment">
+Namespace container that hold a tree of classes.
+</div>
+<div class="def-constructor">Constructor method</div>
+<div class="def-extends">Extends <code>Classify.Class</code></div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the namespace to construct with
+</li>
+</ol>
+</div>
+</div>
+<div id="doc-Classify.Namespace.prototype" class="doc-block doc-type-var">
+<h4 id="def-Classify.Namespace.prototype">Classify.Namespace.prototype</h4>
+<code class="def-definition">Classify.Namespace.prototype</code>
+<div class="doc-comment">
+Prototype chain for Classify.Namespace.
+</div>
+<code class="def-type">Classify.Class</code> Prototype chain for Classify.Namespace
+</div>
+<div id="doc-Classify.Namespace.prototype.name" class="doc-block doc-type-var">
+<h4 id="def-Classify.Namespace.prototype.name">Classify.Namespace.prototype.name</h4>
+<code class="def-definition">Classify.Namespace.prototype.name</code>
+<div class="doc-comment">
+The name of the namespace.
+</div>
+<code class="def-type">String</code> The name of the namespace
+</div>
+<div id="doc-Classify.Namespace.prototype.ref" class="doc-block doc-type-var">
+<h4 id="def-Classify.Namespace.prototype.ref">Classify.Namespace.prototype.ref</h4>
+<code class="def-definition">Classify.Namespace.prototype.ref</code>
+<div class="doc-comment">
+Hashtable containing references to all the classes created within this namespace.
+</div>
+<code class="def-type">Object</code> Hashtable containing references to all the classes created within this namespace
+</div>
+<div id="doc-Classify.Namespace.prototype.create" class="doc-block doc-type-function">
+<h4 id="def-Classify.Namespace.prototype.create">Classify.Namespace.prototype.create</h4>
+<code class="def-definition">Classify.Namespace.prototype.create(name[, parent][, implement], definition)</code>
+<div class="doc-comment">
+Creates a new class within this namespace.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the created class within the namespace
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>[parent]</code> <code>{String|Classify.Class}</code> Optional second parameter defines what object to inherit from, can be a string referencing a class within any namespace
+</li>
+<li>
+<span class="def-arg-count">3.</span>
+<code>[implement]</code> <code>{Object[]}</code> Optional third parameter defines where to implement traits from
+</li>
+<li>
+<span class="def-arg-count">4.</span>
+<code>definition</code> <code>{Object}</code> The description of the class to be created
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Namespace.prototype.destroy" class="doc-block doc-type-function">
+<h4 id="def-Classify.Namespace.prototype.destroy">Classify.Namespace.prototype.destroy</h4>
+<code class="def-definition">Classify.Namespace.prototype.destroy(classname)</code>
+<div class="doc-comment">
+Removes a defined class from this namespace and it's children classes.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>classname</code> <code>{String}</code> Name of class to remove from this namespace
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Namespace</code>
+</div>
+</div>
+<div id="doc-Classify.Namespace.prototype.exists" class="doc-block doc-type-function">
+<h4 id="def-Classify.Namespace.prototype.exists">Classify.Namespace.prototype.exists</h4>
+<code class="def-definition">Classify.Namespace.prototype.exists(classname)</code>
+<div class="doc-comment">
+Checks if a class exists within this namespace.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>classname</code> <code>{String}</code> Name of class to check if it has already been defined
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Boolean</code>
+</div>
+</div>
+<div id="doc-Classify.Namespace.prototype.get" class="doc-block doc-type-function">
+<h4 id="def-Classify.Namespace.prototype.get">Classify.Namespace.prototype.get</h4>
+<code class="def-definition">Classify.Namespace.prototype.get(name[, callback])</code>
+<div class="doc-comment">
+Attempt to retrieve a class within this namespace or the global one.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the class to retrieve
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>[callback]</code> <code>{Function}</code> If passed in the first parameter will the found class
+</li>
+</ol>
+</div>
+</div>
+<div id="doc-Classify.Namespace.prototype.load" class="doc-block doc-type-function">
+<h4 id="def-Classify.Namespace.prototype.load">Classify.Namespace.prototype.load</h4>
+<code class="def-definition">Classify.Namespace.prototype.load(name, callback)</code>
+<div class="doc-comment">
+Default loader function that loads the internal classes from.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>name</code> <code>{String}</code> The name of the class to load
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>callback</code> <code>{Function}</code> The function to call when the class has loaded
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Namespace</code>
+</div>
+</div>
+<div id="doc-Classify.Namespace.prototype.setAutoloader" class="doc-block doc-type-function">
+<h4 id="def-Classify.Namespace.prototype.setAutoloader">Classify.Namespace.prototype.setAutoloader</h4>
+<code class="def-definition">Classify.Namespace.prototype.setAutoloader(callback)</code>
+<div class="doc-comment">
+Sets the internal autoloader by overriding the Classify.Namespace.prototype.load method.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>callback</code> <code>{Function}</code> The function to call when a class that doesn't exist needs to be loaded
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Namespace</code>
+</div>
+</div>
+<div id="doc-Classify.Namespace.prototype.getName" class="doc-block doc-type-function">
+<h4 id="def-Classify.Namespace.prototype.getName">Classify.Namespace.prototype.getName</h4>
+<code class="def-definition">Classify.Namespace.prototype.getName()</code>
+<div class="doc-comment">
+Gets the name of this namespace.
+</div>
+</div>
+<div id="doc-Classify.Namespace.prototype.toString" class="doc-block doc-type-function">
+<h4 id="def-Classify.Namespace.prototype.toString">Classify.Namespace.prototype.toString</h4>
+<code class="def-definition">Classify.Namespace.prototype.toString()</code>
+<div class="doc-comment">
+Gets the translated toString name of this object "[namespace Name]".
+</div>
+</div>
+<h3 id="doc-header-Classify.Observer">Classify.Observer</h3>
+<div id="doc-Classify.Observer" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer">Classify.Observer</h4>
+<code class="def-definition">Classify.Observer(value, value.value[, value.writable=true][, value.delay=0][, value.getter][, value.setter])</code>
+<div class="doc-comment">
+Wrapper object that allows for getter/setter/event listeners of object properties.
+</div>
+<div class="def-constructor">Constructor method</div>
+<div class="def-extends">Extends <code>Classify.Class</code></div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>value</code> <code>{Object}</code> The internal value can be either an object or a value
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>value.value</code> <code>{Object}</code> The internal value if the parameter was passed in as an object
+</li>
+<li>
+<span class="def-arg-count">3.</span>
+<code>[value.writable=true]</code> <code>{Boolean}</code> Marks this object as writable or readonly
+</li>
+<li>
+<span class="def-arg-count">4.</span>
+<code>[value.delay=0]</code> <code>{Number}</code> Only fire the event emitter after a delay of value.delay ms
+</li>
+<li>
+<span class="def-arg-count">5.</span>
+<code>[value.getter]</code> <code>{Function}</code> The internal get modifier
+</li>
+<li>
+<span class="def-arg-count">6.</span>
+<code>[value.setter]</code> <code>{Function}</code> The internal set modifier
+</li>
+</ol>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype" class="doc-block doc-type-var">
+<h4 id="def-Classify.Observer.prototype">Classify.Observer.prototype</h4>
+<code class="def-definition">Classify.Observer.prototype</code>
+<div class="doc-comment">
+Prototype chain for Classify.Observer.
+</div>
+<code class="def-type">Classify.Class</code> Prototype chain for Classify.Observer
+</div>
+<div id="doc-Classify.Observer.prototype.context" class="doc-block doc-type-var">
+<h4 id="def-Classify.Observer.prototype.context">Classify.Observer.prototype.context</h4>
+<code class="def-definition">Classify.Observer.prototype.context</code>
+<div class="doc-comment">
+The context that this object is created within.
+</div>
+<code class="def-type">Classify.Class</code> The context that this object is created within
+</div>
+<div id="doc-Classify.Observer.prototype.name" class="doc-block doc-type-var">
+<h4 id="def-Classify.Observer.prototype.name">Classify.Observer.prototype.name</h4>
+<code class="def-definition">Classify.Observer.prototype.name</code>
+<div class="doc-comment">
+The name of the property that this object observes.
+</div>
+<code class="def-type">String</code> The name of the property that this object observes
+</div>
+<div id="doc-Classify.Observer.prototype.writable" class="doc-block doc-type-var">
+<h4 id="def-Classify.Observer.prototype.writable">Classify.Observer.prototype.writable</h4>
+<code class="def-definition">Classify.Observer.prototype.writable</code>
+<div class="doc-comment">
+Flag to check if this property is writable.
+</div>
+<code class="def-type">Boolean</code> Flag to check if this property is writable
+</div>
+<div id="doc-Classify.Observer.prototype.delay" class="doc-block doc-type-var">
+<h4 id="def-Classify.Observer.prototype.delay">Classify.Observer.prototype.delay</h4>
+<code class="def-definition">Classify.Observer.prototype.delay</code>
+<div class="doc-comment">
+Number of seconds to delay the event emitter, 0 will disable delays.
+</div>
+<code class="def-type">Number</code> Number of seconds to delay the event emitter, 0 will disable delays
+</div>
+<div id="doc-Classify.Observer.prototype._debounce" class="doc-block doc-type-var">
+<h4 id="def-Classify.Observer.prototype._debounce">Classify.Observer.prototype._debounce</h4>
+<code class="def-definition">Classify.Observer.prototype._debounce</code>
+<div class="doc-comment">
+Flag to hold the delay timer.
+</div>
+<code class="def-type">Number</code> Flag to hold the delay timer
+</div>
+<div id="doc-Classify.Observer.prototype.value" class="doc-block doc-type-var">
+<h4 id="def-Classify.Observer.prototype.value">Classify.Observer.prototype.value</h4>
+<code class="def-definition">Classify.Observer.prototype.value</code>
+<div class="doc-comment">
+The internal value of this object.
+</div>
+<code class="def-type">Object</code> The internal value of this object
+</div>
+<div id="doc-Classify.Observer.prototype.events" class="doc-block doc-type-var">
+<h4 id="def-Classify.Observer.prototype.events">Classify.Observer.prototype.events</h4>
+<code class="def-definition">Classify.Observer.prototype.events</code>
+<div class="doc-comment">
+Array containing all the event listeners for when this value changes.
+</div>
+<code class="def-type">Array</code> Array containing all the event listeners for when this value changes
+</div>
+<div id="doc-Classify.Observer.prototype.getter" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.getter">Classify.Observer.prototype.getter</h4>
+<code class="def-definition">Classify.Observer.prototype.getter(value)</code>
+<div class="doc-comment">
+Internal getter method that modifies the internal value being returned by the Classify.Observer.prototype.get method.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>value</code> <code>{Object}</code> The internal value of this object
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Object</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.setter" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.setter">Classify.Observer.prototype.setter</h4>
+<code class="def-definition">Classify.Observer.prototype.setter(value, original)</code>
+<div class="doc-comment">
+Internal setter method that modifies the internal value being set by the Classify.Observer.prototype.set method.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>value</code> <code>{Object}</code> The new value that will be set
+</li>
+<li>
+<span class="def-arg-count">2.</span>
+<code>original</code> <code>{Object}</code> The original internal value of this object
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Object</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.get" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.get">Classify.Observer.prototype.get</h4>
+<code class="def-definition">Classify.Observer.prototype.get()</code>
+<div class="doc-comment">
+Gets the value of the internal property.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Object</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.set" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.set">Classify.Observer.prototype.set</h4>
+<code class="def-definition">Classify.Observer.prototype.set(value)</code>
+<div class="doc-comment">
+Sets the value of the internal property.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>value</code> <code>{Object}</code> Mixed value to store internally
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.emit" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.emit">Classify.Observer.prototype.emit</h4>
+<code class="def-definition">Classify.Observer.prototype.emit()</code>
+<div class="doc-comment">
+Starts the timers to call the registered event listeners.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.triggerEmit" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.triggerEmit">Classify.Observer.prototype.triggerEmit</h4>
+<code class="def-definition">Classify.Observer.prototype.triggerEmit()</code>
+<div class="doc-comment">
+Fires the event listeners in the order they were added.
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.addListener" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.addListener">Classify.Observer.prototype.addListener</h4>
+<code class="def-definition">Classify.Observer.prototype.addListener(listener)</code>
+<div class="doc-comment">
+Add an event listener for when the internal value is changed.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>listener</code> <code>{Function}</code> The event listener to add
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.removeListener" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.removeListener">Classify.Observer.prototype.removeListener</h4>
+<code class="def-definition">Classify.Observer.prototype.removeListener(listener)</code>
+<div class="doc-comment">
+Remove an event listener from being fired when the internal value is changed.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>listener</code> <code>{Function}</code> The event listener to remove
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.removeAllListeners" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.removeAllListeners">Classify.Observer.prototype.removeAllListeners</h4>
+<code class="def-definition">Classify.Observer.prototype.removeAllListeners()</code>
+<div class="doc-comment">
+Remove all event listeners from this object.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.listeners" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.listeners">Classify.Observer.prototype.listeners</h4>
+<code class="def-definition">Classify.Observer.prototype.listeners()</code>
+<div class="doc-comment">
+Returns the array of internal listeners.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Array</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.toValue" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.toValue">Classify.Observer.prototype.toValue</h4>
+<code class="def-definition">Classify.Observer.prototype.toValue()</code>
+<div class="doc-comment">
+Returns the internal value of this object in the scalar form.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Boolean|Number|String</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.toString" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.toString">Classify.Observer.prototype.toString</h4>
+<code class="def-definition">Classify.Observer.prototype.toString()</code>
+<div class="doc-comment">
+Returns the special name of this object.
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>String</code>
+</div>
+</div>
+			</div>
+		</div>
+		
+		<div>
 			<h2>Change Log</h2>
 			<div>
-				@CHANGELOG
+				<div class="changelog">
+<b class="changelog-header">v0.9.7</b>
+<ul class="changelog-list">
+<li>Refactoring internals so that adding and removing mutators can be externalized</li>
+<li>Added mutator to auto bind functions to a class instance</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.9.6</b>
+<ul class="changelog-list">
+<li>Fix case where classes are added as properties of other classes</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.9.5</b>
+<ul class="changelog-list">
+<li>Added ability to add non wrapped methods to the class prototype</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.9.4</b>
+<ul class="changelog-list">
+<li>Adding Travis-ci config file</li>
+<li>Fix issue with IE6-9 when extending from non CLassify classes</li>
+<li>General bug fixes, removing support for IE<6</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.9.3</b>
+<ul class="changelog-list">
+<li>Renaming Class.Extend to Class.extend</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.9.2</b>
+<ul class="changelog-list">
+<li>Ability to delay event listeners from being triggered in observers</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.9.0</b>
+<ul class="changelog-list">
+<li>Ability to add statics and observers in a container</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.8.5</b>
+<ul class="changelog-list">
+<li>Fix issue with adding overriding functions to a parent prototype</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.8.0</b>
+<ul class="changelog-list">
+<li>Only fire observer listeners when the value has changed</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.7.5</b>
+<ul class="changelog-list">
+<li>fixing parent invocation using applicate in default invoke method</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.7.0</b>
+<ul class="changelog-list">
+<li>Ability to inherit from objects that are not created with Classify.create.</li>
+<li>Allow Classify to be AMD compatible.</li>
+<li>extend utility function that "extends" objects with properties from other objects in a shallow manner</li>
+<li>fix issue with class invocation of "invoke" when class is a direct property of a namespace</li>
+<li>"get" in namespace cascades into "GLOBAL" namespace classes</li>
+<li>groundwork for ability to extend native and non create objects</li>
+<li>Removing check for native objects (IE doesn't allow extending native objects).</li>
+<li>throw Error objects instead of strings</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.6.0</b>
+<ul class="changelog-list">
+<li>better detection of parameters for using Classify function ("namespace/classname" for retrieval)</li>
+<li>minification optimizations</li>
+<li>quicker access to the GLOBAL namespace</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.4.0</b>
+<ul class="changelog-list">
+<li>ability to inherit the parent invoke method if not defined</li>
+<li>exporting provide to the Classify object</li>
+<li>GLOBAL namespace that all namespaced classes can inherit from</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.3.5</b>
+<ul class="changelog-list">
+<li>ability to get a class definition synchronously and asynchronously in Classify</li>
+<li>ability to test if a namespace exists</li>
+<li>adding Classify.noConflict for conflict free usage of Classify</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.3.0</b>
+<ul class="changelog-list">
+<li>using more standardized nomenclature</li>
+<li>"_construct_" => "init"</li>
+<li>"_invoke_" => "invoke"</li>
+<li>"_apply_" => "applicate"</li>
+<li>"_parent_" => "parent"</li>
+<li>"_self_" => "self"</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.2.0</b>
+<ul class="changelog-list">
+<li>ability to create and destory classes created within namespaces</li>
+<li>better checking of enumerable keys in IE < 9</li>
+<li>bugfix on Extend functionality</li>
+<li>Classify function endpoint has ability to to get namespace and create classes within the namespace</li>
+<li>fixing issue with adding multiple properties to a class with the addProperty call</li>
+<li>"get" in namespace takes in a callback and passes in the class</li>
+<li>global references</li>
+<li>namespacing functionality</li>
+<li>only export classify to root object if it's a browser</li>
+<li>pulled out the body of invoke to apply and default invoke will call apply</li>
+<li>the exported object is created using the internal Create method</li>
+<li>updated to "use strict";</li>
+</ul>
+</div>
 			</div>
 		</div>
 		
