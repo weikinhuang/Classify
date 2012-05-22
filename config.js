@@ -58,7 +58,8 @@ module.exports = {
 		}
 	},
 	doc : {
-		markdown : "README"
+		markdown : "README",
+		html : "classifyjs.com"
 	},
 	build : "clean lint unit concat min size"
 };
