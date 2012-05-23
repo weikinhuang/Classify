@@ -486,6 +486,7 @@ module.exports = (function(root) {
 		var htmlInputName = typeof options.doc.html === "string" ? options.doc.html : options.name;
 		var template = fs.readFileSync(options.dir.doc + "/" + htmlInputName + ".html", "utf8");
 		template = template.replace(/@VERSION\b/g, options.version);
+		template = template.replace(/@REPO_URI\b/g, options.repo);
 		template = template.replace(/@FULLSIZE\b/g, roundFileSize(source.source.length));
 		template = template.replace(/@MINSIZE\b/g, roundFileSize(source.gzipSource.length));
 		template = template.replace(/@CHANGELOG\b/g, outputHtmlChangelogBlock(options, parseChangelog(options)));
@@ -498,6 +499,8 @@ module.exports = (function(root) {
 			callback();
 			return;
 		}
+		callback.print("Generation documentation files...");
+
 		var docsfile = [], num_processed = 0;
 		options.docs.forEach(function(file) {
 			docsfile.push(fs.readFileSync(options.dir.doc + "/" + file, "utf8").replace(/\r/g, ""));
