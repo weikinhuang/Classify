@@ -1,7 +1,7 @@
 module.exports = {
 	name : "classify",
-	pkg : "package.json",
 	version : "0.9.7",
+	repo : "https://github.com/weikinhuang/Classify",
 	wrap : {
 		copy : [ "copyright.js" ],
 		intro : [ "intro.js" ],
@@ -60,6 +60,29 @@ module.exports = {
 	doc : {
 		markdown : "README",
 		html : "classifyjs.com"
+	},
+	pkg : {
+		file : "package.json",
+		desc : {
+			name : "classifyjs",
+			description : "Classify.js is a library that allows for cross platform and cross browser Object Oriented Javascript class definitions using classical inheritance and namespaces behind the prototype syntax in an easy to use interface function.",
+			keywords : [ "util", "functional", "server", "client", "browser", "prototype", "object-oriented", "class", "classes", "inheritance", "abstraction" ],
+			author : "Wei Kin Huang <wei@closedinterval.com>",
+			version : "@VERSION",
+			homepage : "http://classifyjs.com",
+			repository : {
+				type : "git",
+				url : "https://github.com/weikinhuang/Classify.git"
+			},
+			bugs : {
+				url : "https://github.com/weikinhuang/Classify/issues"
+			},
+			licenses : [ {
+				type : "MIT",
+				url : "https://github.com/weikinhuang/Classify/blob/master/MIT-LICENSE.txt"
+			} ],
+			main : "dist/classify"
+		}
 	},
 	build : "clean lint unit concat min size"
 };
