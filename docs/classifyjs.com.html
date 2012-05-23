@@ -175,5 +175,17 @@
 <script type="text/javascript">
 var _gaq=[["_setAccount","UA-6932121-4"],["_trackPageview"]];(function(b,d,e,a,c){a=b.createElement(d);c=b.getElementsByTagName(d)[0];a.type="text/javascript";a[e]=e;a.src=("https:"==b.location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";c.parentNode.insertBefore(a,c)})(document,"script","async");
 </script>
+<script>
+$(function(){
+	$("a[href^=#]").click(function() {
+		var href = $(this).attr("href");
+		var id = href.replace(/^.*#/, "");
+		$("html,body").stop().animate({
+			scrollTop : ($(document.getElementById(id)).offset().top - 50) + "px"
+		}, 1000);
+		return false;
+	});
+});
+</script>
 </body>
 </html>
