@@ -5,9 +5,31 @@
 }
 
 html, body {
-	height: 100%;
-	color: #000;
 	background: #fff;
+	color: #000;
+	font: normal 14px/22px Helvetica Neue, Helvetica, Arial;
+	height: 100%;
+}
+
+code, pre, tt {
+	font: normal 12px/18px Consolas, Monaco, "Lucida Console", monospace;
+	white-space: pre;
+}
+code {
+	padding: 1px 2px;
+	display: inline-block;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+}
+p {
+	display: block;
+	margin: 20px 0;
+}
+
+h2 {
+	font-size: 18px;
+	margin: 20px 0;
+	font-weight: bold;
 }
 
 .github-fork-banner {
@@ -74,5 +96,83 @@ html, body {
 
 #body {
 	margin: 36px 0 0 250px;
-	padding: 15px;
+	padding: 15px 15px 15px 30px;
 }
+
+.body-wrapper {
+	width: 650px;
+}
+
+#body a {
+	color: #7bf;
+	text-decoration:none;
+	-webkit-transition: all 0.3s linear;
+	border-bottom: 1px solid transparent;
+}
+#body a:link {
+	color:#7bf;
+}
+#body a:visited {
+	color:#96cafe;
+}
+#body a:hover {
+	border-bottom: 1px solid #39f;
+	color:#39f;
+}
+#body a:active { /* selected link */
+	color:#aaa;
+}
+
+#body h2 .small {
+	font-size: 12px;
+}
+
+#body .download-table {
+	
+}
+#body .download-table .download-link {
+	
+}
+#body .download-table .download-detail {
+	font-style: italic;
+}
+
+
+pre.code-block {
+	display: block;
+	padding: 6px 12px;
+	border-width: 1px 1px 1px 6px;
+	border-color: #ccc;
+	border-style: solid;
+	margin: 20px 0;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+.changelog {
+	margin: 20px 0;
+}
+.changelog b {
+	font-weight: bold;
+}
+.changelog ul {
+	
+}
+.changelog ul li {
+	font-size: 12px;
+	line-height: 18px;
+	padding: 0 0 0 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
