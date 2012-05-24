@@ -52,7 +52,6 @@ h2 {
 	transition: line-height 0.3s linear;
 	vertical-align: middle;
 	z-index: 30;
-
 	line-height: 36px;
 	position: fixed;
 	width: 100%;
@@ -66,7 +65,7 @@ h2 {
 	left: 0;
 	overflow-x: hidden;
 	overflow-y: auto;
-	padding: 15px 0 30px 30px;
+	padding: 15px 0 30px 15px;
 	position: fixed;
 	top: 36px;
 	width: 250px;
@@ -75,14 +74,31 @@ h2 {
 #sidebar h4 {
 	
 }
-#sidebar h4 a {
-	
+#sidebar a {
+	display: block;
+	text-decoration: none;
+	color: #000;
+	border-width: 0 0 1px 6px;
+	border-style: solid;
+	border-color: transparent;
+	padding: 2px 6px;
+	-moz-transition: all 0.3s linear;
+	-webkit-transition: all 0.3s linear;
+	-o-transition: all 0.3s linear;
+	-ms-transition: all 0.3s linear;
+	transition: all 0.3s linear;
+}
+#sidebar a:hover {
+	border-color: transparent transparent #ccc #ccc;
+	color: #666;
 }
 #sidebar ul {
-	
 }
 #sidebar ul li {
 	
+}
+#sidebar ul li ul {
+	padding: 0 0 0 6px;
 }
 #sidebar ul li h5 {
 	
@@ -106,8 +122,12 @@ h2 {
 #body a {
 	color: #7bf;
 	text-decoration:none;
-	-webkit-transition: all 0.3s linear;
 	border-bottom: 1px solid transparent;
+	-moz-transition: all 0.3s linear;
+	-webkit-transition: all 0.3s linear;
+	-o-transition: all 0.3s linear;
+	-ms-transition: all 0.3s linear;
+	transition: all 0.3s linear;
 }
 #body a:link {
 	color:#7bf;
@@ -137,6 +157,50 @@ h2 {
 	font-style: italic;
 }
 
+.doc-block {
+	margin: 20px 0 40px;
+}
+.doc-block h4 {
+	display: block;
+	font-weight: bold;
+	border-bottom: 1px solid #ccc;
+	margin: 10px 0;
+	font-size: 16px;
+}
+.doc-block code {
+
+}
+.doc-block .doc-comment{
+	margin: 10px 0;
+}
+.doc-block .type-args {
+	margin: 10px 0;
+}
+.doc-block .type-args b {
+	display: block;
+	border-bottom: 1px solid #ccc;
+	margin: 10px 0;
+}
+.doc-block .type-args ol {
+
+}
+.doc-block .type-args ol li {
+	margin: 0 0 0 16px;
+}
+.doc-block .type-args ol li .def-arg-count {
+	font-size: 11px;
+}
+.doc-block .type-args ol li code {
+	padding: 0 2px;
+}
+.doc-block .type-return {
+	margin: 10px 0;
+}
+.doc-block .type-return b {
+	display: block;
+	border-bottom: 1px solid #ccc;
+	margin: 10px 0;
+}
 
 pre.code-block {
 	display: block;
