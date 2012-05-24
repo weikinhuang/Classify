@@ -230,7 +230,126 @@ pre.code-block {
 
 
 
+pre.code-block .comment,
+pre.code-block .template_comment,
+pre.code-block .diff .header,
+pre.code-block .javadoc {
+	color: #998;
+	font-style: italic;
+}
 
+pre.code-block .keyword,
+pre.code-block .css .rule .keyword,
+pre.code-block .winutils,
+pre.code-block .javascript .title,
+pre.code-block .lisp .title,
+pre.code-block .subst,
+pre.code-block .request,
+pre.code-block .status {
+	color: #006;
+	font-weight: bold;
+}
+
+pre.code-block .number,
+pre.code-block .hexcolor {
+	color: #40a070;
+}
+
+pre.code-block .string,
+pre.code-block .tag .value,
+pre.code-block .phpdoc,
+pre.code-block .tex .formula {
+	color: #d14;
+}
+
+pre.code-block .title,
+pre.code-block .id {
+	color: #900;
+	font-weight: bold;
+}
+
+pre.code-block .javascript .title,
+pre.code-block .lisp .title,
+pre.code-block .subst {
+	font-weight: normal;
+}
+
+pre.code-block .class .title,
+pre.code-block .haskell .type,
+pre.code-block .vhdl .literal,
+pre.code-block .tex .command {
+	color: #458;
+	font-weight: bold;
+}
+
+pre.code-block .tag,
+pre.code-block .tag .title,
+pre.code-block .rules .property,
+pre.code-block .django .tag .keyword {
+	color: #000080;
+	font-weight: normal;
+}
+
+pre.code-block .attribute,
+pre.code-block .variable,
+pre.code-block .instancevar,
+pre.code-block .lisp .body {
+	color: #008080;
+}
+
+pre.code-block .regexp {
+	color: #009926;
+}
+
+pre.code-block .class {
+	color: #458;
+	font-weight: bold;
+}
+
+pre.code-block .symbol,
+pre.code-block .ruby .symbol .string,
+pre.code-block .ruby .symbol .keyword,
+pre.code-block .ruby .symbol .keymethods,
+pre.code-block .lisp .keyword,
+pre.code-block .tex .special,
+pre.code-block .input_number {
+	color: #990073;
+}
+
+pre.code-block .builtin,
+pre.code-block .built_in,
+pre.code-block .lisp .title {
+	color: #0086b3;
+}
+
+pre.code-block .pre.code-blockprocessor,
+pre.code-block .pi,
+pre.code-block .doctype,
+pre.code-block .shebang,
+pre.code-block .cdata {
+	color: #999;
+	font-weight: bold;
+}
+
+pre.code-block .deletion {
+	background: #fdd;
+}
+
+pre.code-block .addition {
+	background: #dfd;
+}
+
+pre.code-block .diff .change {
+	background: #0086b3;
+}
+
+pre.code-block .chunk {
+	color: #aaa;
+}
+
+pre.code-block .tex .formula {
+	opacity: 0.5;
+}
 
 
 
