@@ -1,7 +1,9 @@
 module.exports = (function(root) {
 
+	// include the fs mmodule
+	var fs = require("fs"),
 	// execute system commands
-	var exec = require("child_process");
+	exec = require("child_process");
 
 	function lpad(str, len, chr) {
 		return (Array(len + 1).join(chr || " ") + str).substr(-len);
@@ -16,10 +18,10 @@ module.exports = (function(root) {
 		return number[0].replace(/(?=(?:\d{3})+$)(?!\b)/g, ',') + (number[1] ? '.' + number[1] : '');
 	}
 
-	function processUnitTestResults(results, callback) {
+	function processUnitTestResults(results, prevResults, callback) {
 		var error = 0;
 		results.forEach(function(test) {
-			var message = "  ";
+			var message = "  ", prevCompare;
 			if (test.error) {
 				message += "\x1B[38;5;160m" + rpad(test.name, 35) + "\x1B[0m";
 			} else {
@@ -27,6 +29,15 @@ module.exports = (function(root) {
 			}
 			message += lpad(formatNumber(test.hz.toFixed(test.hz < 100 ? 2 : 0)), 12) + " ops/s (\u00B1" + test.stats.rme.toFixed(2) + "%)";
 			message += " [" + formatNumber(test.count) + "x in " + test.times.cycle.toFixed(3) + "s]";
+
+			if(prevResults[test.name]) {
+				prevCompare = test.hz - prevResults[test.name].hz;
+				message += " [Vs. ";
+				message += (prevCompare >= 0 ? "+" : "-") + formatNumber(Math.abs(prevCompare).toFixed(Math.abs(prevCompare) < 100 ? 2 : 0)) + " ops/s";
+				message += " (" + (prevCompare >= 0 ? "+" : "-") + Math.abs(((test.hz - prevResults[test.name].hz) / test.hz) * 100).toFixed(3) + "%)";
+				message += "]";
+			}
+
 			callback.log(message);
 			if (test.error) {
 				error++;
@@ -100,8 +111,18 @@ module.exports = (function(root) {
 		}
 		callback.print("Running benchmarks with Benchmark.js...");
 		var tests = [], complete = function(env, results) {
+			var prevPerfStats = {}, currentPerfStats = {};
 			if (env !== null && results !== true) {
-				processUnitTestResults(results, callback);
+				try {
+					prevPerfStats = JSON.parse(fs.readFileSync(options.dir.build + "/.perfcache." + env + ".json", "utf8"));
+				} catch (e) {
+				}
+				processUnitTestResults(results, prevPerfStats, callback);
+				results.forEach(function(test) {
+					currentPerfStats[test.name] = test;
+				});
+				fs.writeFileSync(options.dir.build + "/.perfcache." + env + ".json", JSON.stringify(currentPerfStats, true), "utf8");
+
 			}
 			if (results === true) {
 				callback.log("\x1B[38;5;160m\u2716 \x1B[0mEnvironment " + env + " not found!");

@@ -9,6 +9,6 @@
 .externalToolBuilders
 .buildpath
 .project
-build/.sizecache.json
-build/.coveragecache.json
+test/dev.html
+build/.*.json
 coverage/*
