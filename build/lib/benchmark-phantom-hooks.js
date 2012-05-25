@@ -1,4 +1,4 @@
-(function(tests) {
+(function(window, tests) {
 	tests.on("add", function(e) {
 		// bind events
 		e.target.on("complete", function(e) {
@@ -28,4 +28,11 @@
 			data : {}
 		}));
 	});
-})(___benchmarks);
+
+	// wrapper function to add a test group
+	window.Benchmark.test = function(group, testGroup) {
+		testGroup(function(name, test) {
+			tests.add.call(tests, group + "." + name, test);
+		});
+	};
+})(window, ___benchmarks);

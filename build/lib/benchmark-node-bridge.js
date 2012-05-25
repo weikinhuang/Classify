@@ -79,6 +79,13 @@ sandbox.___benchmarks.on("complete", function() {
 	});
 });
 
+// wrapper function to add a test group
+sandbox.Benchmark.test = function(group, testGroup) {
+	testGroup(function(name, test) {
+		sandbox.___benchmarks.add.call(sandbox.___benchmarks, group + "." + name, test);
+	});
+};
+
 //load source and tests into the sandbox
 function load(src, root) {
 	var files = [];

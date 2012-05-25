@@ -41,7 +41,7 @@
 		tdStatus.className = "test-status";
 
 		aName[textProp] = test.name;
-		preBody[textProp] = test.fn.toString().replace(/\t/g, "    ").replace(/^function\s*\(.*\)\s*\{\s*[\n\r]+/, "").replace(/\s*[\n\r]+}\s*$/, "").replace(/^\    /gm, "");
+		preBody[textProp] = test.fn.toString().replace(/\t/g, "    ").replace(/^function\s*\(.*\)\s*\{\s*[\n\r]+/, "").replace(/\s*[\n\r]+\s*}\s*$/, "").replace(/^\    /gm, "");
 		tdStatus[textProp] = "Ready";
 
 		tr.appendChild(tdName);
@@ -77,4 +77,11 @@
 	}).on("reset", function() {
 		statusElem[textProp] = "Initializing...";
 	});
+
+	// wrapper function to add a test group
+	window.Benchmark.test = function(group, testGroup) {
+		testGroup(function(name, test) {
+			tests.add.call(tests, group + "." + name, test);
+		});
+	};
 })(this, ___benchmarks);

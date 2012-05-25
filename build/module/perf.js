@@ -21,9 +21,9 @@ module.exports = (function(root) {
 		results.forEach(function(test) {
 			var message = "  ";
 			if (test.error) {
-				message += "\x1B[38;5;160m" + rpad(test.name, 25) + "\x1B[0m";
+				message += "\x1B[38;5;160m" + rpad(test.name, 35) + "\x1B[0m";
 			} else {
-				message += rpad(test.name, 25);
+				message += rpad(test.name, 35);
 			}
 			message += lpad(formatNumber(test.hz.toFixed(test.hz < 100 ? 2 : 0)), 12) + " ops/s (\u00B1" + test.stats.rme.toFixed(2) + "%)";
 			message += " [" + formatNumber(test.count) + "x in " + test.times.cycle.toFixed(3) + "s]";
@@ -95,6 +95,9 @@ module.exports = (function(root) {
 	}
 
 	return function(options, source, callback) {
+		if(!options.perf || options.perf.length === 0) {
+			return callback();
+		}
 		callback.print("Running benchmarks with Benchmark.js...");
 		var tests = [], complete = function(env, results) {
 			if (env !== null && results !== true) {

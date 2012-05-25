@@ -47,6 +47,13 @@ var root = this;
 <script type="text/javascript">
 (function(files) {
 	for ( var i = 0, l = files.length; i < l; i++) {
+		document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../vendor/' + files[i] + '"></scr' + 'ipt>');
+	}
+})(this.___opts.external || []);
+</script>
+<script type="text/javascript">
+(function(files) {
+	for ( var i = 0, l = files.length; i < l; i++) {
 		document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../src/' + files[i] + '"></scr' + 'ipt>');
 	}
 })(this.___opts.src);
