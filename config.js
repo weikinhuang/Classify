@@ -9,7 +9,7 @@ module.exports = {
 	},
 	src : [ "core.js", "create.js", "mutator.static.js", "mutator.nowrap.js", "mutator.alias.js", "mutator.bind.js", "observer.js", "mutator.observable.js", "namespace.js", "export.js" ],
 	unit : [ "core.js", "create.js", "mutator.static.js", "mutator.nowrap.js", "mutator.alias.js", "mutator.bind.js", "observer.js", "mutator.observable.js", "namespace.js", "export.js" ],
-	perf : [],
+	perf : [ "create.js" ],
 	docs : [ "classify.docs.js" ],
 	env : {
 		node : true,
