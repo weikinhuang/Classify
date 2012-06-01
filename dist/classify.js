@@ -5,7 +5,7 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Sun, 20 May 2012 16:36:12 GMT
+ * Date: Fri, 01 Jun 2012 20:06:51 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -1016,8 +1016,8 @@ extend(Classify, {
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.
-if (typeof root.module !== "undefined" && root.module.exports) {
-	root.module.exports = Classify;
+if (typeof module !== "undefined" && module.exports) {
+	module.exports = Classify;
 	// create a circular reference
 	Classify.Classify = Classify;
 } else if (typeof root.define === "function" && root.define.amd) {

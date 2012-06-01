@@ -80,8 +80,8 @@ extend(Classify, {
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
 // old "require()" API. If we're not in CommonJS, add "Classify" to the global object.
-if (typeof root.module !== "undefined" && root.module.exports) {
-	root.module.exports = Classify;
+if (typeof module !== "undefined" && module.exports) {
+	module.exports = Classify;
 	// create a circular reference
 	Classify.Classify = Classify;
 } else if (typeof root.define === "function" && root.define.amd) {
