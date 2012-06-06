@@ -1,27 +1,19 @@
-module.exports = (function(root) {
+// include the fs mmodule
+var fs = require("fs");
 
-	// include the fs mmodule
-	var fs = require("fs");
+module.exports = function(build, callback) {
+	build.printHeader(build.color("Generating Code Coverage Report...", "bold"));
 
-	return function(options, source, callback) {
-		callback.print("Generating Code Coverage Report...");
-		var report;
-		try {
-			report = JSON.parse(fs.readFileSync(options.dir.build + "/.coveragecache.json", "utf-8"));
-		} catch (e) {
-			report = [];
-		}
-
-		if (report.length === 0) {
+	build.readCacheFile("coverage", function(data) {
+		data = data || [];
+		if (data.length === 0) {
 			return callback({
 				error : new Error("Code Coverage reports not yet generated!")
 			});
 		}
-
-		report.forEach(function(msg) {
-			callback.log(msg);
+		data.forEach(function(msg) {
+			build.printLine(msg);
 		});
-
 		callback();
-	};
-})(global);
+	});
+};

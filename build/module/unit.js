@@ -1,133 +1,182 @@
-module.exports = (function(root) {
+// execute system commands
+var childProcess = require("child_process");
+// classify library
+var Classify = require("../vendor/classify/classify.min.js");
+// require the special array library
+require("../vendor/classify/classify-array.min.js")(Classify);
+var cArray = Classify("/Array");
 
-	// execute system commands
-	var exec = require("child_process");
-
-	function processUnitTestResults(results, summary, callback) {
-		Object.keys(results).forEach(function(test) {
-			callback.log("\x1B[39;1mModule:\x1B[0m " + test);
-			results[test].forEach(function(assertion) {
-				callback.log("    " + (assertion.result ? "\x1B[38;5;34m\u2714" : "\x1B[38;5;160m\u2716") + " \x1B[0m\x1B[39;1mTest #\x1B[0m " + assertion.index + "/" + summary.total);
-				callback.log("        " + assertion.message + " [\x1B[38;5;248m" + assertion.test + "\x1B[0m]");
+var UnitTest = Classify.create({
+	init : function(name, build) {
+		this.build = build;
+		this.name = name;
+		this.runtime = 0;
+		this.failed = 0;
+		this.passed = 0;
+		this.total = 0;
+		this.results = {};
+	},
+	setCallback : function(callback) {
+		this.callback = callback;
+		return this;
+	},
+	onComplete : function() {
+		this.build.printLine();
+		this.callback();
+	},
+	start : function() {
+		this.build.printLine("Running in " + this.build.color(this.name, "bold") + " environment...");
+	},
+	logEvent : function(type, data) {
+		switch (type) {
+			case "assertionDone":
+				if (data.result === false) {
+					if (!this.results[data.module]) {
+						this.results[data.module] = [];
+					}
+					this.results[data.module].push(data);
+				}
+				break;
+			case "testStart":
+				this.build.printTemp("Running: " + this.build.color(data.module, "bold") + " " + data.name);
+				break;
+			case "testDone":
+				break;
+			case "moduleStart":
+				break;
+			case "moduleDone":
+				break;
+			case "done":
+				this.build.printTemp("Unit tests done.");
+				this.failed = data.failed;
+				this.passed = data.passed;
+				this.total = data.total;
+				this.runtime = data.runtime;
+				this.process();
+				break;
+		}
+	},
+	process : function() {
+		var self = this, build = this.build;
+		Object.keys(this.results).forEach(function(test) {
+			build.printLine(build.color("Module: ", "bold") + test);
+			self.results[test].forEach(function(assertion) {
+				build.printLine("    " + (assertion.result ? build.color("\u2714  ", 34) : build.color("\u2716 ", 160)) + build.color("Test # ", "bold") + assertion.index + "/" + self.total);
+				build.printLine("        " + assertion.message + " [" + build.color(assertion.test, 248) + "]");
 				if (typeof assertion.expected !== "undefined") {
-					callback.log("            -> \x1B[38;5;34mExpected: " + assertion.expected + "\x1B[0m");
+					build.printLine("            -> " + build.color("Expected: " + assertion.expected, 34));
 					// if test failed, then we need to output the result
 					if (!assertion.result) {
-						callback.log("            ->   \x1B[38;5;160mResult: " + assertion.actual + "\x1B[0m");
+						build.printLine("            ->   " + build.color("Result: " + assertion.actual, 160));
 					}
 				}
 			});
 		});
 
-		if (summary.failed > 0) {
-			callback.log("\x1B[38;5;160m\u2716 \x1B[0m" + summary.failed + " / " + summary.total + " Failed");
+		if (this.failed > 0) {
+			build.printLine(build.color("\u2716 ", 160) + this.failed + " / " + this.total + " Failed");
 		} else {
-			callback.log("\x1B[38;5;34m\u2714 \x1B[0mAll tests [" + summary.passed + " / " + summary.total + "] passed!");
+			build.printLine(build.color("\u2714 ", 34) + "All tests [" + this.passed + " / " + this.total + "] passed!");
 		}
-		callback.log("");
+		this.onComplete();
 	}
+});
 
-	function unitNode(options, callback) {
-		var child = exec.fork(options.dir.build + "/lib/qunit-node-bridge.js", [ JSON.stringify({
-			src : options.src,
-			tests : options.unit
+var UnitTestNodeJs = Classify.create(UnitTest, {
+	init : function(build) {
+		this.parent("NodeJs", build);
+	},
+	start : function() {
+		this.parent();
+		var self = this, index = 0, child;
+
+		child = childProcess.fork(this.build.dir.build + "/bridge/qunit-node-bridge.js", [ JSON.stringify({
+			source : {
+				src : this.build.options.src,
+				tests : this.build.options.unit,
+				external : this.build.options.external
+			},
+			dir : this.build.dir
 		}) ], {
 			env : process.env
-		}), results = {}, index = 0;
+		});
 
-		child.on("message", function(msg) {
-			if (msg.event === "assertionDone") {
-				msg.data.index = ++index;
-				if (msg.data.result === false) {
-					if (!results[msg.data.module]) {
-						results[msg.data.module] = [];
-					}
-					results[msg.data.module].push(msg.data);
-				}
-			} else if (msg.event === "done") {
-				child.kill();
-				callback(results, msg.data);
+		child.on("message", function(message) {
+			if (message.event === "assertionDone") {
+				message.data.index = ++index;
 			}
+			if (message.event === "done") {
+				child.kill();
+			}
+			self.logEvent(message.event, message.data || {});
 		});
 	}
+});
 
-	function unitPhantom(options, callback) {
-		var child = exec.spawn("phantomjs", [ options.dir.build + "/lib/phantom-bridge.js", options.dir.build + "/lib/qunit-phantom-bridge.html" ], {
+var UnitTestPhantomJs = Classify.create(UnitTest, {
+	init : function(build) {
+		this.parent("PhantomJs", build);
+	},
+	start : function() {
+		this.parent();
+		var self = this, index = 0, child;
+
+		child = childProcess.spawn("phantomjs", [ this.build.dir.build + "/bridge/phantom-bridge.js", this.build.dir.build + "/bridge/qunit-phantom-bridge.html" ], {
 			env : process.env
-		}), results = {}, index = 0, processEvent = function(msg) {
-			if (msg.event === "assertionDone") {
-				msg.data.index = ++index;
-				if (msg.data.result === false) {
-					if (!results[msg.data.module]) {
-						results[msg.data.module] = [];
-					}
-					results[msg.data.module].push(msg.data);
-				}
-			} else if (msg.event === "done") {
-				callback(results, msg.data);
-			}
-		};
+		});
 
-		child.stdout.setEncoding("utf-8");
+		child.stdout.setEncoding("utf8");
 		child.stdout.on("data", function(stdout) {
 			stdout.toString().split("{\"event\"").forEach(function(data) {
 				if (!data) {
 					return;
 				}
+				var message = {};
 				try {
-					var msg = JSON.parse("{\"event\"" + data);
-					processEvent(msg);
+					message = JSON.parse("{\"event\"" + data);
 				} catch (e) {
 					throw e;
-					return;
 				}
+
+				if (message.event === "assertionDone") {
+					message.data.index = ++index;
+				}
+				if (message.event === "done") {
+					child.kill();
+				}
+				self.logEvent(message.event, message.data || {});
 			});
 		});
 		child.on("exit", function(code) {
 			// phantomjs doesn't exist
 			if (code === 127) {
-				callback(true);
+				self.build.printLine(self.build.color("\u2716 ", 160) + "Environment " + self.name + " not found!");
+				self.onComplete();
 			}
 		});
 	}
+});
 
-	return function(options, source, callback) {
-		callback.print("Running unit tests against QUnit...");
-		var tests = [], failed = 0, runtime = 0, complete = function(env, results, summary) {
-			if (env !== null && results !== true) {
-				failed += summary.failed || 0;
-				runtime += summary.runtime;
-				processUnitTestResults(results, summary, callback);
-			}
-			if (results === true) {
-				callback.log("\x1B[38;5;160m\u2716 \x1B[0mEnvironment " + env + " not found!");
-				callback.log("");
-			}
-			if (tests.length === 0) {
-				return callback({
-					error : failed > 0 ? new Error(failed + " Unit Test(s) failed.") : null,
-					time : runtime
-				});
-			}
-			(tests.shift())();
-		};
-		if (options.env.node === true) {
-			tests.push(function() {
-				callback.log("Running in \x1B[39;1mNodeJs\x1B[0m environment...");
-				unitNode(options, function(results, summary) {
-					complete("NodeJs", results, summary);
-				});
-			});
-		}
-		if (options.env.web === true) {
-			tests.push(function() {
-				callback.log("Running in \x1B[39;1mPhantomJs\x1B[0m environment...");
-				unitPhantom(options, function(results, summary) {
-					complete("PhantomJs", results, summary);
-				});
-			});
-		}
-		// start the unit tests
-		complete(null);
-	};
-})(global);
+module.exports = function(build, callback) {
+	build.printHeader(build.color("Running unit tests against QUnit...", "bold"));
+	var tests = cArray();
+	if (build.options.env.node === true) {
+		tests.push(new UnitTestNodeJs(build));
+	}
+	if (build.options.env.web === true) {
+		tests.push(new UnitTestPhantomJs(build));
+	}
+	tests.serialEach(function(next, test) {
+		test.setCallback(next).start();
+	}, function() {
+		var failed = 0, runtime = 0;
+		tests.forEach(function(test) {
+			failed += test.failed;
+			runtime += test.runtime;
+		});
+		callback({
+			error : failed > 0 ? new Error(failed + " Unit Test(s) failed.") : null,
+			time : runtime
+		});
+	});
+};

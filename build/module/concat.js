@@ -1,22 +1,23 @@
-module.exports = (function(root) {
-	// include the fs mmodule
-	var fs = require("fs");
+// include the fs mmodule
+var fs = require("fs");
 
-	return function(options, source, callback) {
-		callback.print("Building the source file from parts...");
-		try {
-			fs.writeFile(options.dir.dist + "/" + options.name + ".js", source.copyright + "\n" + source.source, "utf-8", function(error) {
-				if (error != null) {
+module.exports = function(build, callback) {
+	build.printHeader(build.color("Building the source file from parts...", "bold"));
+	try {
+		build.getSource(function(src) {
+			build.getCopyright(function(copyright) {
+				// remove all jscoverage comments
+				src = src.replace(/^\/\/#JSCOVERAGE_(?:END)?IF.*[\n\r]+/mg, "");
+				fs.writeFile(build.dir.dist + "/" + build.options.name + ".js", copyright + "\n" + src, "utf8", function(error) {
 					return callback({
 						error : error
 					});
-				}
-				return callback();
+				});
 			});
-		} catch (e) {
-			return callback({
-				error : e
-			});
-		}
-	};
-})(global);
+		});
+	} catch (e) {
+		return callback({
+			error : e
+		});
+	}
+};

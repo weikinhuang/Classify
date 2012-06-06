@@ -288,8 +288,15 @@ function Scope(parent) {
         }
 };
 
+function base54_digits() {
+        if (typeof DIGITS_OVERRIDE_FOR_TESTING != "undefined")
+                return DIGITS_OVERRIDE_FOR_TESTING;
+        else
+                return "etnrisouaflchpdvmgybwESxTNCkLAOM_DPHBjFIqRUzWXV$JKQGYZ0516372984";
+}
+
 var base54 = (function(){
-        var DIGITS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_0123456789";
+        var DIGITS = base54_digits();
         return function(num) {
                 var ret = "", base = 54;
                 do {
@@ -502,11 +509,17 @@ function ast_add_scope(ast) {
 
 function ast_mangle(ast, options) {
         var w = ast_walker(), walk = w.walk, scope;
-        options = options || {};
+        options = defaults(options, {
+                mangle: true
+        });
 
         function get_mangled(name, newMangle) {
+                if (!options.mangle) return name;
                 if (!options.toplevel && !scope.parent) return name; // don't mangle toplevel
                 if (options.except && member(name, options.except))
+                        return name;
+                if (options.no_functions && HOP(scope.names, name) &&
+                    (scope.names[name] == 'defun' || scope.names[name] == 'lambda'))
                         return name;
                 return scope.get_mangled(name, newMangle);
         };
@@ -525,7 +538,7 @@ function ast_mangle(ast, options) {
         };
 
         function _lambda(name, args, body) {
-                if (!options.no_functions) {
+                if (!options.no_functions && options.mangle) {
                         var is_defun = this[0] == "defun", extra;
                         if (name) {
                                 if (is_defun) name = get_mangled(name);
@@ -1008,7 +1021,8 @@ function ast_squeeze(ast, options) {
                 make_seqs   : true,
                 dead_code   : true,
                 no_warnings : false,
-                keep_comps  : true
+                keep_comps  : true,
+                unsafe      : false
         });
 
         var w = ast_walker(), walk = w.walk, scope;
@@ -1382,6 +1396,13 @@ function ast_squeeze(ast, options) {
                             return [ "block" ];
                         scope.directives.push(dir);
                         return [ this[0], dir ];
+                },
+                "call": function(expr, args) {
+                        expr = walk(expr);
+                        if (options.unsafe && expr[0] == "dot" && expr[1][0] == "string" && expr[2] == "toString") {
+                                return expr[1];
+                        }
+                        return [ this[0], expr,  MAP(args, walk) ];
                 }
         }, function() {
                 for (var i = 0; i < 2; ++i) {
@@ -1657,7 +1678,7 @@ function gen_code(ast, options) {
                 "dot": function(expr) {
                         var out = make(expr), i = 1;
                         if (expr[0] == "num") {
-                                if (!/\./.test(expr[1]))
+                                if (!/[a-f.]/i.test(out))
                                         out += ".";
                         } else if (expr[0] != "function" && needs_parens(expr))
                                 out = "(" + out + ")";
@@ -1852,10 +1873,10 @@ function gen_code(ast, options) {
                 switch (node[0]) {
                     case "with":
                     case "while":
-                        return empty(node[2]); // `with' or `while' with empty body?
+                        return empty(node[2]) || must_has_semicolon(node[2]);
                     case "for":
                     case "for-in":
-                        return empty(node[4]); // `for' with empty body?
+                        return empty(node[4]) || must_has_semicolon(node[4]);
                     case "if":
                         if (empty(node[2]) && !node[3]) return true; // `if' with empty `then' and no `else'
                         if (node[3]) {

@@ -1,22 +1,26 @@
-module.exports = (function(root) {
+// include the fs mmodule
+var fs = require("fs");
 
-	// include the fs mmodule
-	var fs = require("fs");
+module.exports = function(build, callback) {
+	build.printHeader(build.color("Generation package.json file...", "bold"));
 
-	return function(options, source, callback) {
-		if(!options.pkg) {
-			callback();
-			return;
-		}
+	if (!build.options.pkg) {
+		callback();
+		return;
+	}
 
-		callback.print("Generation package.json file...");
+	var pkgStr = JSON.stringify(build.options.pkg.desc, true, 4);
+	pkgStr = pkgStr.replace(/@VERSION\b/g, build.options.version);
+	pkgStr = pkgStr.replace(/@DATE\b/g, (new Date()).toUTCString());
 
-		var pkgStr = JSON.stringify(options.pkg.desc, true, 4);
-		pkgStr = pkgStr.replace(/@VERSION\b/g, options.version);
-		pkgStr = pkgStr.replace(/@DATE\b/g, (new Date()).toUTCString());
-
-		fs.writeFile(options.dir.base + "/" + options.pkg.file, pkgStr, "utf-8", function() {
-			callback();
+	if (build.options.sourceReplace) {
+		var replacer = build.options.sourceReplace;
+		Object.keys(replacer).forEach(function(key) {
+			pkgStr = pkgStr.replace(new RegExp("@" + key + "\\b", "g"), replacer[key]);
 		});
-	};
-})(global);
+	}
+
+	fs.writeFile(build.dir.base + "/" + build.options.pkg.file, pkgStr, "utf8", function() {
+		callback();
+	});
+};

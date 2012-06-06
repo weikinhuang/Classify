@@ -10,10 +10,18 @@ this.module = {};
 <script type="text/javascript" src="../config.js"></script>
 <script type="text/javascript">
 this.___opts = this.module.exports;
-this.module = this.___prev_module;
-try {
-	delete this.___prev_module;
-} catch(e) {
+if(this.___prev_module == null) {
+	this.module = null;
+	try {
+		delete this.module;
+	} catch (e) {
+	}
+} else {
+	this.module = this.___prev_module;
+	try {
+		delete this.___prev_module;
+	} catch (e) {
+	}
 }
 </script>
 <script type="text/javascript">

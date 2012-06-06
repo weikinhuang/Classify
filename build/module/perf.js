@@ -1,155 +1,205 @@
-module.exports = (function(root) {
+// execute system commands
+var childProcess = require("child_process");
+// classify library
+var Classify = require("../vendor/classify/classify.min.js");
+// require the special array library
+require("../vendor/classify/classify-array.min.js")(Classify);
+var cArray = Classify("/Array");
 
-	// include the fs mmodule
-	var fs = require("fs"),
-	// execute system commands
-	exec = require("child_process");
-
-	function lpad(str, len, chr) {
-		return (Array(len + 1).join(chr || " ") + str).substr(-len);
-	}
-
-	function rpad(str, len, chr) {
-		return (str + Array(len + 1).join(chr || " ")).substr(0, len);
-	}
-
-	function formatNumber(number) {
-		number = String(number).split('.');
-		return number[0].replace(/(?=(?:\d{3})+$)(?!\b)/g, ',') + (number[1] ? '.' + number[1] : '');
-	}
-
-	function processUnitTestResults(results, prevResults, callback) {
-		var error = 0;
-		results.forEach(function(test) {
-			var message = "  ", prevCompare;
-			if (test.error) {
-				message += "\x1B[38;5;160m" + rpad(test.name, 35) + "\x1B[0m";
-			} else {
-				message += rpad(test.name, 35);
-			}
-			message += lpad(formatNumber(test.hz.toFixed(test.hz < 100 ? 2 : 0)), 12) + " ops/s (\u00B1" + test.stats.rme.toFixed(2) + "%)";
-			message += " [" + formatNumber(test.count) + "x in " + test.times.cycle.toFixed(3) + "s]";
-
-			if(prevResults[test.name]) {
-				prevCompare = test.hz - prevResults[test.name].hz;
-				message += " [Vs. ";
-				message += (prevCompare >= 0 ? "+" : "-") + formatNumber(Math.abs(prevCompare).toFixed(Math.abs(prevCompare) < 100 ? 2 : 0)) + " ops/s";
-				message += " (" + (prevCompare >= 0 ? "+" : "-") + Math.abs(((test.hz - prevResults[test.name].hz) / test.hz) * 100).toFixed(3) + "%)";
-				message += "]";
-			}
-
-			callback.log(message);
-			if (test.error) {
-				error++;
-				callback.log("    \x1B[38;5;160m\u2716 \x1B[0m" + test.error);
-			}
+var Benchmark = Classify.create({
+	init : function(name, build) {
+		this.build = build;
+		this.name = name;
+		this.failed = 0;
+		this.passed = 0;
+		this.total = 0;
+		this.results = [];
+	},
+	setCallback : function(callback) {
+		this.callback = callback;
+		return this;
+	},
+	onComplete : function() {
+		this.build.printLine();
+		this.callback();
+	},
+	start : function() {
+		this.build.printLine("Running in " + this.build.color(this.name, "bold") + " environment...");
+	},
+	logEvent : function(type, data) {
+		var modules;
+		switch (type) {
+			case "testStart":
+				modules = data.name.split(".");
+				this.build.printTemp("Starting: " + this.build.color(modules.shift(), "bold") + " " + modules.join("."));
+				break;
+			case "testCycle":
+				modules = data.name.split(".");
+				this.build.printTemp(this.build.color(modules.shift(), "bold") + " " + modules.join(".") + " x " + this.build.formatNumber(data.count) + " (" + data.size + " sample" + (data.size == 1 ? "" : "s") + ")");
+				break;
+			case "testError":
+				break;
+			case "testComplete":
+				this[data.error ? "failed" : "passed"]++;
+				this.results.push(data);
+				break;
+			case "done":
+				this.build.printTemp("Benchmarks done.");
+				this.total = this.results.length;
+				this.process();
+				break;
+		}
+	},
+	process : function(prevResults) {
+		var self = this;
+		this.build.readCacheFile("perf." + this.name, function(data) {
+			var currentPerfStats = {};
+			self.results.forEach(function(test) {
+				currentPerfStats[test.name] = test;
+			});
+			self.build.writeCacheFile("perf." + self.name, currentPerfStats, function() {
+				self.output(data || {});
+			});
+		});
+	},
+	output : function(prevResults) {
+		var self = this;
+		this.results.forEach(function(test) {
+			self.outputTest(test, prevResults[test.name]);
 		});
 
-		if (error > 0) {
-			callback.log("\x1B[38;5;160m\u2716 \x1B[0m" + error + " / " + results.length + " Failed");
+		if (this.failed > 0) {
+			this.build.printLine(this.build.color("\u2716 ", 160) + this.failed + " / " + this.total + " Failed");
 		} else {
-			callback.log("\x1B[38;5;34m\u2714 \x1B[0mAll benchmarks run successfully!");
+			this.build.printLine(this.build.color("\u2714 ", 34) + "All benchmarks run successfully!");
 		}
-		callback.log("");
-	}
+		this.build.printLine();
+		this.onComplete();
+	},
+	outputTest : function(test, prev) {
+		var message = [ "  " ], prevCompare;
+		if (test.error) {
+			message.push(this.build.color(this.build.rpad(test.name, 35), 160));
+		} else {
+			message.push(this.build.rpad(test.name, 35));
+		}
+		message.push(this.build.lpad(this.build.formatNumber(test.hz.toFixed(test.hz < 100 ? 2 : 0)), 12));
+		message.push(" ops/s (\u00B1" + test.stats.rme.toFixed(2) + "%)");
+		message.push(" [" + this.build.formatNumber(test.count) + "x in " + test.times.cycle.toFixed(3) + "s]");
 
-	function unitNode(options, callback) {
-		var child = exec.fork(options.dir.build + "/lib/benchmark-node-bridge.js", [ JSON.stringify({
-			src : options.src,
-			tests : options.perf
+		if (prev) {
+			prevCompare = test.hz - prev.hz;
+			message.push(" [Vs. ");
+			message.push(prevCompare >= 0 ? "+" : "-");
+			message.push(this.build.formatNumber(Math.abs(prevCompare).toFixed(Math.abs(prevCompare) < 100 ? 2 : 0)));
+			message.push(" ops/s ");
+			message.push("(");
+			message.push(prevCompare >= 0 ? "+" : "-");
+			message.push(Math.abs(((test.hz - prev.hz) / test.hz) * 100).toFixed(3) + "%");
+			message.push(")");
+			message.push("]");
+		}
+
+		this.build.printLine(message.join(""));
+		if (test.error) {
+			this.build.printLine("    " + this.build.color("\u2716 ", 160) + test.error);
+		}
+	}
+});
+
+var BenchmarkNodeJs = Classify.create(Benchmark, {
+	init : function(build) {
+		this.parent("NodeJs", build);
+	},
+	start : function() {
+		this.parent();
+
+		var self = this, index = 0, child;
+		child = childProcess.fork(this.build.dir.build + "/bridge/benchmark-node-bridge.js", [ JSON.stringify({
+			source : {
+				src : this.build.options.src,
+				perf : this.build.options.perf,
+				external : this.build.options.external
+			},
+			dir : this.build.dir
 		}) ], {
 			env : process.env
-		}), results = [], index = 0;
+		});
 
-		child.on("message", function(msg) {
-			if (msg.event === "testDone") {
-				msg.data.index = ++index;
-				results.push(msg.data);
-			} else if (msg.event === "done") {
-				child.kill();
-				callback(results);
+		child.on("message", function(message) {
+			if (message.event === "testComplete") {
+				message.data.index = ++index;
 			}
+			if (message.event === "done") {
+				child.kill();
+			}
+			self.logEvent(message.event, message.data || {});
 		});
 	}
+});
 
-	function unitPhantom(options, callback) {
-		var child = exec.spawn("phantomjs", [ options.dir.build + "/lib/phantom-bridge.js", options.dir.build + "/lib/benchmark-phantom-bridge.html" ], {
+var BenchmarkPhantomJs = Classify.create(Benchmark, {
+	init : function(build) {
+		this.parent("PhantomJs", build);
+	},
+	start : function() {
+		this.parent();
+		var self = this, index = 0, child;
+
+		child = childProcess.spawn("phantomjs", [ this.build.dir.build + "/bridge/phantom-bridge.js", this.build.dir.build + "/bridge/benchmark-phantom-bridge.html" ], {
 			env : process.env
-		}), results = [], index = 0;
+		});
 
-		child.stdout.setEncoding("utf-8");
+		child.stdout.setEncoding("utf8");
 		child.stdout.on("data", function(stdout) {
 			stdout.toString().split("{\"event\"").forEach(function(data) {
 				if (!data) {
 					return;
 				}
+				var message = {};
 				try {
-					var msg = JSON.parse("{\"event\"" + data);
-					if (msg.event === "testDone") {
-						msg.data.index = ++index;
-						results.push(msg.data);
-					} else if (msg.event === "done") {
-						callback(results);
-					}
+					message = JSON.parse("{\"event\"" + data);
 				} catch (e) {
 					throw e;
-					return;
 				}
+
+				if (message.event === "testComplete") {
+					message.data.index = ++index;
+				}
+				if (message.event === "done") {
+					child.kill();
+				}
+				self.logEvent(message.event, message.data || {});
 			});
 		});
 		child.on("exit", function(code) {
 			// phantomjs doesn't exist
 			if (code === 127) {
-				callback(true);
+				self.build.printLine(self.build.color("\u2716 ", 160) + "Environment " + self.name + " not found!");
+				self.onComplete();
 			}
 		});
 	}
+});
 
-	return function(options, source, callback) {
-		if(!options.perf || options.perf.length === 0) {
-			return callback();
-		}
-		callback.print("Running benchmarks with Benchmark.js...");
-		var tests = [], complete = function(env, results) {
-			var prevPerfStats = {}, currentPerfStats = {};
-			if (env !== null && results !== true) {
-				try {
-					prevPerfStats = JSON.parse(fs.readFileSync(options.dir.build + "/.perfcache." + env + ".json", "utf8"));
-				} catch (e) {
-				}
-				processUnitTestResults(results, prevPerfStats, callback);
-				results.forEach(function(test) {
-					currentPerfStats[test.name] = test;
-				});
-				fs.writeFileSync(options.dir.build + "/.perfcache." + env + ".json", JSON.stringify(currentPerfStats, true), "utf8");
-
-			}
-			if (results === true) {
-				callback.log("\x1B[38;5;160m\u2716 \x1B[0mEnvironment " + env + " not found!");
-				callback.log("");
-			}
-			if (tests.length === 0) {
-				return callback();
-			}
-			(tests.shift())();
-		};
-		if (options.env.node === true) {
-			tests.push(function() {
-				callback.log("Running in \x1B[39;1mNodeJs\x1B[0m environment...");
-				unitNode(options, function(results) {
-					complete("NodeJs", results);
-				});
-			});
-		}
-		if (options.env.web === true) {
-			tests.push(function() {
-				callback.log("Running in \x1B[39;1mPhantomJs\x1B[0m environment...");
-				unitPhantom(options, function(results) {
-					complete("PhantomJs", results);
-				});
-			});
-		}
-		// start the unit tests
-		complete(null);
-	};
-})(global);
+module.exports = function(build, callback) {
+	build.printHeader(build.color("Running benchmarks with Benchmark.js...", "bold"));
+	var tests = cArray();
+	if (build.options.env.node === true) {
+		tests.push(new BenchmarkNodeJs(build));
+	}
+	if (build.options.env.web === true) {
+		tests.push(new BenchmarkPhantomJs(build));
+	}
+	tests.serialEach(function(next, test) {
+		test.setCallback(next).start();
+	}, function() {
+		var failed = 0;
+		tests.forEach(function(test) {
+			failed += test.failed;
+		});
+		callback({
+			error : failed > 0 ? new Error(failed + " Benchmarks(s) failed.") : null
+		});
+	});
+};
