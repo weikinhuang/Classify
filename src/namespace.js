@@ -149,7 +149,9 @@ var Namespace = create({
 		return this.ref[name] || (this.name !== global_namespace && getGlobalNamespace().get(name)) || null;
 	},
 	load : function(name, callback) {
-		callback && callback(this.ref[name] || null);
+		if (callback) {
+			callback(this.ref[name] || null);
+		}
 		return this;
 	},
 	setAutoloader : function(callback) {

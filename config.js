@@ -1,6 +1,6 @@
 module.exports = {
 	name : "classify",
-	version : "0.9.7",
+	version : "0.9.8",
 	repo : "https://github.com/weikinhuang/Classify",
 	wrap : {
 		copy : [ "copyright.js" ],
@@ -16,7 +16,10 @@ module.exports = {
 		web : true
 	},
 	lint : {
-		expr : true,
+		latedef : true,
+		noempty : true,
+		undef : true,
+		strict : true,
 		node : true,
 		browser : true,
 		predef : []

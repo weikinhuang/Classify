@@ -233,7 +233,9 @@ var create = function() {
 	var subclass_prototype = SubClass.prototype;
 	klass.prototype = new SubClass();
 	// Add this class to the list of subclasses of the parent
-	parent.subclass && parent.subclass.push(klass);
+	if (parent.subclass) {
+		parent.subclass.push(klass);
+	}
 	// Create a magic method that can invoke any of the parent methods
 	methods.invoke = function(name, args) {
 		if (name in subclass_prototype && name !== "invoke" && isFunction(subclass_prototype[name])) {

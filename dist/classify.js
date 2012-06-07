@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.9.7
+ * Classify JavaScript Library v0.9.8
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Fri, 01 Jun 2012 20:06:51 GMT
+ * Date: Thu, 07 Jun 2012 18:24:52 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -365,7 +365,9 @@ var create = function() {
 	var subclass_prototype = SubClass.prototype;
 	klass.prototype = new SubClass();
 	// Add this class to the list of subclasses of the parent
-	parent.subclass && parent.subclass.push(klass);
+	if (parent.subclass) {
+		parent.subclass.push(klass);
+	}
 	// Create a magic method that can invoke any of the parent methods
 	methods.invoke = function(name, args) {
 		if (name in subclass_prototype && name !== "invoke" && isFunction(subclass_prototype[name])) {
@@ -543,7 +545,12 @@ addMutator("bind", {
 		// wrap all prototypes that needs to be bound to the instance
 		each(bindings, function(prop) {
 			instance[prop] = function() {
-				return klass.prototype[prop].apply(instance, arguments);
+				// convert the arguments to an array
+				var args = argsToArray(arguments);
+				// so we can push the context in as the first argument
+				args.unshift(this);
+				// then call the original method with the proper context
+				return klass.prototype[prop].apply(instance, args);
 			};
 		});
 	}
@@ -872,7 +879,9 @@ var Namespace = create({
 		return this.ref[name] || (this.name !== global_namespace && getGlobalNamespace().get(name)) || null;
 	},
 	load : function(name, callback) {
-		callback && callback(this.ref[name] || null);
+		if (callback) {
+			callback(this.ref[name] || null);
+		}
 		return this;
 	},
 	setAutoloader : function(callback) {
@@ -934,7 +943,8 @@ testNamespace = function(namespace) {
 // get the globally available namespace
 getGlobalNamespace = function() {
 	return getNamespace(global_namespace);
-};// quick reference to the seperator string
+};
+// quick reference to the seperator string
 var namespace_separator = "/",
 // Create a wrapped reference to the Classify object.
 Classify = create({
@@ -993,7 +1003,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.9.7",
+	version : "0.9.8",
 
 	// direct access functions
 	create : create,

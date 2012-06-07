@@ -50,7 +50,12 @@ addMutator("bind", {
 		// wrap all prototypes that needs to be bound to the instance
 		each(bindings, function(prop) {
 			instance[prop] = function() {
-				return klass.prototype[prop].apply(instance, arguments);
+				// convert the arguments to an array
+				var args = argsToArray(arguments);
+				// so we can push the context in as the first argument
+				args.unshift(this);
+				// then call the original method with the proper context
+				return klass.prototype[prop].apply(instance, args);
 			};
 		});
 	}

@@ -1,7 +1,11 @@
 QUnit.module("mutator.bind");
 
 QUnit.test("bound properties", function() {
-	QUnit.expect(9);
+	QUnit.expect(11);
+	// temp object for context testing
+	var temp = {
+		val : 1
+	};
 	// testing class creation with bound properties
 	var test = create({
 		a : 1,
@@ -14,6 +18,10 @@ QUnit.test("bound properties", function() {
 		__bind_c : function() {
 			// the internal "this" reference should always point to the class definition
 			return this.a;
+		},
+		__bind_d : function(context, a) {
+			QUnit.strictEqual(context, temp, "Bound function's first argument is actual context of the caller");
+			QUnit.equal(a, 1, "Bound function's passed in arguments are shifted by 1");
 		}
 	});
 
@@ -21,6 +29,8 @@ QUnit.test("bound properties", function() {
 	QUnit.equal(instance.b.call([]), instance, "Modified context is ignored for bound functions");
 	QUnit.equal(instance.c.call([]), 1, "Return value of bound functions is passed through");
 	QUnit.equal(instance.z, 1, "Non Function properties are not wrapped");
+	// test arguments
+	instance.d.call(temp, 1);
 
 	// testing class creation with bound properties
 	var test2 = create(test, {
@@ -29,7 +39,7 @@ QUnit.test("bound properties", function() {
 			// the internal "this" reference should always point to the class definition
 			return this.a;
 		},
-		__bind_d : function() {
+		__bind_e : function() {
 			// the internal "this" reference should always point to the class definition
 			return this;
 		}
@@ -37,7 +47,7 @@ QUnit.test("bound properties", function() {
 	var instance2 = new test2();
 	QUnit.ok(instance2.b.call([]) instanceof test2, "Inherited bound function's reference to 'this' is of class");
 	QUnit.equal(instance2.c.call([]), 1, "Return value of overriden bound functions is passed through");
-	QUnit.equal(instance2.d.call([]), instance2, "Modified context is ignored for bound functions when inheriting");
+	QUnit.equal(instance2.e.call([]), instance2, "Modified context is ignored for bound functions when inheriting");
 });
 
 QUnit.test("bound properties defined in container", function() {

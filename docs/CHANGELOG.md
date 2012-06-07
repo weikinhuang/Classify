@@ -1,3 +1,6 @@
+#### v0.9.8
+	The called context is passed in as argument 1 for auto bound functions
+
 #### v0.9.7
 	Refactoring internals so that adding and removing mutators can be externalized
 	Added mutator to auto bind functions to a class instance
