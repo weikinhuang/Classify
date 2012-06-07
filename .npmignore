@@ -15,13 +15,12 @@ make.js
 .externalToolBuilders
 .buildpath
 .project
-build/.sizecache.json
-build/.coveragecache.json
 
 README.md
 
-src/*
 build/*
-test/*
-perf/*
 coverage/*
+docs/*
+perf/*
+src/*
+test/*

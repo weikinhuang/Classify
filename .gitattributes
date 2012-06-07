@@ -6,7 +6,10 @@
 config.js		export-ignore
 make.js			export-ignore
 .travis.yml		export-ignore
+/docs/*.html	export-ignore
 
-/src			export-ignore
 /build			export-ignore
+/coverage		export-ignore
+/perf			export-ignore
+/src			export-ignore
 /test			export-ignore
