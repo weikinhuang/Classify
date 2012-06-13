@@ -10,9 +10,9 @@ module.exports = function(build, callback) {
 				build.readCacheFile("size", function(data) {
 					data = data || {};
 					var sizes = {};
-					sizes[build.options.name + ".js"] = src.length;
-					sizes[build.options.name + ".min.js"] = min.length;
-					sizes[build.options.name + ".min.js.gz"] = zip.length;
+					sizes[build.name + ".js"] = src.length;
+					sizes[build.name + ".min.js"] = min.length;
+					sizes[build.name + ".min.js.gz"] = zip.length;
 
 					Object.keys(sizes).forEach(function(key) {
 						var diff = data[key] && (sizes[key] - data[key]);

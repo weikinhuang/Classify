@@ -15,31 +15,24 @@ var sandbox = {
 	setInterval : setInterval,
 	clearTimeout : clearTimeout,
 	clearInterval : clearInterval,
-	console : console,
-	Object : Object,
-	Function : Function,
-	Boolean : Boolean,
-	Number : Number,
-	String : String,
-	RegExp : RegExp,
-	Array : Array,
-	Date : Date,
-	Error : Error
+	console : console
 };
-// window is a circualr reference
+//window/global/root is a circualr reference
 sandbox.window = sandbox;
+sandbox.global = sandbox;
+sandbox.root = sandbox;
+
+//create a new context
+var context = vm.createContext(sandbox);
 
 // load the benchmark library into the sandbox
-sandbox.Benchmark = require(path.join(__dirname, "..", "perf/benchmark.js"));
-
-// keep a reference to the "root" variable
-sandbox.root = sandbox.window;
+context.Benchmark = require(path.join(__dirname, "..", "perf/benchmark.js"));
 
 // create a new global test suite
-sandbox.___benchmarks = new sandbox.Benchmark.Suite();
+context.___benchmarks = new context.Benchmark.Suite();
 
 // bind the response handlers to the parent process
-sandbox.___benchmarks.on("add", function(e) {
+context.___benchmarks.on("add", function(e) {
 	var i = 0, test = e.target, testData = {
 		id : test.id,
 		name : test.name
@@ -94,7 +87,7 @@ sandbox.___benchmarks.on("add", function(e) {
 });
 
 // notify the parent process that tests are finished
-sandbox.___benchmarks.on("complete", function() {
+context.___benchmarks.on("complete", function() {
 	process.send({
 		event : "done",
 		data : {}
@@ -102,9 +95,9 @@ sandbox.___benchmarks.on("complete", function() {
 });
 
 // wrapper function to add a test group
-sandbox.Benchmark.test = function(group, testGroup) {
+context.Benchmark.test = function(group, testGroup) {
 	testGroup(function(name, test) {
-		sandbox.___benchmarks.add.call(sandbox.___benchmarks, group + "." + name, test);
+		context.___benchmarks.add.call(context.___benchmarks, group + "." + name, test);
 	});
 };
 
@@ -123,7 +116,7 @@ function load(src, root) {
 
 	// run the source in the sandbox
 	try {
-		vm.runInNewContext(files.join("\n"), sandbox);
+		vm.runInContext(files.join("\n"), context);
 	} catch (e) {
 		console.log(e.message);
 		process.exit(1);
@@ -140,7 +133,7 @@ load(options.source.src, options.dir.src);
 load(options.source.perf, options.dir.perf);
 
 // start the tests
-sandbox.___benchmarks.run({
+context.___benchmarks.run({
 	async : true,
 	queued : true
 });

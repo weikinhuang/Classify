@@ -178,7 +178,7 @@ function groupByMembers(docblocks) {
 
 function createMarkdown(build, docGroups, callback) {
 	var markdown = [];
-	markdown.push("# " + build.options.name + " `v" + build.options.version + "`");
+	markdown.push("# " + build.name + " `v" + build.version + "`");
 	markdown.push("==================================================");
 	markdown.push("");
 	Object.keys(docGroups).forEach(function(key) {
@@ -474,10 +474,10 @@ function outputHtmlDocBlock(block, messages) {
 function createHtmlIndex(build, docGroups, callback) {
 	build.getMinifiedSource(function(min) {
 		build.getGzippedSource(function(zip) {
-			var htmlInputName = typeof build.options.doc.html === "string" ? build.options.doc.html : build.options.name;
+			var htmlInputName = typeof build.getOption("doc.html") === "string" ? build.getOption("doc.html") : build.name;
 			var template = fs.readFileSync(build.dir.doc + "/" + htmlInputName + ".html", "utf8");
-			template = template.replace(/@VERSION\b/g, build.options.version);
-			template = template.replace(/@REPO_URI\b/g, build.options.repo);
+			template = template.replace(/@VERSION\b/g, build.version);
+			template = template.replace(/@REPO_URI\b/g, build.repoUrl);
 			template = template.replace(/@FULLSIZE\b/g, roundFileSize(min.length));
 			template = template.replace(/@MINSIZE\b/g, roundFileSize(zip.length));
 			template = template.replace(/@CHANGELOG\b/g, outputHtmlChangelogBlock(build, parseChangelog(build)));
@@ -490,21 +490,21 @@ function createHtmlIndex(build, docGroups, callback) {
 module.exports = function(build, callback) {
 	build.printHeader(build.color("Generating documentation files...", "bold"));
 
-	if (build.options.docs.length === 0) {
+	if (!build.getOption("doc.files") || build.getOption("doc.files").length === 0) {
 		callback();
 		return;
 	}
 
 	var docsfile = [], num_processed = 0;
-	build.options.docs.forEach(function(file) {
+	build.getOption("doc.files").forEach(function(file) {
 		docsfile.push(fs.readFileSync(build.dir.doc + "/" + file, "utf8").replace(/\r/g, ""));
 	});
 	var docblocks = parseDocs(docsfile.join("\n"));
 	var groups = groupByMembers(docblocks);
 
-	if (build.options.doc.markdown) {
+	if (build.getOption("doc.markdown")) {
 		num_processed++;
-		var markdownOutputName = typeof build.options.doc.markdown === "string" ? build.options.doc.markdown : build.options.name;
+		var markdownOutputName = typeof build.getOption("doc.markdown") === "string" ? build.getOption("doc.markdown") : build.name;
 		createMarkdown(build, groups, function(doc) {
 			fs.writeFileSync(build.dir.doc + "/" + markdownOutputName + ".md", doc, "utf8");
 			setTimeout(function() {
@@ -515,9 +515,9 @@ module.exports = function(build, callback) {
 		});
 	}
 
-	if (build.options.doc.html) {
+	if (build.getOption("doc.html")) {
 		num_processed++;
-		var htmlOutputName = typeof build.options.doc.html === "string" ? build.options.doc.html : build.options.name;
+		var htmlOutputName = typeof build.getOption("doc.html") === "string" ? build.getOption("doc.html") : build.name;
 		createHtmlIndex(build, groups, function(doc) {
 			fs.writeFileSync(build.dir.doc + "/" + htmlOutputName + ".out.html", doc, "utf8");
 			setTimeout(function() {

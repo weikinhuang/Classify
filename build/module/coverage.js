@@ -18,7 +18,7 @@ var CodeCoverage = Classify.create({
 				}
 				var filter = [];
 				files.forEach(function(v) {
-					if (build.options.src.indexOf(v) === -1) {
+					if (build.src.indexOf(v) === -1) {
 						filter.push(v);
 					}
 				});
@@ -58,7 +58,7 @@ var CodeCoverage = Classify.create({
 							return;
 						}
 						files.forEach(function(v) {
-							if (build.options.src.indexOf(v) === -1) {
+							if (build.src.indexOf(v) === -1) {
 								fs.unlinkSync(build.dir.coverage + "/" + v);
 							}
 						});
@@ -125,7 +125,7 @@ var CodeCoverage = Classify.create({
 	},
 	processCoverageData : function(callback) {
 		var self = this, files = [], summary = [];
-		this.build.options.src.forEach(function(v) {
+		this.build.src.forEach(function(v) {
 			if (self.coverage.hasOwnProperty(v)) {
 				files.push(v);
 			}
@@ -168,7 +168,7 @@ var CodeCoverage = Classify.create({
 	},
 	outputSummaryTable : function(summary) {
 		var self = this, longestName = 0;
-		this.build.options.src.forEach(function(filename) {
+		this.build.src.forEach(function(filename) {
 			if (self.coverage.hasOwnProperty(filename) && longestName < filename.length) {
 				longestName = filename.length;
 			}
@@ -270,9 +270,9 @@ var CodeCoverageNodeJs = Classify.create(CodeCoverage, {
 
 		child = childProcess.fork(this.build.dir.build + "/bridge/coverage-node-bridge.js", [ JSON.stringify({
 			source : {
-				src : this.build.options.src,
-				tests : this.build.options.unit,
-				external : this.build.options.external
+				src : this.build.src,
+				tests : this.build.unit,
+				external : this.build.external
 			},
 			dir : this.build.dir
 		}) ], {
@@ -350,10 +350,10 @@ module.exports = function(build, callback) {
 		}
 
 		var tests = cArray();
-		if (build.options.env.node === true) {
+		if (build.env.node === true) {
 			tests.push(new CodeCoverageNodeJs(build));
 		}
-		if (build.options.env.web === true) {
+		if (build.env.web === true) {
 			tests.push(new CodeCoveragePhantomJs(build));
 		}
 		tests.serialEach(function(next, test) {

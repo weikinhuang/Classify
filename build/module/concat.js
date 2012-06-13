@@ -8,7 +8,7 @@ module.exports = function(build, callback) {
 			build.getCopyright(function(copyright) {
 				// remove all jscoverage comments
 				src = src.replace(/^\/\/#JSCOVERAGE_(?:END)?IF.*[\n\r]+/mg, "");
-				fs.writeFile(build.dir.dist + "/" + build.options.name + ".js", copyright + "\n" + src, "utf8", function(error) {
+				fs.writeFile(build.dir.dist + "/" + build.name + ".js", copyright + "\n" + src, "utf8", function(error) {
 					return callback({
 						error : error
 					});

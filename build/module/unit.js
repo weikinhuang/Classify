@@ -92,9 +92,9 @@ var UnitTestNodeJs = Classify.create(UnitTest, {
 
 		child = childProcess.fork(this.build.dir.build + "/bridge/qunit-node-bridge.js", [ JSON.stringify({
 			source : {
-				src : this.build.options.src,
-				tests : this.build.options.unit,
-				external : this.build.options.external
+				src : this.build.src,
+				tests : this.build.unit,
+				external : this.build.external
 			},
 			dir : this.build.dir
 		}) ], {
@@ -160,10 +160,10 @@ var UnitTestPhantomJs = Classify.create(UnitTest, {
 module.exports = function(build, callback) {
 	build.printHeader(build.color("Running unit tests against QUnit...", "bold"));
 	var tests = cArray();
-	if (build.options.env.node === true) {
+	if (build.env.node === true) {
 		tests.push(new UnitTestNodeJs(build));
 	}
-	if (build.options.env.web === true) {
+	if (build.env.web === true) {
 		tests.push(new UnitTestPhantomJs(build));
 	}
 	tests.serialEach(function(next, test) {

@@ -17,38 +17,31 @@ var sandbox = {
 	setInterval : setInterval,
 	clearTimeout : clearTimeout,
 	clearInterval : clearInterval,
-	console : console,
-	Object : Object,
-	Function : Function,
-	Boolean : Boolean,
-	Number : Number,
-	String : String,
-	RegExp : RegExp,
-	Array : Array,
-	Date : Date,
-	Error : Error
+	console : console
 };
-// window is a circualr reference
+// window/global/root is a circualr reference
 sandbox.window = sandbox;
+sandbox.global = sandbox;
+sandbox.root = sandbox;
+
+// create a new context
+var context = vm.createContext(sandbox);
 
 try {
-	vm.runInNewContext(fs.readFileSync(path.join(__dirname, "..", "qunit/qunit.js"), "utf8"), sandbox);
+	vm.runInContext(fs.readFileSync(path.join(__dirname, "..", "qunit/qunit.js"), "utf8"), context);
 } catch (err) {
 	process.exit(1);
 }
 
-// keep a reference to the "root" variable
-sandbox.root = sandbox.window;
-
 // have a global reference to QUnit within the sandbox
-sandbox.QUnit = sandbox.exports;
-sandbox.exports = {};
+context.QUnit = context.exports;
+context.exports = {};
 
 // don't have qunit reorder tests
-sandbox.QUnit.config.reorder = false;
+context.QUnit.config.reorder = false;
 
-// override the log function to output back to the parent process
-sandbox.QUnit.log(function(data) {
+// add event listeners to the qunit test events
+context.QUnit.log(function(data) {
 	data.test = this.config.current.testName;
 	data.module = currentmodule;
 	process.send({
@@ -56,47 +49,39 @@ sandbox.QUnit.log(function(data) {
 		data : data
 	});
 });
-
-// start test
-sandbox.QUnit.testStart(function(data) {
+context.QUnit.testStart(function(data) {
 	// use last module name if no module name defined
 	currentmodule = data.module || currentmodule;
 	data.test = this.config.current.testName;
 	data.module = currentmodule;
-
 	process.send({
 		event : "testStart",
 		data : data
 	});
 });
-
-// override the testDone function to signal back to the parent process
-sandbox.QUnit.testDone(function(data) {
+context.QUnit.testDone(function(data) {
 	// use last module name if no module name defined
 	data.module = data.module || currentmodule;
-
 	process.send({
 		event : "testDone",
 		data : data
 	});
 });
-
-sandbox.QUnit.moduleStart = function(data) {
+context.QUnit.moduleStart(function(data) {
 	process.send({
 		event : "moduleStart",
 		data : data
 	});
-};
-
-sandbox.QUnit.moduleDone = function(data) {
+});
+context.QUnit.moduleDone(function(data) {
 	process.send({
 		event : "moduleDone",
 		data : data
 	});
-};
+});
 
 // override the done function to signal back to the parent process that this unit test is done
-sandbox.QUnit.done((function() {
+context.QUnit.done((function() {
 	var timeout = null, later = function(data) {
 		timeout = null;
 		process.send({
@@ -127,7 +112,7 @@ function load(src, root) {
 
 	// run the source in the sandbox
 	try {
-		vm.runInNewContext(files.join("\n"), sandbox);
+		vm.runInContext(files.join("\n"), context);
 	} catch (e) {
 		console.log(e.message);
 		process.exit(1);

@@ -2,38 +2,11 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<script type="text/javascript">
-var root = this;
-this.___prev_module = this.module;
-this.module = {};
-</script>
-<script type="text/javascript" src="../.cache.options.json"></script>
-<script type="text/javascript">
-this.___opts = this.module.exports;
-if(this.___prev_module === undefined) {
-	this.module = undefined;
-	try {
-		delete this.module;
-	} catch (e) {
-	}
-} else {
-	this.module = this.___prev_module;
-}
-try {
-	delete this.___prev_module;
-} catch (e) {
-}
-</script>
-<script type="text/javascript">
-document.write("<title>" + this.___opts.name + " Test Suite</title>");
-</script>
-<link rel="stylesheet" media="screen" href="../qunit/qunit.css" />
+<title>QUnit Test Suite</title>
 </head>
 
 <body>
-<script type="text/javascript">
-document.write("<h1 id=\"qunit-header\">" + this.___opts.name + " Test Suite</h1>");
-</script>
+<h1 id="qunit-header">QUnit Test Suite</h1>
 <h2 id="qunit-banner"></h2>
 <div id="qunit-testrunner-toolbar"></div>
 <h2 id="qunit-userAgent"></h2>
@@ -41,6 +14,22 @@ document.write("<h1 id=\"qunit-header\">" + this.___opts.name + " Test Suite</h1
 
 <script type="text/javascript">
 var root = this;
+var ___prev_module = window.module;
+window.module = {};
+</script>
+<script type="text/javascript" src="../.cache.options.json"></script>
+<script type="text/javascript">
+var ___opts = module.exports;
+if(___prev_module == null) {
+	window.module = null;
+	try {
+		delete window.module;
+	} catch(e) {
+		window.module = undefined;
+	}
+} else {
+	window.module = ___prev_module;
+}
 </script>
 <script type="text/javascript">
 (function(files) {
@@ -52,11 +41,13 @@ var root = this;
 <script type="text/javascript">
 (function(files) {
 	for ( var i = 0, l = files.length; i < l; i++) {
-		document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../../coverage/' + files[i] + '"></scr' + 'ipt>');
+		document.write("\n" + '<scr' + 'ipt type="text/javascript" src="../../src/' + files[i] + '"></scr' + 'ipt>');
 	}
 })(this.___opts.src);
 </script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="../qunit/qunit.js"></script>
+<script type="text/javascript" src="qunit-browserstack-hooks.js"></script>
 <script type="text/javascript">
 (function(files) {
 	for ( var i = 0, l = files.length; i < l; i++) {

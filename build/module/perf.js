@@ -117,9 +117,9 @@ var BenchmarkNodeJs = Classify.create(Benchmark, {
 		var self = this, index = 0, child;
 		child = childProcess.fork(this.build.dir.build + "/bridge/benchmark-node-bridge.js", [ JSON.stringify({
 			source : {
-				src : this.build.options.src,
-				perf : this.build.options.perf,
-				external : this.build.options.external
+				src : this.build.src,
+				perf : this.build.perf,
+				external : this.build.external
 			},
 			dir : this.build.dir
 		}) ], {
@@ -185,10 +185,10 @@ var BenchmarkPhantomJs = Classify.create(Benchmark, {
 module.exports = function(build, callback) {
 	build.printHeader(build.color("Running benchmarks with Benchmark.js...", "bold"));
 	var tests = cArray();
-	if (build.options.env.node === true) {
+	if (build.env.node === true) {
 		tests.push(new BenchmarkNodeJs(build));
 	}
-	if (build.options.env.web === true) {
+	if (build.env.web === true) {
 		tests.push(new BenchmarkPhantomJs(build));
 	}
 	tests.serialEach(function(next, test) {

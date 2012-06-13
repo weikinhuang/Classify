@@ -7,7 +7,7 @@ module.exports = function(build, callback) {
 		build.getMinifiedSource(function(min) {
 			build.getCopyright(function(copyright) {
 				try {
-					fs.writeFile(build.dir.dist + "/" + build.options.name + ".min.js", copyright + ";" + min + ";", "utf8", function(error) {
+					fs.writeFile(build.dir.dist + "/" + build.name + ".min.js", copyright + ";" + min + ";", "utf8", function(error) {
 						if (error) {
 							return callback({
 								error : error
