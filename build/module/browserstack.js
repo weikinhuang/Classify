@@ -26,20 +26,21 @@ var Browser = Classify.create({
 				version : 0,
 				os : "other"
 			};
+			var osMatches, browserMatches, versionMatches;
 			ua = ua.toLowerCase();
 
-			var osMatches = /(windows|mac|linux)/.exec(ua);
+			osMatches = /(windows|mac|linux)/.exec(ua);
 			if (osMatches == null) {
 				return;
 			}
 			browser.os = osMatches[1];
 
-			var browserMatches = /(chrome|safari|opera|firefox|msie)/.exec(ua);
+			browserMatches = /(chrome|safari|opera|firefox|msie)/.exec(ua);
 			if (browserMatches == null) {
 				return;
 			}
 			browser.browser = browserMatches[1];
-			var versionMatches = this.uaBrowserMatch[browser.browser].exec(ua);
+			versionMatches = this.uaBrowserMatch[browser.browser].exec(ua);
 			if (versionMatches == null) {
 				return;
 			}
@@ -102,13 +103,19 @@ var Browser = Classify.create({
 	},
 	start : function() {
 		var self = this;
-		this.browserstack.createWorker({
+		var options = {
 			version : this.version,
-			browser : this.browser,
 			os : this.os,
-			url : "http://" + (self.build.getOption("browserstack.ip") || "127.0.0.1") + ":" + parseInt(self.build.getOption("browserstack.port") || 80, 10) + "/build/bridge/qunit-browserstack-bridge.html",
+			url : "http://" + (self.build.getOption("browserstack.ip") || "127.0.0.1") + ":" + parseInt(self.build.getOption("browserstack.port") || 80, 10) + "/build/bridge/qunit-browserstack-bridge.html?__browser=" + encodeURIComponent(this.name),
 			timeout : 60
-		}, function(error, worker) {
+		};
+		if (this.browser) {
+			options.browser = this.browser;
+		} else if (this.device) {
+			options.device = this.device;
+		}
+
+		this.browserstack.createWorker(options, function(error, worker) {
 			if (error) {
 				self.callback();
 				return;
@@ -166,11 +173,15 @@ var Browser = Classify.create({
 			case "moduleDone":
 				break;
 			case "done":
-				this.build.printLine(this.build.color("\u2714 ", 34) + "Browser " + this.build.color(this.name, "bold") + " completed tests");
 				this.failed = data.failed;
 				this.passed = data.passed;
 				this.total = data.total;
 				this.runtime = data.runtime;
+				if(this.failed > 0) {
+					this.build.printLine(this.build.color("\u2716 ", 160) + "Browser " + this.build.color(this.name, "bold") + " completed tests");
+				} else {
+					this.build.printLine(this.build.color("\u2714 ", 34) + "Browser " + this.build.color(this.name, "bold") + " completed tests");
+				}
 				this.stopWorker();
 				this.callback();
 				break;
@@ -279,6 +290,7 @@ var Server = Classify.create({
 	__static_ : {
 		contentType : {
 			js : "text/javascript",
+			json : "text/javascript",
 			css : "text/css",
 			html : "text/html"
 		}
@@ -341,7 +353,7 @@ var Server = Classify.create({
 			"flash policy port" : parseInt(this.build.getOption("browserstack.port") || 80, 10)
 		}).sockets.on("connection", function(socket) {
 			socket.on("browserConnect", function(data) {
-				self.list.getBrowser(Browser.uaToBrowser(data.ua)).setSocket(socket);
+				self.list.getBrowser(data.browser).setSocket(socket);
 			});
 		});
 

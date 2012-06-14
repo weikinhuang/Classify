@@ -16,17 +16,15 @@
 	original_done = QUnit.done;
 
 	var socket = io.connect();
+	var browser = decodeURIComponent((/__browser=(.+?)(&|$)/).exec(window.location.search)[1] || "Unknown 0.0 unknown");
 	socket.emit("browserConnect", {
-		ua : navigator.userAgent
+		ua : navigator.userAgent,
+		browser : browser
 	});
 
 	// pass data to the process
 	function send(data) {
-		data.ua = navigator.userAgent;
 		socket.emit(data.event, data.data);
-		if (data.event === "done") {
-			socket.disconnect();
-		}
 	}
 
 	QUnit.log = function(data) {

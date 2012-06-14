@@ -510,7 +510,11 @@ function ast_add_scope(ast) {
 function ast_mangle(ast, options) {
         var w = ast_walker(), walk = w.walk, scope;
         options = defaults(options, {
-                mangle: true
+                mangle       : true,
+                toplevel     : false,
+                defines      : null,
+                except       : null,
+                no_functions : false
         });
 
         function get_mangled(name, newMangle) {
@@ -1238,6 +1242,9 @@ function ast_squeeze(ast, options) {
                 t = walk(t);
                 e = walk(e);
 
+                if (empty(e) && empty(t))
+                        return [ "stat", c ];
+
                 if (empty(t)) {
                         c = negate(c);
                         t = e;
@@ -1258,8 +1265,6 @@ function ast_squeeze(ast, options) {
                                 }
                         })();
                 }
-                if (empty(e) && empty(t))
-                        return [ "stat", c ];
                 var ret = [ "if", c, t, e ];
                 if (t[0] == "if" && empty(t[3]) && empty(e)) {
                         ret = best_of(ret, walk([ "if", [ "binary", "&&", c, t[1] ], t[2] ]));
@@ -1403,6 +1408,15 @@ function ast_squeeze(ast, options) {
                                 return expr[1];
                         }
                         return [ this[0], expr,  MAP(args, walk) ];
+                },
+                "num": function (num) {
+                        if (!isFinite(num))
+                                return [ "binary", "/", num === 1 / 0
+                                         ? [ "num", 1 ] : num === -1 / 0
+                                         ? [ "unary-prefix", "-", [ "num", 1 ] ]
+                                         : [ "num", 0 ], [ "num", 0 ] ];
+
+                        return [ this[0], num ];
                 }
         }, function() {
                 for (var i = 0; i < 2; ++i) {
@@ -1571,7 +1585,7 @@ function gen_code(ast, options) {
         };
 
         function make_num(num) {
-                var str = num.toString(10), a = [ str.replace(/^0\./, ".") ], m;
+                var str = num.toString(10), a = [ str.replace(/^0\./, ".").replace('e+', 'e') ], m;
                 if (Math.floor(num) === num) {
                         if (num >= 0) {
                                 a.push("0x" + num.toString(16).toLowerCase(), // probably pointless

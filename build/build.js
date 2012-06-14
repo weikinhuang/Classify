@@ -173,7 +173,7 @@ var Build = Classify.create({
 			temp = this.taskOptions[this.currentStep];
 			name.split(".").some(function(part, i) {
 				// skip the first step if it's name is the same as the step
-				if (i === 0 && part === self.currentStep) {
+				if (!part || i === 0 && part === self.currentStep) {
 					return;
 				}
 				if (temp == null || !temp.hasOwnProperty(part)) {
@@ -226,6 +226,12 @@ var Build = Classify.create({
 		if (temp != null) {
 			return temp;
 		}
+
+		// lastly try to pull from a different task option
+		if (this.taskOptions[name]) {
+			return this.taskOptions[name];
+		}
+
 		return null;
 	},
 
