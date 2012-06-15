@@ -230,7 +230,7 @@ QUnit.test("observer called in context with class", function() {
 });
 
 QUnit.test("observer with bound setter event listeners", function() {
-	QUnit.expect(9);
+	QUnit.expect(10);
 	var test = create({
 		a : function() {
 			return 1;
@@ -254,12 +254,18 @@ QUnit.test("observer with bound setter event listeners", function() {
 	var second_listener = function(value) {
 		QUnit.ok(true, "Second bound event listener called.");
 	};
+	var third_listener = function(value) {
+		QUnit.ok(true, "Third bound event listener bound with 'on' called.");
+	};
 
 	// add event listeners
 	QUnit.ok(observer.addListener(first_listener) === testinstance, "The return value of addListener is a chain of internal instance.");
 
 	// add event listeners
 	observer.addListener(second_listener);
+
+	// add event listeners with "on" alias
+	observer.on(third_listener);
 
 	// trigger the event listeners
 	observer.set(newvalue);
@@ -278,7 +284,7 @@ QUnit.test("observer with bound setter event listeners", function() {
 	// get the list of event listeners
 	var listeners = observer.listeners();
 	QUnit.ok(isArray(listeners), "observers listeners method returned an array of bound listeners.");
-	QUnit.equal(listeners.length, 2, "observers listeners method returned an array or proper number of events.");
+	QUnit.equal(listeners.length, 3, "observers listeners method returned an array or proper number of events.");
 	QUnit.equal(listeners[0], first_listener, "observers listeners method returned an array of bound listeners unmodified.");
 
 	// attempting to add non function listener throws error
@@ -289,8 +295,53 @@ QUnit.test("observer with bound setter event listeners", function() {
 	}
 });
 
+QUnit.test("observer with event listeners bound with 'once'", function() {
+	QUnit.expect(8);
+	var test = create({
+		a : function() {
+			return 1;
+		},
+		e : function() {
+			return this.constructor;
+		}
+	});
+	var testinstance = new test();
+
+	var val = 10;
+	var newvalue = 100;
+	var called = false;
+	// create observer with writable flag true
+	var observer = new Observer(testinstance, "z", val);
+
+	var first_listener = function(value) {
+		QUnit.ok(true, "First bound event listener called.");
+		QUnit.equal(value, newvalue, "Set value passed to event listener as first parameter.");
+		QUnit.ok(this === testinstance, "Context of base object passed to event listener.");
+		QUnit.ok(!called, "Events bound with once only gets called once");
+		called = false;
+	};
+
+	// add event listeners
+	QUnit.ok(observer.once(first_listener) === testinstance, "The return value of addListener is a chain of internal instance.");
+
+	// trigger the event listeners
+	observer.set(newvalue);
+	observer.set(newvalue);
+
+	// get the list of event listeners
+	var listeners = observer.listeners();
+	QUnit.ok(isArray(listeners), "observers listeners method returned an array of bound listeners.");
+	QUnit.equal(listeners.length, 0, "observers listeners method returned an array or proper number of events.");
+
+	try {
+		observer.once({});
+	} catch (e) {
+		QUnit.ok(e instanceof Error, "Attempt to bind non function listener throws error.");
+	}
+});
+
 QUnit.test("removing bound event listeners from observer", function() {
-	QUnit.expect(10);
+	QUnit.expect(11);
 	var test = create({
 		a : function() {
 			return 1;
@@ -312,6 +363,9 @@ QUnit.test("removing bound event listeners from observer", function() {
 	var second_listener = function(value) {
 		QUnit.ok(true, "Second bound event listener called.");
 	};
+	var third_listener = function(value) {
+		QUnit.ok(true, "Third bound event listener called.");
+	};
 	// add event listener
 	observer.addListener(first_listener);
 
@@ -323,6 +377,12 @@ QUnit.test("removing bound event listeners from observer", function() {
 
 	// trigger the event listeners
 	observer.set(newvalue);
+
+	// remove event listener bound with once
+	observer.once(third_listener);
+	// get the list of event listeners
+	QUnit.equal(observer.listeners().length, 2, "observers listeners method returned an array or proper number of events after bound with once.");
+	observer.removeListener(third_listener);
 
 	// get the list of event listeners
 	var listeners = observer.listeners();

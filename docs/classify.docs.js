@@ -693,10 +693,12 @@ Classify.Observer.prototype.emit = function() {
 /**
  * Fires the event listeners in the order they were added
  *
+ * @param {Array}
+ *            args Array of arguments to pass to the bound event listeners
  * @private
  * @memberOf Classify.Observer
  */
-Classify.Observer.prototype.triggerEmit = function() {
+Classify.Observer.prototype._triggerEmit = function(args) {
 };
 /**
  * Add an event listener for when the internal value is changed
@@ -709,6 +711,33 @@ Classify.Observer.prototype.triggerEmit = function() {
  * @type {Classify.Class}
  */
 Classify.Observer.prototype.addListener = function(listener) {
+	return new Classify.Class();
+};
+/**
+ * Add an event listener for when the internal value is changed, alias to addListener
+ *
+ * @param {Function}
+ *            listener The event listener to add
+ * @throws Error
+ * @see Classify.Observer.prototype.addListener
+ * @memberOf Classify.Observer
+ * @returns {Classify.Class}
+ * @type {Classify.Class}
+ */
+Classify.Observer.prototype.on = function(listener) {
+	return new Classify.Class();
+};
+/**
+ * Add an event listener to be called only once when the internal value is changed
+ *
+ * @param {Function}
+ *            listener The event listener to add
+ * @throws Error
+ * @memberOf Classify.Observer
+ * @returns {Classify.Class}
+ * @type {Classify.Class}
+ */
+Classify.Observer.prototype.once = function(listener) {
 	return new Classify.Class();
 };
 /**

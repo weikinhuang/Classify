@@ -24,19 +24,22 @@ isExtendable = function(o) {
 },
 // quick test for isArray
 isArray = Array.isArray || function(o) {
+//#JSCOVERAGE_IF !Array.isArray
 	return toString.call(o) === "[object Array]";
+//#JSCOVERAGE_ENDIF
 },
 // quickly be able to get all the keys of an object
 keys = function(o) {
 	var k = [], i;
 	for (i in o) {
-		k.push(i);
+		k[k.length] = i;
 	}
+//#JSCOVERAGE_IF
 	if (isEnumerationBuggy) {
 		// only add buggy enumerated values if it's not the Object.prototype's
-		for (i = 0; i < enumerationLength; i++) {
+		for (i = 0; i < enumerationLength; ++i) {
 			if (o.hasOwnProperty(enumeratedKeys[i])) {
-				k.push(enumeratedKeys[i]);
+				k[k.length] = enumeratedKeys[i];
 			}
 		}
 	}
@@ -52,15 +55,19 @@ argsToArray = function(o) {
 },
 // test if an item is in a array
 indexOf = Array.prototype.indexOf ? function(array, item) {
+//#JSCOVERAGE_IF Array.prototype.indexOf
 	return array.indexOf(item);
+//#JSCOVERAGE_ENDIF
 } : function(array, item) {
+//#JSCOVERAGE_IF !Array.prototype.indexOf
 	var i = 0, length = array.length;
-	for (; i < length; i++) {
+	for (; i < length; ++i) {
 		if (array[i] === item) {
 			return i;
 		}
 	}
 	return -1;
+//#JSCOVERAGE_ENDIF
 },
 // ability to store the original definition into the new function definition
 store = function(fn, base) {

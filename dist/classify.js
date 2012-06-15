@@ -5,7 +5,7 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Thu, 07 Jun 2012 18:24:52 GMT
+ * Date: Fri, 15 Jun 2012 01:42:51 GMT
  */
 (function( root, undefined ) {
 	"use strict";
@@ -41,13 +41,13 @@ isArray = Array.isArray || function(o) {
 keys = function(o) {
 	var k = [], i;
 	for (i in o) {
-		k.push(i);
+		k[k.length] = i;
 	}
 	if (isEnumerationBuggy) {
 		// only add buggy enumerated values if it's not the Object.prototype's
-		for (i = 0; i < enumerationLength; i++) {
+		for (i = 0; i < enumerationLength; ++i) {
 			if (o.hasOwnProperty(enumeratedKeys[i])) {
-				k.push(enumeratedKeys[i]);
+				k[k.length] = enumeratedKeys[i];
 			}
 		}
 	}
@@ -66,7 +66,7 @@ indexOf = Array.prototype.indexOf ? function(array, item) {
 	return array.indexOf(item);
 } : function(array, item) {
 	var i = 0, length = array.length;
-	for (; i < length; i++) {
+	for (; i < length; ++i) {
 		if (array[i] === item) {
 			return i;
 		}
@@ -591,40 +591,41 @@ var Observer = create({
 		return this.getter ? this.getter.call(this.context, this.value) : this.value;
 	},
 	set : function(value) {
-		var original = this.value;
+		var original = this.value, context = this.context;
 		// if this is not writable then we can't do anything
 		if (!this.writable) {
-			return this.context;
+			return context;
 		}
 		// setter method is called for return value to set if specified
-		this.value = this.setter ? this.setter.call(this.context, value, original) : value;
+		this.value = this.setter ? this.setter.call(context, value, original) : value;
 		// only fire event listeners if the value has changed
 		if (this.value !== original) {
 			// emit the change event
 			this.emit();
 		}
-		return this.context;
+		return context;
 	},
 	emit : function() {
-		var self = this;
+		var self = this, args = argsToArray(arguments);
 		if (this.delay > 0) {
 			if (this._debounce !== null) {
 				root.clearTimeout(this._debounce);
 			}
 			this._debounce = root.setTimeout(function() {
-				this._debounce = null;
-				self.triggerEmit();
+				self._debounce = null;
+				self._triggerEmit(args);
 			}, this.delay);
 		} else {
-			this.triggerEmit();
+			this._triggerEmit(args);
 		}
 		return this.context;
 	},
-	triggerEmit : function() {
-		var i = 0, l = this.events.length;
+	_triggerEmit : function(args) {
+		var i = 0, l = this.events.length, context = this.context, events = this.events;
+		args.unshift(this.value);
 		// fire off all event listeners in the order they were added
-		for (; i < l; i++) {
-			this.events[i].call(this.context, this.value);
+		for (; i < l; ++i) {
+			events[i].apply(context, args);
 		}
 	},
 	addListener : function(listener) {
@@ -633,7 +634,20 @@ var Observer = create({
 			throw new Error("Observer.addListener only takes instances of Function");
 		}
 		// add the event to the queue
-		this.events.push(listener);
+		this.events[this.events.length] = listener;
+		return this.context;
+	},
+	once : function(listener) {
+		// event listeners can only be functions
+		if (!isFunction(listener)) {
+			throw new Error("Observer.once only takes instances of Function");
+		}
+		var self = this, temp = function() {
+			self.removeListener(temp);
+			listener.apply(this, arguments);
+		};
+		temp.listener = listener;
+		this.addListener(temp);
 		return this.context;
 	},
 	removeListener : function(listener) {
@@ -642,15 +656,22 @@ var Observer = create({
 			throw new Error("Observer.removeListener only takes instances of Function");
 		}
 		// remove the event listener if it exists
-		var i = indexOf(this.events, listener);
-		if (i < 0) {
-			return this.context;
+		var context = this.context, events = this.events, index = -1, i = 0, length = events.length;
+
+		for (; i < length; ++i) {
+			if (events[i] === listener || (events[i].listener && events[i].listener === listener)) {
+				index = i;
+				break;
+			}
 		}
-		this.events.splice(i, 1);
-		return this.context;
+		if (index < 0) {
+			return context;
+		}
+		events.splice(i, 1);
+		return context;
 	},
 	removeAllListeners : function() {
-		// garbage cleanup
+		// garbage collection
 		this.events = null;
 		// reset the internal events array
 		this.events = [];
@@ -669,6 +690,9 @@ var Observer = create({
 		return "[observer " + this.name + "]";
 	}
 });
+
+// alias "on" to addListener
+Observer.prototype.on = Observer.prototype.addListener;
 // mutator for adding observable properties to a class
 addMutator("observable", {
 	// the special identifier is "__observable_"
