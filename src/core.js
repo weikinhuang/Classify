@@ -38,7 +38,7 @@ keys = function(o) {
 	if (isEnumerationBuggy) {
 		// only add buggy enumerated values if it's not the Object.prototype's
 		for (i = 0; i < enumerationLength; ++i) {
-			if (o.hasOwnProperty(enumeratedKeys[i])) {
+			if (hasOwn.call(o, enumeratedKeys[i])) {
 				k[k.length] = enumeratedKeys[i];
 			}
 		}

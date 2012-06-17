@@ -5,7 +5,7 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Sun, 17 Jun 2012 02:28:46 GMT
+ * Date: Sun, 17 Jun 2012 22:26:08 GMT
  */
 (function(root, undefined) {
 	"use strict";
@@ -47,7 +47,7 @@ keys = function(o) {
 	if (isEnumerationBuggy) {
 		// only add buggy enumerated values if it's not the Object.prototype's
 		for (i = 0; i < enumerationLength; ++i) {
-			if (o.hasOwnProperty(enumeratedKeys[i])) {
+			if (hasOwn.call(o, enumeratedKeys[i])) {
 				k[k.length] = enumeratedKeys[i];
 			}
 		}
@@ -530,7 +530,7 @@ addMutator("bind", {
 
 		// we need to delete the bound property from all children as well as the current class
 		each(klass.subclass, function(k) {
-			if (indexOf(k.bindings, name) > -1 && !k.prototype.hasOwnProperty(name)) {
+			if (indexOf(k.bindings, name) > -1 && !hasOwn.call(k.prototype, name)) {
 				k.removeBoundProperty(name);
 			}
 		});
