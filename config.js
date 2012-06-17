@@ -19,8 +19,7 @@ module.exports = function(build) {
 
 	// adds any copy, headers, footers to the js file
 	build.addCopyright("copyright.js");
-	build.addIntro("intro.js");
-	build.addOutro("outro.js");
+	build.addSourceWrap("wrap.js");
 
 	// sets the list of environments that this code can run against
 	build.enableEnvironment("node", "web");

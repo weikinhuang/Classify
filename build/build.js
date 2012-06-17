@@ -114,18 +114,11 @@ var Build = Classify.create({
 		this.wrap.copy.push.apply(this.wrap.copy, Array.isArray(arguments[0]) ? arguments[0] : arguments);
 		return this;
 	},
-	addIntro : function() {
-		if (!this.wrap.intro) {
-			this.wrap.intro = [];
+	addSourceWrap : function() {
+		if (!this.wrap.wrap) {
+			this.wrap.wrap = [];
 		}
-		this.wrap.intro.push.apply(this.wrap.intro, Array.isArray(arguments[0]) ? arguments[0] : arguments);
-		return this;
-	},
-	addOutro : function() {
-		if (!this.wrap.outro) {
-			this.wrap.outro = [];
-		}
-		this.wrap.outro.push.apply(this.wrap.outro, Array.isArray(arguments[0]) ? arguments[0] : arguments);
+		this.wrap.wrap.push.apply(this.wrap.wrap, Array.isArray(arguments[0]) ? arguments[0] : arguments);
 		return this;
 	},
 	addReplaceToken : function(name, value) {
@@ -240,18 +233,14 @@ var Build = Classify.create({
 			callback(this.sourceCache.full);
 			return;
 		}
-		var self = this, intro = "", outro = "", src = "", data;
-		(this.wrap && this.wrap.intro || []).forEach(function(file) {
-			intro += fs.readFileSync(self.dir.src + "/" + file, "utf8");
-		});
-		(this.wrap && this.wrap.outro || []).forEach(function(file) {
-			outro += fs.readFileSync(self.dir.src + "/" + file, "utf8");
-		});
+		var self = this, data = "";
 		this.src.forEach(function(file) {
-			src += fs.readFileSync(self.dir.src + "/" + file, "utf8");
+			data += fs.readFileSync(self.dir.src + "/" + file, "utf8");
+		});
+		(this.wrap && this.wrap.wrap || []).forEach(function(file) {
+			data = fs.readFileSync(self.dir.src + "/" + file, "utf8").replace(/"@SOURCE\b";/g, data);
 		});
 
-		data = intro + src + outro;
 		data = data.replace(/@VERSION\b/g, this.version);
 		data.replace(/@DATE\b/g, (new Date()).toUTCString());
 
