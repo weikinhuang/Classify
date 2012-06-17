@@ -864,6 +864,15 @@ Classify.getGlobalNamespace = function() {
 };
 
 /**
+ * The globally named namespace
+ *
+ * @static
+ * @memberOf Classify
+ * @type {Classify.Namespace}
+ */
+Classify.global = new Classify.Namespace();
+
+/**
  * Adds a global class mutator that modifies the defined classes at different points with hooks
  *
  * @param {String}

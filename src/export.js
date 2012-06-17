@@ -70,6 +70,9 @@ extend(Classify, {
 	addMutator : addMutator,
 	removeMutator : removeMutator,
 
+	// shortcut to the global namespace
+	global : getGlobalNamespace(),
+
 	// utility function to provide functionality to quickly add properties to objects
 	extend : extend,
 	// utility function to provide functionality to allow for name provisioning

@@ -5,11 +5,12 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Fri, 15 Jun 2012 01:42:51 GMT
+ * Date: Sun, 17 Jun 2012 02:28:46 GMT
  */
-(function( root, undefined ) {
+(function(root, undefined) {
 	"use strict";
-// shortcut for minification compaction
+
+	// shortcut for minification compaction
 var prototype = "prototype",
 // For IE, check if looping through objects works with toString & valueOf
 isEnumerationBuggy = !({
@@ -1040,6 +1041,9 @@ extend(Classify, {
 	addMutator : addMutator,
 	removeMutator : removeMutator,
 
+	// shortcut to the global namespace
+	global : getGlobalNamespace(),
+
 	// utility function to provide functionality to quickly add properties to objects
 	extend : extend,
 	// utility function to provide functionality to allow for name provisioning
@@ -1079,5 +1083,6 @@ if (typeof module !== "undefined" && module.exports) {
 		return Classify;
 	};
 }
-// Establish the root object, "window" in the browser, or "global" on the server.
+
+	// Establish the root object, "window" in the browser, or "global" on the server.
 })(this);

@@ -340,6 +340,24 @@ QUnit.test("observer with event listeners bound with 'once'", function() {
 	}
 });
 
+QUnit.test("directly calling emit function from observer", function() {
+	QUnit.expect(4);
+	var test = create({});
+	var testinstance = new test();
+
+	var val = 10;
+	var observer = new Observer(testinstance, "z", val);
+
+	observer.addListener(function(value, a) {
+		QUnit.equal(arguments.length, 2, "observers listeners method gets passed correct number of arguments when called with emit.");
+		QUnit.equal(value, val, "observers listeners method first argument is always the current value.");
+		QUnit.equal(a, 1, "observers listeners method arguments from emit gets passed as additional arguments.");
+	});
+
+	// call emit function directly
+	QUnit.ok(observer.emit(1) === testinstance, "The return value of emit is a chain of internal instance.");
+});
+
 QUnit.test("removing bound event listeners from observer", function() {
 	QUnit.expect(11);
 	var test = create({
