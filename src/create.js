@@ -212,7 +212,7 @@ var create = function() {
 		return new TempClass();
 	};
 	// Use the defined invoke method if possible, otherwise use the default one
-	klass.invoke = methods.invoke || (parent.invoke && !parent.invoke.__original_ ? parent.invoke : null) || store(function() {
+	klass.invoke = methods.invoke || (parent.invoke && isFunction(parent.invoke) && !parent.invoke.__original_ ? parent.invoke : null) || store(function() {
 		return klass.applicate(arguments);
 	}, true);
 	// Remove the invoke method from the prototype chain
@@ -220,7 +220,7 @@ var create = function() {
 	// Keep a list of the inheritance chain
 	klass.superclass = parent;
 	klass.subclass = [];
-	klass.implement = (parent.implement || []).concat(implement);
+	klass.implement = (isArray(parent.implement) ? parent.implement : []).concat(implement);
 	// Give this class the ability to create sub classes
 	klass.extend = klass.prototype.extend = function() {
 		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
@@ -233,7 +233,7 @@ var create = function() {
 	var subclass_prototype = SubClass.prototype;
 	klass.prototype = new SubClass();
 	// Add this class to the list of subclasses of the parent
-	if (parent.subclass) {
+	if (parent.subclass && isArray(parent.subclass)) {
 		parent.subclass.push(klass);
 	}
 	// Create a magic method that can invoke any of the parent methods

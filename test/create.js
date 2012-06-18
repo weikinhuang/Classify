@@ -508,7 +508,7 @@ QUnit.test("extending core Javascript objects using inheritance", function() {
 });
 
 QUnit.test("extending Javascript objects not bult using Classify using inheritance", function() {
-	QUnit.expect(6);
+	QUnit.expect(11);
 	var test = function(value) {
 		this.value = value;
 	};
@@ -519,7 +519,7 @@ QUnit.test("extending Javascript objects not bult using Classify using inheritan
 		return "lorem ipsum";
 	};
 
-	// extending the Number object
+	// extending the predefined object
 	var test_obj = create(test, {
 		shuffle : function() {
 			return "ipsum lorem";
@@ -537,6 +537,28 @@ QUnit.test("extending Javascript objects not bult using Classify using inheritan
 	QUnit.equal(instance.custom(), "lorem ipsum", "External object's prototype function called.");
 	QUnit.equal(instance.shuffle(), "ipsum lorem", "Internal object's prototype function called.");
 	QUnit.equal(instance.override(), "tlorem ipsum", "External object's function called through the \"parent\" special function.");
+
+	var override = function(value) {
+		this.value = value;
+	};
+	override.subclass= 1;
+	override.implement = 1;
+	// extending the predefined object
+	var otest_obj = create(override, {
+		shuffle : function() {
+			return "ipsum lorem";
+		},
+		override : function() {
+			return "t" + this.parent();
+		}
+	});
+
+	var oinstance = new otest_obj("test");
+	QUnit.ok(oinstance instanceof otest_obj, "Extended external object is an instance of itself.");
+	QUnit.ok(oinstance instanceof override, "Extended external object is an instance of external class.");
+	QUnit.equal(instance.value, "test", "External object's constructor function called.");
+	QUnit.equal(Object.prototype.toString.call(otest_obj.implement), "[object Array]", "Special properties (implement) are fixed during creation.");
+	QUnit.equal(Object.prototype.toString.call(otest_obj.subclass), "[object Array]", "Special properties (subclass) are fixed during creation.");
 });
 
 QUnit.test("implementing methods in classes from other objects", function() {
