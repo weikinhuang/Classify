@@ -1,4 +1,4 @@
-# classify `v0.9.8`
+# classify `v0.9.9`
 ==================================================
 
 ## `Classify`
@@ -10,6 +10,7 @@
  * [`Classify.destroyNamespace`](#Classify.destroyNamespace)
  * [`Classify.testNamespace`](#Classify.testNamespace)
  * [`Classify.getGlobalNamespace`](#Classify.getGlobalNamespace)
+ * [`Classify.global`](#Classify.global)
  * [`Classify.addMutator`](#Classify.addMutator)
  * [`Classify.removeMutator`](#Classify.removeMutator)
  * [`Classify.extend`](#Classify.extend)
@@ -86,8 +87,10 @@
  * [`Classify.Observer#get`](#Classify.Observer.prototype.get)
  * [`Classify.Observer#set`](#Classify.Observer.prototype.set)
  * [`Classify.Observer#emit`](#Classify.Observer.prototype.emit)
- * [`Classify.Observer#triggerEmit`](#Classify.Observer.prototype.triggerEmit)
+ * [`Classify.Observer#_triggerEmit`](#Classify.Observer.prototype._triggerEmit)
  * [`Classify.Observer#addListener`](#Classify.Observer.prototype.addListener)
+ * [`Classify.Observer#on`](#Classify.Observer.prototype.on)
+ * [`Classify.Observer#once`](#Classify.Observer.prototype.once)
  * [`Classify.Observer#removeListener`](#Classify.Observer.prototype.removeListener)
  * [`Classify.Observer#removeAllListeners`](#Classify.Observer.prototype.removeAllListeners)
  * [`Classify.Observer#listeners`](#Classify.Observer.prototype.listeners)
@@ -239,6 +242,12 @@ Retieves the globally named namespace.
 
 ##### Returns
 `Classify.Namespace`
+
+### <a id="Classify.global" href="#">`Classify.global`</a>
+The globally named namespace.
+[&#9650;](#)
+
+`Classify.Namespace`: The globally named namespace
 
 ### <a id="Classify.addMutator" href="#">`Classify.addMutator(name, mutator[, mutator.onCreate][, mutator.onPropAdd][, mutator.onPropRemove][, mutator.onInit])`</a>
 Adds a global class mutator that modifies the defined classes at different points with hooks.
@@ -794,13 +803,38 @@ Starts the timers to call the registered event listeners.
 ##### Returns
 `Classify.Class`
 
-### <a id="Classify.Observer.prototype.triggerEmit" href="#">`Classify.Observer.prototype.triggerEmit()`</a>
+### <a id="Classify.Observer.prototype._triggerEmit" href="#">`Classify.Observer.prototype._triggerEmit(args)`</a>
 Fires the event listeners in the order they were added.
 [&#9650;](#)
 
 
+##### Arguments
+1. `args` `{Array}`: Array of arguments to pass to the bound event listeners
+
 ### <a id="Classify.Observer.prototype.addListener" href="#">`Classify.Observer.prototype.addListener(listener)`</a>
 Add an event listener for when the internal value is changed.
+[&#9650;](#)
+
+
+##### Arguments
+1. `listener` `{Function}`: The event listener to add
+
+##### Returns
+`Classify.Class`
+
+### <a id="Classify.Observer.prototype.on" href="#">`Classify.Observer.prototype.on(listener)`</a>
+Add an event listener for when the internal value is changed, alias to addListener.
+[&#9650;](#)
+
+
+##### Arguments
+1. `listener` `{Function}`: The event listener to add
+
+##### Returns
+`Classify.Class`
+
+### <a id="Classify.Observer.prototype.once" href="#">`Classify.Observer.prototype.once(listener)`</a>
+Add an event listener to be called only once when the internal value is changed.
 [&#9650;](#)
 
 

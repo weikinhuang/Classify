@@ -226,6 +226,12 @@ Other options include: `clean`, `lint`, `unit`, `concat`, `min`, `size`, `perf`,
 Changelog
 --------------------------------------
 
+#### v0.9.9
+	Fix issue when extending non Classify objects overriding special properties
+	Global namespace is now a property of Classify on Classify.global
+	Updated Observers to have a 'on' alias and be able to bind events to be fired only once
+	Using Object.prototype.hasOwnProperty instead of .hasOwnProperty
+
 #### v0.9.8
 	The called context is passed in as argument 1 for auto bound functions
 

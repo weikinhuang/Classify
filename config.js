@@ -1,6 +1,6 @@
 module.exports = function(build) {
 	// set basic info about the repo
-	build.setNameVersion("classify", "0.9.8");
+	build.setNameVersion("classify", "0.9.9");
 
 	// set the url of this repo
 	build.setRepoName("https://github.com/weikinhuang/Classify");
