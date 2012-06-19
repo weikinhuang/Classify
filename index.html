@@ -125,12 +125,12 @@
 				</p>
 				<table class="download-table">
 					<tr>
-						<th class="download-link"><a href="https://raw.github.com/weikinhuang/Classify/master/dist/classify.js">Development Version</a> (v0.9.8)</th>
-						<td class="download-detail">11.00 kb,  Uncompressed and Fully Commented</td>
+						<th class="download-link"><a href="https://raw.github.com/weikinhuang/Classify/master/dist/classify.js">Development Version</a> (v0.9.9)</th>
+						<td class="download-detail">11.39 kb,  Uncompressed and Fully Commented</td>
 					</tr>
 					<tr>
-						<th class="download-link"><a href="https://raw.github.com/weikinhuang/Classify/master/dist/classify.min.js">Production Version</a> (v0.9.8)</th>
-						<td class="download-detail">3.59 kb, Minified and Gzipped</td>
+						<th class="download-link"><a href="https://raw.github.com/weikinhuang/Classify/master/dist/classify.min.js">Production Version</a> (v0.9.9)</th>
+						<td class="download-detail">3.70 kb, Minified and Gzipped</td>
 					</tr>
 				</table>
 			</div>
@@ -330,6 +330,14 @@ Retieves the globally named namespace.
 <b>Returns</b>
 <code>Classify.Namespace</code>
 </div>
+</div>
+<div id="doc-Classify.global" class="doc-block doc-type-var">
+<h4 id="def-Classify.global">Classify.global</h4>
+<code class="def-definition">Classify.global</code>
+<div class="doc-comment">
+The globally named namespace.
+</div>
+<code class="def-type">Classify.Namespace</code> The globally named namespace
 </div>
 <div id="doc-Classify.addMutator" class="doc-block doc-type-function">
 <h4 id="def-Classify.addMutator">Classify.addMutator</h4>
@@ -1264,11 +1272,20 @@ Starts the timers to call the registered event listeners.
 <code>Classify.Class</code>
 </div>
 </div>
-<div id="doc-Classify.Observer.prototype.triggerEmit" class="doc-block doc-type-function">
-<h4 id="def-Classify.Observer.prototype.triggerEmit">Classify.Observer.prototype.triggerEmit</h4>
-<code class="def-definition">Classify.Observer.prototype.triggerEmit()</code>
+<div id="doc-Classify.Observer.prototype._triggerEmit" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype._triggerEmit">Classify.Observer.prototype._triggerEmit</h4>
+<code class="def-definition">Classify.Observer.prototype._triggerEmit(args)</code>
 <div class="doc-comment">
 Fires the event listeners in the order they were added.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>args</code> <code>{Array}</code> Array of arguments to pass to the bound event listeners
+</li>
+</ol>
 </div>
 </div>
 <div id="doc-Classify.Observer.prototype.addListener" class="doc-block doc-type-function">
@@ -1276,6 +1293,46 @@ Fires the event listeners in the order they were added.
 <code class="def-definition">Classify.Observer.prototype.addListener(listener)</code>
 <div class="doc-comment">
 Add an event listener for when the internal value is changed.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>listener</code> <code>{Function}</code> The event listener to add
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.on" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.on">Classify.Observer.prototype.on</h4>
+<code class="def-definition">Classify.Observer.prototype.on(listener)</code>
+<div class="doc-comment">
+Add an event listener for when the internal value is changed, alias to addListener.
+</div>
+<div class="type-args">
+<b>Arguments</b>
+<ol>
+<li>
+<span class="def-arg-count">1.</span>
+<code>listener</code> <code>{Function}</code> The event listener to add
+</li>
+</ol>
+</div>
+<div class="type-return">
+<b>Returns</b>
+<code>Classify.Class</code>
+</div>
+</div>
+<div id="doc-Classify.Observer.prototype.once" class="doc-block doc-type-function">
+<h4 id="def-Classify.Observer.prototype.once">Classify.Observer.prototype.once</h4>
+<code class="def-definition">Classify.Observer.prototype.once(listener)</code>
+<div class="doc-comment">
+Add an event listener to be called only once when the internal value is changed.
 </div>
 <div class="type-args">
 <b>Arguments</b>
@@ -1362,6 +1419,15 @@ Returns the special name of this object.
 				<h2 id="changelog">Change Log</h2>
 				<div>
 					<div class="changelog">
+<b class="changelog-header">v0.9.9</b>
+<ul class="changelog-list">
+<li>Fix issue when extending non Classify objects overriding special properties</li>
+<li>Global namespace is now a property of Classify on Classify.global</li>
+<li>Updated Observers to have a 'on' alias and be able to bind events to be fired only once</li>
+<li>Using Object.prototype.hasOwnProperty instead of .hasOwnProperty</li>
+</ul>
+</div>
+<div class="changelog">
 <b class="changelog-header">v0.9.8</b>
 <ul class="changelog-list">
 <li>The called context is passed in as argument 1 for auto bound functions</li>
