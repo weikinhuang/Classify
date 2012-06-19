@@ -125,9 +125,7 @@ module.exports = function(build) {
 		            // win - chrome
 		            { browser : "chrome", version : "19.0", os : "win" },
 		            // win - firefox
-		            { browser : "firefox", version : "10.0", os : "win"	},
-		            { browser : "firefox", version : "10.0", os : "win"	},
-		            { browser : "firefox", version : "10.0", os : "win"	}
+		            { browser : "firefox", version : "13.0", os : "win"	}
 		            ]
 	});
 };
