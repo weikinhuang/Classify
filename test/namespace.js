@@ -110,11 +110,9 @@ QUnit.test("class extension and implementation using named references", function
 	QUnit.equal(g.implement[1], f, "implement object reference stored internally");
 
 	// attempt to extend a non defined class
-	try {
+	QUnit.raises(function(){
 		var h = ns.create("Z", "Y", {});
-	} catch (e) {
-		QUnit.ok(e instanceof Error, "attempt to extend a undefined class throws an error");
-	}
+	}, Error, "attempt to extend a undefined class throws an error");
 
 	// using the extend function
 	var i = ns.C.extend([ "B" ], {
@@ -229,11 +227,9 @@ QUnit.test("class autoloading", function() {
 	});
 
 	// attempt to set autoloader to a non function
-	try {
+	QUnit.raises(function(){
 		ns.setAutoloader([]);
-	} catch (e) {
-		QUnit.ok(e instanceof Error, "attempt to set non function autoloader throws an error");
-	}
+	}, Error, "attempt to set non function autoloader throws an error");
 });
 
 QUnit.test("global namespace inheritance", function() {

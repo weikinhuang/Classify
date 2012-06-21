@@ -64,13 +64,20 @@ QUnit.test("basic requirements", function() {
 	// test empty
 	QUnit.deepEqual(keys(test), [], "keys for a empty object is empty");
 	// test single object prototype
-	test.toString = function() {
-		return "";
+	test = {
+		toString : function() {
+			return "";
+		}
 	};
 	QUnit.deepEqual(keys(test).sort(), [ "toString" ], "toString (a object prototype) is enumerable");
 	// test multiple object prototype
-	test.valueOf = function() {
-		return 0;
+	test = {
+		toString : function() {
+			return "";
+		},
+		valueOf : function() {
+			return 0;
+		}
 	};
 	QUnit.deepEqual(keys(test).sort(), [ "toString", "valueOf" ], "toString,valueOf (a object prototype) is enumerable");
 	// test other object properties

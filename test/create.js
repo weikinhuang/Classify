@@ -326,11 +326,9 @@ QUnit.test("Calling parent methods with the invoke magic method", function() {
 	QUnit.equal((new subclass()).d(), 2, "Calling invoke from within class invokes parent method.");
 	QUnit.equal((new subclass()).invoke("b"), 2, "Calling invoke from outside class invokes parent method.");
 
-	try {
+	QUnit.raises(function(){
 		(new subclass()).invoke("z");
-	} catch (e) {
-		QUnit.ok(e instanceof Error, "Attempts to invoke parent property that is not a function throws a error.");
-	}
+	}, Error, "Attempts to invoke parent property that is not a function throws a error.");
 });
 
 QUnit.test("adding new properties", function() {
@@ -441,43 +439,40 @@ QUnit.test("removing existing properties", function() {
 });
 
 QUnit.test("extending core Javascript objects using inheritance", function() {
-	QUnit.expect(4);
+	QUnit.expect(11);
 	// extending the Number object
 	var test_number = create(Number, {
-		init : function() {
-			this.value = Number.prototype.constructor.apply(this, arguments);
+		value : null,
+		init : function(value) {
+			this.value = Number(value);
 		},
 		custom : function() {
-			return "I am " + this.toFixed(6) + ".";
+			return "I am " + Number.prototype.toFixed.call(this.value, 6) + ".";
 		},
 		round : function() {
-			return Math.round(this.valueOf());
+			return Math.round(this.value);
+		},
+		toPrecision : function() {
+			return Number.prototype.toPrecision.apply(this.value, arguments);
 		},
 		valueOf : function() {
-			return Number(this.value).valueOf();
+			return this.value;
 		},
 		toString : function() {
-			return Number(this.value).toString();
+			return String(this.value);
 		}
 	});
 
 	// this test fails in Internet explorer because of using prototypes
 	// of the scalar objects are prohibited in extended objects
-	try {
-		// var test_n = new test_number("15.6");
-		// QUnit.equal(test_n.valueOf(), 15.6, "Overriden valueOf function called for Number");
-		// QUnit.equal(test_n.toString(), "15.6", "Overriden toString function called for Number");
-		// QUnit.equal(test_n.toPrecision(4), "15.60", "Native function called for Number");
-		// QUnit.equal(test_n.round(), 16, "Custom prototype function (round) called for Number.");
-		// QUnit.equal(test_n.custom(), "I am 15.600000.", "Custom prototype function using native function called for Number.");
-		// QUnit.ok(test_n instanceof test_number, "Extended Number object is an instance of itself.");
-		// QUnit.ok(test_n instanceof Number, "Extended Number object is an instance of Number.");
-	} catch (e) {
-		// IE throws this type of error
-		if (!(e instanceof TypeError)) {
-			throw e;
-		}
-	}
+	var test_n = new test_number("15.6");
+	QUnit.equal(test_n.valueOf(), 15.6, "Overriden valueOf function called for Number");
+	QUnit.equal(test_n.toString(), "15.6", "Overriden toString function called for Number");
+	QUnit.equal(test_n.toPrecision(4), "15.60", "Native function called for Number");
+	QUnit.equal(test_n.round(), 16, "Custom prototype function (round) called for Number.");
+	QUnit.equal(test_n.custom(), "I am 15.600000.", "Custom prototype function using native function called for Number.");
+	QUnit.ok(test_n instanceof test_number, "Extended Number object is an instance of itself.");
+	QUnit.ok(test_n instanceof Number, "Extended Number object is an instance of Number.");
 
 	// extending the Error object
 	var test_error = create(Error, {
@@ -541,7 +536,7 @@ QUnit.test("extending Javascript objects not bult using Classify using inheritan
 	var override = function(value) {
 		this.value = value;
 	};
-	override.subclass= 1;
+	override.subclass = 1;
 	override.implement = 1;
 	// extending the predefined object
 	var otest_obj = create(override, {
@@ -655,18 +650,14 @@ QUnit.test("adding and removing mutators", function() {
 	addMutator("test", {});
 
 	// adding duplicate mutators will throw an error
-	try {
+	QUnit.raises(function(){
 		addMutator("test", {});
-	} catch (e) {
-		QUnit.ok(e instanceof Error, "Attempts to add an existing mutator throws a error.");
-	}
+	}, Error, "Attempts to add an existing mutator throws a error.");
 
 	removeMutator("test");
-	try {
+	QUnit.raises(function(){
 		removeMutator("test");
-	} catch (e) {
-		QUnit.ok(e instanceof Error, "Attempts to remove an non existing mutator throws a error.");
-	}
+	}, Error, "Attempts to remove an non existing mutator throws a error.");
 });
 
 QUnit.test("adding and removing mutators to the on create hook", function() {
@@ -759,7 +750,7 @@ QUnit.test("adding and removing mutators to the on initialize hook", function() 
 
 	addMutator("test", {
 		onInit : function(instance, klass) {
-			if(klass.count == null) {
+			if (klass.count == null) {
 				klass.count = 0;
 			}
 			instance.a = 1;
@@ -773,7 +764,6 @@ QUnit.test("adding and removing mutators to the on initialize hook", function() 
 	(new test());
 	QUnit.equal(test.count, 2, "onInit mutator called during each class initialization");
 	QUnit.equal((new test()).a, 1, "onInit mutator called during class initialization and modified instance value");
-
 
 	removeMutator("test");
 

@@ -27,12 +27,10 @@ QUnit.test("basic observer creation", function() {
 	// test toValue method
 	QUnit.equal(observer.toValue(), val, "Observer toValue function returned basic value of the internal value.");
 
-	try {
+	QUnit.raises(function(){
 		var observer2 = new Observer(null, "z", val);
 		testinstance.z = observer2;
-	} catch (e) {
-		QUnit.ok(!!e, "Observer null context throws error on instantiation.");
-	}
+	}, Error, "Observer null context throws error on instantiation.");
 });
 
 QUnit.test("observer getter with 'get' functionality", function() {
@@ -288,11 +286,9 @@ QUnit.test("observer with bound setter event listeners", function() {
 	QUnit.equal(listeners[0], first_listener, "observers listeners method returned an array of bound listeners unmodified.");
 
 	// attempting to add non function listener throws error
-	try {
+	QUnit.raises(function(){
 		observer2.addListener({});
-	} catch (e) {
-		QUnit.ok(e instanceof Error, "Attempt to bind non function listener throws error.");
-	}
+	}, Error, "Attempt to bind non function listener throws error.");
 });
 
 QUnit.test("observer with event listeners bound with 'once'", function() {
@@ -333,11 +329,9 @@ QUnit.test("observer with event listeners bound with 'once'", function() {
 	QUnit.ok(isArray(listeners), "observers listeners method returned an array of bound listeners.");
 	QUnit.equal(listeners.length, 0, "observers listeners method returned an array or proper number of events.");
 
-	try {
+	QUnit.raises(function(){
 		observer.once({});
-	} catch (e) {
-		QUnit.ok(e instanceof Error, "Attempt to bind non function listener throws error.");
-	}
+	}, Error, "Attempt to bind non function listener throws error.");
 });
 
 QUnit.test("directly calling emit function from observer", function() {
@@ -409,11 +403,9 @@ QUnit.test("removing bound event listeners from observer", function() {
 	QUnit.equal(listeners[0], second_listener, "observers listeners method returned an array of bound listeners unmodified.");
 
 	// attempting to remove non function listener throws error
-	try {
+	QUnit.raises(function(){
 		observer.removeListener({});
-	} catch (e) {
-		QUnit.ok(e instanceof Error, "Attempt to remove non function listener throws error.");
-	}
+	}, Error, "Attempt to remove non function listener throws error.");
 
 	// add event listener
 	observer.addListener(function(value) {

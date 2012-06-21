@@ -123,9 +123,31 @@ module.exports = function(build) {
 		            { browser : "ie", version : "9.0", os : "win" },
 		            { browser : "ie", version : "10.0", os : "win" },
 		            // win - chrome
-		            { browser : "chrome", version : "19.0", os : "win" },
+		            { browser : "chrome", version : "14.0", os : "win" },
+		            { browser : "chrome", version : "17.0", os : "win" },
+		            { browser : "chrome", version : "20.0", os : "win" },
 		            // win - firefox
-		            { browser : "firefox", version : "13.0", os : "win"	}
+		            { browser : "firefox", version : "3.0", os : "win" },
+		            { browser : "firefox", version : "3.6", os : "win" },
+		            { browser : "firefox", version : "4.0", os : "win" },
+		            { browser : "firefox", version : "13.0", os : "win" },
+		            // win - opera
+		            { browser : "opera", version : "10.0", os : "win" },
+		            { browser : "opera", version : "11.6", os : "win" },
+		            // win - safari
+		            { browser : "safari", version : "4.0", os : "win" },
+		            { browser : "safari", version : "5.1", os : "win" },
+		            // mac - safari
+		            { browser : "safari", version : "4.0", os : "mac" },
+		            { browser : "safari", version : "5.1", os : "mac" },
+		            // mac - chrome
+		            { browser : "chrome", version : "19.0", os : "mac" },
+		            // mac - firefox
+		            { browser : "firefox", version : "5.0", os : "mac" },
+		            { browser : "firefox", version : "13.0", os : "mac" },
+		            // mac - opera
+		            { browser : "opera", version : "11.6", os : "mac" },
+		            { browser : "opera", version : "12.0", os : "mac" }
 		            ]
 	});
 };

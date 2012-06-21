@@ -19,7 +19,7 @@
 
 #### v0.9.4
 	Adding Travis-ci config file
-	Fix issue with IE6-9 when extending from non CLassify classes
+	Fix issue with IE6-9 when extending from non Classify classes
 	General bug fixes, removing support for IE<6
 
 #### v0.9.3

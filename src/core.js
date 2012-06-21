@@ -2,7 +2,7 @@
 var prototype = "prototype",
 // For IE, check if looping through objects works with toString & valueOf
 isEnumerationBuggy = !({
-	toString : 1
+	toString : null
 }).propertyIsEnumerable("toString"),
 // gets the enumerated keys if necessary (bug in older ie < 9)
 enumeratedKeys = isEnumerationBuggy ? "hasOwnProperty,valueOf,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,constructor".split(",") : [],
