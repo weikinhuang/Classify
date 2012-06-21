@@ -28,6 +28,12 @@ isArray = Array.isArray || function(o) {
 	return toString.call(o) === "[object Array]";
 //#JSCOVERAGE_ENDIF
 },
+// regex for native function testing
+nativeFunctionRegExp = /^\s*function\s+.+?\(.*?\)\s*\{\s*\[native code\]\s*\}\s*$/,
+// ability to check if a function is native
+isNativeFunction = function(o) {
+	return isFunction(o) && nativeFunctionRegExp.test(o.toString());
+},
 // quickly be able to get all the keys of an object
 keys = function(o) {
 	var k = [], i;

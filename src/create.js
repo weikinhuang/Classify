@@ -14,6 +14,14 @@ initMutator = [],
 refMutator = [ createMutator, propAddMutator, propRemoveMutator, initMutator ],
 // Array of mutator methods that correspond to the mutator quick reference
 refMutatorOrder = [ "onCreate", "onPropAdd", "onPropRemove", "onInit" ],
+// Use native object.create whenever possible
+objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto, props) {
+	// This method allows for the constructor to not be called when making a new subclass
+	var SubClass = function() {
+	};
+	SubClass.prototype = proto;
+	return new SubClass();
+},
 // create the base object that everything extends from
 base = (function() {
 	var fn = function() {
@@ -226,22 +234,19 @@ var create = function() {
 		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
 	};
 
-	// This method allows for the constructor to not be called when making a new subclass
-	var SubClass = function() {
-	};
-	SubClass.prototype = parent.prototype;
-	var subclass_prototype = SubClass.prototype;
-	klass.prototype = new SubClass();
+	// assign child prototype to be that of the parent's by default (inheritance)
+	klass.prototype = objectCreate(parent.prototype);
+
 	// Add this class to the list of subclasses of the parent
 	if (parent.subclass && isArray(parent.subclass)) {
 		parent.subclass.push(klass);
 	}
 	// Create a magic method that can invoke any of the parent methods
 	methods.invoke = function(name, args) {
-		if (name in subclass_prototype && name !== "invoke" && isFunction(subclass_prototype[name])) {
+		if (name in parent.prototype && name !== "invoke" && isFunction(parent.prototype[name])) {
 			var tmp = this.invoke, ret;
-			this.invoke = subclass_prototype.invoke;
-			ret = subclass_prototype[name].apply(this, args || []);
+			this.invoke = parent.prototype.invoke;
+			ret = parent.prototype[name].apply(this, args || []);
 			this.invoke = tmp;
 			return ret;
 		}
@@ -253,10 +258,10 @@ var create = function() {
 		prefix = prefix || "";
 		if (property === undefined) {
 			each(keys(name), function(n) {
-				addProperty(klass, SubClass, prefix + n, name[n]);
+				addProperty(klass, parent, prefix + n, name[n]);
 			});
 		} else {
-			addProperty(klass, SubClass, prefix + name, property);
+			addProperty(klass, parent, prefix + name, property);
 		}
 		return klass;
 	};
