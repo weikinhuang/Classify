@@ -16,11 +16,17 @@ refMutator = [ createMutator, propAddMutator, propRemoveMutator, initMutator ],
 refMutatorOrder = [ "onCreate", "onPropAdd", "onPropRemove", "onInit" ],
 // Use native object.create whenever possible
 objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto, props) {
+//#JSCOVERAGE_IF !Object.create
 	// This method allows for the constructor to not be called when making a new subclass
 	var SubClass = function() {
 	};
 	SubClass.prototype = proto;
 	return new SubClass();
+//#JSCOVERAGE_ENDIF
+},
+// Hook to use Object.defineProperty if needed
+objectDefineProperty = function(obj, prop, descriptor) {
+	obj[prop] = descriptor;
 },
 // create the base object that everything extends from
 base = (function() {
@@ -114,14 +120,14 @@ addProperty = function(klass, parent, name, property) {
 
 	var parent_prototype = parent.prototype[name], self_prototype = klass.prototype;
 	// Else this is not a prefixed static property, so we're assigning it to the prototype
-	self_prototype[name] = (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property;
+	objectDefineProperty(self_prototype, name, (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property);
 
 	// Wrap all child implementation with the parent wrapper
 	if (isFunction(property)) {
 		each(klass.subclass, function(k) {
 			// add only if it's not already wrapped
 			if (isFunction(k.prototype[name]) && !k.prototype[name].__original_) {
-				k.prototype[name] = wrapParentProperty(self_prototype[name], k.prototype[name]);
+				objectDefineProperty(k.prototype, name, wrapParentProperty(self_prototype[name], k.prototype[name]));
 			}
 		});
 	}
@@ -153,7 +159,7 @@ removeProperty = function(klass, name) {
 	each(klass.subclass, function(k) {
 		// remove the parent function wrapper for child classes
 		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].__original_)) {
-			k.prototype[name] = k.prototype[name].__original_;
+			objectDefineProperty(k.prototype, name, k.prototype[name].__original_);
 		}
 	});
 	klass.prototype[name] = null;
@@ -271,6 +277,11 @@ var create = function() {
 		return klass;
 	};
 
+	// call each of the onCreate mutators to modify this class
+	each(createMutator, function(mutator) {
+		mutator.onCreate.call(mutator, klass, parent);
+	});
+
 	// Now implement each of the implemented objects before extending
 	if (implement.length !== 0) {
 		each(implement, function(impl) {
@@ -282,11 +293,6 @@ var create = function() {
 			});
 		});
 	}
-
-	// call each of the onCreate mutators to modify this class
-	each(createMutator, function(mutator) {
-		mutator.onCreate.call(mutator, klass, parent);
-	});
 
 	// Now extend each of those methods and allow for a parent accessor
 	klass.addProperty(methods);

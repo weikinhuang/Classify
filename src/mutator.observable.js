@@ -52,7 +52,7 @@ addMutator("observable", {
 		// initialize the observable properties if any
 		for (prop in observables) {
 			if (hasOwn.call(observables, prop)) {
-				instance[prop] = new Observer(instance, prop, observables[prop]);
+				objectDefineProperty(instance, prop, new Observer(instance, prop, observables[prop]));
 			}
 		}
 	}
