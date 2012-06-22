@@ -235,13 +235,14 @@ var create = function() {
 	klass.superclass = parent;
 	klass.subclass = [];
 	klass.implement = (isArray(parent.implement) ? parent.implement : []).concat(implement);
-	// Give this class the ability to create sub classes
-	klass.extend = klass.prototype.extend = function() {
-		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
-	};
 
 	// assign child prototype to be that of the parent's by default (inheritance)
-	klass.prototype = objectCreate(parent.prototype);
+	var proto = klass.prototype = objectCreate(parent.prototype);
+
+	// Give this class the ability to create sub classes
+	klass.extend = proto.extend = function() {
+		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
+	};
 
 	// Add this class to the list of subclasses of the parent
 	if (parent.subclass && isArray(parent.subclass)) {
@@ -277,27 +278,27 @@ var create = function() {
 		return klass;
 	};
 
-	// call each of the onCreate mutators to modify this class
-	each(createMutator, function(mutator) {
-		mutator.onCreate.call(mutator, klass, parent);
-	});
-
 	// Now implement each of the implemented objects before extending
 	if (implement.length !== 0) {
 		each(implement, function(impl) {
 			var props = impl.__isclass_ ? impl.prototype : impl;
 			each(keys(props), function(name) {
-				if (klass.prototype[name] === undefined && methods[name] === undefined) {
+				if (!hasOwn.call(proto, name) && !hasOwn.call(methods, name)) {
 					klass.addProperty(name, props[name]);
 				}
 			});
 		});
 	}
 
+	// call each of the onCreate mutators to modify this class
+	each(createMutator, function(mutator) {
+		mutator.onCreate.call(mutator, klass, parent);
+	});
+
 	// Now extend each of those methods and allow for a parent accessor
 	klass.addProperty(methods);
-	klass.prototype.constructor = klass;
-	klass.prototype.self = klass;
+	proto.constructor = klass;
+	proto.self = klass;
 	klass.__isclass_ = true;
 	return klass;
 };
