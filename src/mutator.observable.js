@@ -17,6 +17,8 @@ addMutator("observable", {
 	onPropAdd : function(klass, parent, name, property) {
 		// add the observable to the internal observable array
 		klass.observable[name] = property;
+		// add a null value to the prototype
+		objectDefineProperty(klass.prototype, name, null);
 		// we need to add the observable property from all children as well as the current class
 		each(klass.subclass, function(k) {
 			// add it only if it is not redefined in the child classes
