@@ -10,6 +10,6 @@ addMutator("nowrap", {
 	},
 	onPropAdd : function(klass, parent, name, property) {
 		// unwrapped properties are simply added to the prototype
-		klass.prototype[name] = property;
+		objectDefineProperty(klass.prototype, name, property);
 	}
 });

@@ -120,8 +120,8 @@ QUnit.test("class extension and implementation using named references", function
 			return this;
 		}
 	});
-	QUnit.equal(i.prototype.a, c.prototype.a, "implementing a class using a named reference with extend");
-	QUnit.equal(i.prototype.b, d.prototype.b, "implementing a object with a named reference with extend");
+	QUnit.equal(i.prototype.a.__original_, c.prototype.a, "implementing a class using a named reference with extend");
+	QUnit.equal(i.prototype.b, d.prototype.b, "implementing a object with a named reference with implement");
 });
 
 QUnit.test("removing named classes", function() {

@@ -16,11 +16,17 @@ refMutator = [ createMutator, propAddMutator, propRemoveMutator, initMutator ],
 refMutatorOrder = [ "onCreate", "onPropAdd", "onPropRemove", "onInit" ],
 // Use native object.create whenever possible
 objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto, props) {
+//#JSCOVERAGE_IF !Object.create
 	// This method allows for the constructor to not be called when making a new subclass
 	var SubClass = function() {
 	};
 	SubClass.prototype = proto;
 	return new SubClass();
+//#JSCOVERAGE_ENDIF
+},
+// Hook to use Object.defineProperty if needed
+objectDefineProperty = function(obj, prop, descriptor) {
+	obj[prop] = descriptor;
 },
 // create the base object that everything extends from
 base = (function() {
@@ -114,14 +120,14 @@ addProperty = function(klass, parent, name, property) {
 
 	var parent_prototype = parent.prototype[name], self_prototype = klass.prototype;
 	// Else this is not a prefixed static property, so we're assigning it to the prototype
-	self_prototype[name] = (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property;
+	objectDefineProperty(self_prototype, name, (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property);
 
 	// Wrap all child implementation with the parent wrapper
 	if (isFunction(property)) {
 		each(klass.subclass, function(k) {
 			// add only if it's not already wrapped
 			if (isFunction(k.prototype[name]) && !k.prototype[name].__original_) {
-				k.prototype[name] = wrapParentProperty(self_prototype[name], k.prototype[name]);
+				objectDefineProperty(k.prototype, name, wrapParentProperty(self_prototype[name], k.prototype[name]));
 			}
 		});
 	}
@@ -153,7 +159,7 @@ removeProperty = function(klass, name) {
 	each(klass.subclass, function(k) {
 		// remove the parent function wrapper for child classes
 		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].__original_)) {
-			k.prototype[name] = k.prototype[name].__original_;
+			objectDefineProperty(k.prototype, name, k.prototype[name].__original_);
 		}
 	});
 	klass.prototype[name] = null;
@@ -171,7 +177,9 @@ var create = function() {
 	// array of objects/classes that this class will implement the functions of, but will not be an instance of
 	implement = [],
 	// quick reference to the arguments array and it's length
-	args = arguments, arg_len = args.length;
+	args = arguments, arg_len = args.length,
+	// other variables
+	klass, proto;
 	// Parse out the arguments to grab the parent and methods
 	if (arg_len === 1) {
 		methods = args[0];
@@ -187,12 +195,16 @@ var create = function() {
 		implement = toArray(args[1]);
 		methods = args[2];
 	}
+
+	// extend so that modifications won't affect the passed in object
+	methods = extend({}, methods);
+
 	// extending from an outside object and not passing in a constructor
 	if (!parent.__isclass_ && !methods.init) {
 		methods.init = parent;
 	}
 	// Constructor function
-	var klass = function() {
+	klass = function() {
 		var tmp, i, l;
 		// We're not creating a instantiated object so we want to force a instantiation or call the invoke function
 		// we need to test for !this when in "use strict" mode
@@ -229,13 +241,14 @@ var create = function() {
 	klass.superclass = parent;
 	klass.subclass = [];
 	klass.implement = (isArray(parent.implement) ? parent.implement : []).concat(implement);
-	// Give this class the ability to create sub classes
-	klass.extend = klass.prototype.extend = function() {
-		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
-	};
 
 	// assign child prototype to be that of the parent's by default (inheritance)
-	klass.prototype = objectCreate(parent.prototype);
+	proto = klass.prototype = objectCreate(parent.prototype);
+
+	// Give this class the ability to create sub classes
+	klass.extend = proto.extend = function() {
+		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
+	};
 
 	// Add this class to the list of subclasses of the parent
 	if (parent.subclass && isArray(parent.subclass)) {
@@ -276,8 +289,9 @@ var create = function() {
 		each(implement, function(impl) {
 			var props = impl.__isclass_ ? impl.prototype : impl;
 			each(keys(props), function(name) {
-				if (klass.prototype[name] === undefined && methods[name] === undefined) {
-					klass.addProperty(name, props[name]);
+				if (!hasOwn.call(proto, name) && !hasOwn.call(methods, name)) {
+					// copy all the implemented properties to the methods definition object
+					methods[name] = props[name];
 				}
 			});
 		});
@@ -290,8 +304,8 @@ var create = function() {
 
 	// Now extend each of those methods and allow for a parent accessor
 	klass.addProperty(methods);
-	klass.prototype.constructor = klass;
-	klass.prototype.self = klass;
+	proto.constructor = klass;
+	proto.self = klass;
 	klass.__isclass_ = true;
 	return klass;
 };

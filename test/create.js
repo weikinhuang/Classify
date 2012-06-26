@@ -636,8 +636,8 @@ QUnit.test("implementing methods in classes from other objects", function() {
 		}
 	});
 	QUnit.equal(test_ei.prototype.d, inf_subclass.prototype.d, "method implemented through a subclass & extension object into prototype of class");
-	QUnit.equal(test_ei.prototype.e, extens.prototype.e, "method implemented through extension takes priority over implemented class");
-	QUnit.equal((new test_ei()).e(), 3, "method implemented through a extended object can be called from main class");
+	QUnit.equal(test_ei.prototype.e.__original_, inf_subclass.prototype.e, "method added through implementation takes priority over extension");
+	QUnit.equal((new test_ei()).e(), 2, "method implemented through a extended object can be called from main class");
 	QUnit.equal((new test_ei()).d(), 1, "method implemented through a subclass object can be called from main class and is able to call the parent function of the implemented class");
 	QUnit.equal((new test_ei()).g().constructor, test_ei, "method implemented through a subclass object's 'this' reference is the calling object");
 	QUnit.equal(test_ei.superclass, extens, "implemented subclass' reference is stored");
