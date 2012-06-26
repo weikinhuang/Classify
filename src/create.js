@@ -1,5 +1,7 @@
 // regex for keyword properties
 var keywordRegexp = /^(?:superclass|subclass|implement|observable|bindings|extend|prototype|applicate|(?:add|remove)(?:Static|Observable|Aliased|Bound)Property)$/,
+// regex to test for a mutator name to avoid a loop
+mutatorNameTest = /^__/,
 // reference to existing mutators
 mutators = {},
 // array of mutators that will get called when a class is created
@@ -95,34 +97,40 @@ removeMutator = function(name) {
 },
 // adds a property to an existing class taking into account parent
 addProperty = function(klass, parent, name, property) {
+	var foundMutator, parent_prototype, self_prototype;
 	// we don't want to re-add the core javascript properties, it's redundant
 	if (property === objectPrototype[name]) {
 		return;
 	}
 
-	var foundMutator = false;
-	each(propAddMutator, function(mutator) {
-		if (mutator.propTest.test(name)) {
-			if (name === mutator.propPrefix) {
-				each(property, function(prop, key) {
-					mutator.onPropAdd.call(mutator, klass, parent, key, prop);
-				});
-			} else {
-				mutator.onPropAdd.call(mutator, klass, parent, name.replace(mutator.propTest, ""), property);
+	// check to see if the property needs to be mutated
+	if (mutatorNameTest.test(name)) {
+		foundMutator = false;
+		each(propAddMutator, function(mutator) {
+			if (mutator.propTest.test(name)) {
+				if (name === mutator.propPrefix) {
+					each(property, function(prop, key) {
+						mutator.onPropAdd.call(mutator, klass, parent, key, prop);
+					});
+				} else {
+					mutator.onPropAdd.call(mutator, klass, parent, name.replace(mutator.propTest, ""), property);
+				}
+				foundMutator = true;
+				return false;
 			}
-			foundMutator = true;
-			return false;
+		});
+		if (foundMutator) {
+			return;
 		}
-	});
-	if (foundMutator) {
-		return;
 	}
 
-	var parent_prototype = parent.prototype[name], self_prototype = klass.prototype;
-	// Else this is not a prefixed static property, so we're assigning it to the prototype
+	// quick references
+	parent_prototype = parent.prototype[name];
+	self_prototype = klass.prototype;
+	// else this is not a prefixed static property, so we're assigning it to the prototype
 	objectDefineProperty(self_prototype, name, (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property);
 
-	// Wrap all child implementation with the parent wrapper
+	// wrap all child implementation with the parent wrapper
 	if (isFunction(property)) {
 		each(klass.subclass, function(k) {
 			// add only if it's not already wrapped
@@ -135,15 +143,17 @@ addProperty = function(klass, parent, name, property) {
 // removes a property from the chain
 removeProperty = function(klass, name) {
 	var foundMutator = false;
-	each(propRemoveMutator, function(mutator) {
-		if (mutator.propTest.test(name)) {
-			mutator.onPropRemove.call(mutator, klass, name.replace(mutator.propTest, ""));
-			foundMutator = true;
-			return false;
+	if (mutatorNameTest.test(name)) {
+		each(propRemoveMutator, function(mutator) {
+			if (mutator.propTest.test(name)) {
+				mutator.onPropRemove.call(mutator, klass, name.replace(mutator.propTest, ""));
+				foundMutator = true;
+				return false;
+			}
+		});
+		if (foundMutator) {
+			return;
 		}
-	});
-	if (foundMutator) {
-		return;
 	}
 
 	// if we are not removing a function from the prototype chain, then just delete it
@@ -269,7 +279,7 @@ var create = function() {
 	klass.addProperty = function(name, property, prefix) {
 		// the prefix parameter is for internal use only
 		prefix = prefix || "";
-		if (property === undefined) {
+		if (property === undefined && typeof name !== "string") {
 			each(keys(name), function(n) {
 				addProperty(klass, parent, prefix + n, name[n]);
 			});
