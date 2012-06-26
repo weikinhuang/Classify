@@ -177,7 +177,9 @@ var create = function() {
 	// array of objects/classes that this class will implement the functions of, but will not be an instance of
 	implement = [],
 	// quick reference to the arguments array and it's length
-	args = arguments, arg_len = args.length;
+	args = arguments, arg_len = args.length,
+	// other variables
+	klass, proto;
 	// Parse out the arguments to grab the parent and methods
 	if (arg_len === 1) {
 		methods = args[0];
@@ -193,12 +195,16 @@ var create = function() {
 		implement = toArray(args[1]);
 		methods = args[2];
 	}
+
+	// extend so that modifications won't affect the passed in object
+	methods = extend({}, methods);
+
 	// extending from an outside object and not passing in a constructor
 	if (!parent.__isclass_ && !methods.init) {
 		methods.init = parent;
 	}
 	// Constructor function
-	var klass = function() {
+	klass = function() {
 		var tmp, i, l;
 		// We're not creating a instantiated object so we want to force a instantiation or call the invoke function
 		// we need to test for !this when in "use strict" mode
@@ -237,7 +243,7 @@ var create = function() {
 	klass.implement = (isArray(parent.implement) ? parent.implement : []).concat(implement);
 
 	// assign child prototype to be that of the parent's by default (inheritance)
-	var proto = klass.prototype = objectCreate(parent.prototype);
+	proto = klass.prototype = objectCreate(parent.prototype);
 
 	// Give this class the ability to create sub classes
 	klass.extend = proto.extend = function() {
@@ -284,7 +290,8 @@ var create = function() {
 			var props = impl.__isclass_ ? impl.prototype : impl;
 			each(keys(props), function(name) {
 				if (!hasOwn.call(proto, name) && !hasOwn.call(methods, name)) {
-					klass.addProperty(name, props[name]);
+					// copy all the implemented properties to the methods definition object
+					methods[name] = props[name];
 				}
 			});
 		});
