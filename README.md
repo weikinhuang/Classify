@@ -229,7 +229,7 @@ Changelog
 #### v0.9.10
 	BREAKING CHANGE, implements overrides extends when defining a class that institutes both
 	Use ES5 Object.create when possible
-	
+
 #### v0.9.9
 	Fix issue when extending non Classify objects overriding special properties
 	Global namespace is now a property of Classify on Classify.global
