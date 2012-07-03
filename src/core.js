@@ -14,6 +14,12 @@ objectPrototype = Object.prototype,
 toString = objectPrototype.toString,
 // quick reference to the toString prototype
 hasOwn = objectPrototype.hasOwnProperty,
+// regex to test for scalar value
+scalarRegExp = /^(?:boolean|number|string|undefined)$/,
+// test if a value is scalar in nature
+isScalar = function(o) {
+	return o === null || scalarRegExp.test(typeof o);
+},
 // test if object is a function
 isFunction = function(o) {
 	return typeof o === "function";

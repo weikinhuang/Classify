@@ -187,13 +187,13 @@ var create = function() {
 	// array of objects/classes that this class will implement the functions of, but will not be an instance of
 	implement = [],
 	// quick reference to the arguments array and it's length
-	args = arguments, arg_len = args.length,
+	args = arguments, argLength = args.length,
 	// other variables
 	klass, proto;
 	// Parse out the arguments to grab the parent and methods
-	if (arg_len === 1) {
+	if (argLength === 1) {
 		methods = args[0];
-	} else if (arg_len === 2) {
+	} else if (argLength === 2) {
 		if (!args[0].__isclass_ && !isExtendable(args[0])) {
 			implement = toArray(args[0]);
 		} else {
@@ -223,12 +223,25 @@ var create = function() {
 		if (!this || !this.init || !(this instanceof klass)) {
 			return klass.invoke.apply(klass, arguments);
 		}
+		// loop through all the mutators for the onInit hook
 		for (i = 0, l = initMutator.length; i < l; i++) {
-			initMutator[i].onInit.call(initMutator[i], this, klass);
+			// if the onInit hook returns anything, then it will override the "new" keyword
+			tmp = initMutator[i].onInit.call(initMutator[i], this, klass);
+			if (tmp !== undefined) {
+				// however this method can only return objects and not scalar values
+				if (isScalar(tmp)) {
+					throw new Error("Return values during onInit hook can only be objects.");
+				}
+				return tmp;
+			}
 		}
 		// just in case we want to do anything special like "new" keyword override (usually don't return anything)
 		tmp = this.init.apply(this, arguments);
 		if (tmp !== undefined) {
+			// we can only return objects because the new keyword forces it to be an object
+			if (isScalar(tmp)) {
+				throw new Error("Return values for the constructor can only be objects.");
+			}
 			return tmp;
 		}
 	};

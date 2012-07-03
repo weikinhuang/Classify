@@ -1,7 +1,7 @@
 QUnit.module("core");
 
 QUnit.test("basic requirements", function() {
-	QUnit.expect(63);
+	QUnit.expect(71);
 	var test, empty;
 	// test basic properties of the base Object
 	QUnit.ok(Object.prototype, "Object prototype exists");
@@ -9,6 +9,16 @@ QUnit.test("basic requirements", function() {
 	QUnit.ok(Object.prototype.hasOwnProperty, "Object prototype hasOwnProperty exists");
 
 	// test basic internal functions
+
+	// test detection of scalar value
+	QUnit.ok(isScalar(), "undefined is scalar");
+	QUnit.ok(isScalar(null), "null is scalar");
+	QUnit.ok(isScalar(false), "boolean is scalar");
+	QUnit.ok(isScalar(0), "number is scalar");
+	QUnit.ok(isScalar("string"), "string is scalar");
+	QUnit.ok(!isScalar([]), "array is not scalar");
+	QUnit.ok(!isScalar({}), "object is not scalar");
+	QUnit.ok(!isScalar(function(){}), "function is not scalar");
 
 	// test detection of a function
 	QUnit.ok(!isFunction(), "undefined not a function");

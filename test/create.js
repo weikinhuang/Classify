@@ -32,7 +32,7 @@ QUnit.test("simple class creation", function() {
 });
 
 QUnit.test("invocation and constructors", function() {
-	QUnit.expect(18);
+	QUnit.expect(19);
 	// testing class creation without a constructor
 	var test = create({
 		a : 1,
@@ -136,6 +136,16 @@ QUnit.test("invocation and constructors", function() {
 	});
 	QUnit.ok(new test_sub() instanceof test, "overriding the 'new' keyword within a class constructor");
 	QUnit.ok(test_sub.applicate([ "a" ]) instanceof test, "overriding the 'new' keyword within a class constructor called with applicate");
+
+	// overriding init with scalar return
+	test = create({
+		init : function(a) {
+			return false;
+		}
+	});
+	QUnit.raises(function() {
+		new test();
+	}, Error, "overiding constructor return with scalar value throws a error.");
 });
 
 QUnit.test("known properties", function() {
@@ -326,7 +336,7 @@ QUnit.test("Calling parent methods with the invoke magic method", function() {
 	QUnit.equal((new subclass()).d(), 2, "Calling invoke from within class invokes parent method.");
 	QUnit.equal((new subclass()).invoke("b"), 2, "Calling invoke from outside class invokes parent method.");
 
-	QUnit.raises(function(){
+	QUnit.raises(function() {
 		(new subclass()).invoke("z");
 	}, Error, "Attempts to invoke parent property that is not a function throws a error.");
 });
@@ -650,12 +660,12 @@ QUnit.test("adding and removing mutators", function() {
 	addMutator("test", {});
 
 	// adding duplicate mutators will throw an error
-	QUnit.raises(function(){
+	QUnit.raises(function() {
 		addMutator("test", {});
 	}, Error, "Attempts to add an existing mutator throws a error.");
 
 	removeMutator("test");
-	QUnit.raises(function(){
+	QUnit.raises(function() {
 		removeMutator("test");
 	}, Error, "Attempts to remove an non existing mutator throws a error.");
 });
@@ -746,7 +756,7 @@ QUnit.test("adding and removing mutators to the on property remove hook", functi
 });
 
 QUnit.test("adding and removing mutators to the on initialize hook", function() {
-	QUnit.expect(6);
+	QUnit.expect(9);
 
 	addMutator("test", {
 		onInit : function(instance, klass) {
@@ -771,4 +781,48 @@ QUnit.test("adding and removing mutators to the on initialize hook", function() 
 	var test2 = create({});
 	(new test2());
 	QUnit.ok(!test2.hasOwnProperty("count"), "removed onInit mutator is no longer called during instantiation");
+
+	// test returning objects
+	var retval = {};
+	addMutator("test2", {
+		onInit : function(instance, klass) {
+			// override all class creation with a return value
+			return retval;
+		}
+	});
+
+	var test3 = create({});
+	QUnit.strictEqual(new test3(), retval, "onInit mutator override new keyword during instantiation");
+
+	removeMutator("test2");
+
+	// test returning functions
+	var retval2 = function() {
+	};
+	addMutator("test3", {
+		onInit : function(instance, klass) {
+			// override all class creation with a return value
+			return retval2;
+		}
+	});
+
+	var test4 = create({});
+	QUnit.strictEqual(new test4(), retval2, "onInit mutator override new keyword during instantiation");
+
+	removeMutator("test3");
+
+	// test returning scalar value
+	addMutator("test4", {
+		onInit : function(instance, klass) {
+			// override all class creation with a return value
+			return 1;
+		}
+	});
+
+	var test5 = create({});
+	QUnit.raises(function() {
+		new test5();
+	}, Error, "onInit mutator override new keyword during instantiation with scalar value throws a error.");
+
+	removeMutator("test4");
 });
