@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.9.10
+ * Classify JavaScript Library v0.10.0
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Tue, 03 Jul 2012 15:15:22 GMT
+ * Date: Tue, 03 Jul 2012 20:52:26 GMT
  */
 (function(root, undefined) {
 	"use strict";
@@ -26,6 +26,12 @@ objectPrototype = Object.prototype,
 toString = objectPrototype.toString,
 // quick reference to the toString prototype
 hasOwn = objectPrototype.hasOwnProperty,
+// regex to test for scalar value
+scalarRegExp = /^(?:boolean|number|string|undefined)$/,
+// test if a value is scalar in nature
+isScalar = function(o) {
+	return o === null || scalarRegExp.test(typeof o);
+},
 // test if object is a function
 isFunction = function(o) {
 	return typeof o === "function";
@@ -324,13 +330,13 @@ var create = function() {
 	// array of objects/classes that this class will implement the functions of, but will not be an instance of
 	implement = [],
 	// quick reference to the arguments array and it's length
-	args = arguments, arg_len = args.length,
+	args = arguments, argLength = args.length,
 	// other variables
 	klass, proto;
 	// Parse out the arguments to grab the parent and methods
-	if (arg_len === 1) {
+	if (argLength === 1) {
 		methods = args[0];
-	} else if (arg_len === 2) {
+	} else if (argLength === 2) {
 		if (!args[0].__isclass_ && !isExtendable(args[0])) {
 			implement = toArray(args[0]);
 		} else {
@@ -360,12 +366,25 @@ var create = function() {
 		if (!this || !this.init || !(this instanceof klass)) {
 			return klass.invoke.apply(klass, arguments);
 		}
+		// loop through all the mutators for the onInit hook
 		for (i = 0, l = initMutator.length; i < l; i++) {
-			initMutator[i].onInit.call(initMutator[i], this, klass);
+			// if the onInit hook returns anything, then it will override the "new" keyword
+			tmp = initMutator[i].onInit.call(initMutator[i], this, klass);
+			if (tmp !== undefined) {
+				// however this method can only return objects and not scalar values
+				if (isScalar(tmp)) {
+					throw new Error("Return values during onInit hook can only be objects.");
+				}
+				return tmp;
+			}
 		}
 		// just in case we want to do anything special like "new" keyword override (usually don't return anything)
 		tmp = this.init.apply(this, arguments);
 		if (tmp !== undefined) {
+			// we can only return objects because the new keyword forces it to be an object
+			if (isScalar(tmp)) {
+				throw new Error("Return values for the constructor can only be objects.");
+			}
 			return tmp;
 		}
 	};
@@ -1063,7 +1082,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.9.10",
+	version : "0.10.0",
 
 	// direct access functions
 	create : create,

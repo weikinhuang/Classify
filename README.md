@@ -226,6 +226,11 @@ Other options include: `clean`, `lint`, `unit`, `concat`, `min`, `size`, `perf`,
 Changelog
 --------------------------------------
 
+#### v0.10.1
+	Allow init mutators to override constructor return value & throw on scalar values
+	Adding null value to the prototype for observable properties
+	Observer properties don't need to go through objectDefineProperty
+
 #### v0.9.10
 	BREAKING CHANGE, implements overrides extends when defining a class that institutes both
 	Use ES5 Object.create when possible
