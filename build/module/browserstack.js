@@ -313,7 +313,7 @@ var Server = Classify.create({
 		this.server = http.createServer(function(request, response) {
 			var uri = url.parse(request.url).pathname, filename = path.join(self.build.dir.base, uri);
 			self.build.printTemp(filename);
-			path.exists(filename, function(exists) {
+			fs.exists(filename, function(exists) {
 				if (!exists) {
 					response.writeHead(404, {
 						"Content-Type" : "text/plain"
