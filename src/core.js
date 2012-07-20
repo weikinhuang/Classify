@@ -92,11 +92,13 @@ each = function(o, iterator, context) {
 	if (!o) {
 		return o;
 	}
-	var n, i = 0, l = o.length;
-	// objects and functions are iterated with the for in statement
+	var n, i = 0, l = o.length, k;
+	// objects and functions iterate through the keys
 	if (l === undefined || isFunction(o)) {
-		for (n in o) {
-			if (iterator.call(context || o[n], o[n], n, o) === false) {
+		k = keys(o);
+		l = k.length;
+		for (n = o[k[0]]; i < l; n = o[k[++i]]) {
+			if (iterator.call(context || n, n, k[i], o) === false) {
 				break;
 			}
 		}
