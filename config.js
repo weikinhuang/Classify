@@ -87,7 +87,20 @@ module.exports = function(build) {
 		markdown : "README",
 		html : "classifyjs.com",
 		files : [ "classify.docs.js" ],
-		examples : [ "examples/doc.js", "examples/Classify.js", "examples/Classify.Class.js", "examples/Classify.Namespace.js", "examples/Classify.Observer.js", "examples/Classify.export.js" ]
+		examples : [
+		            "examples/doc.js",
+		            "examples/Classify.js",
+		            "examples/Classify.Class.js",
+		            "examples/Classify.Namespace.js",
+		            "examples/Classify.Observer.js",
+		            "examples/Classify.export.js",
+		            "examples/mutator.js",
+		            "examples/mutator.alias.js",
+		            "examples/mutator.bind.js",
+		            "examples/mutator.nowrap.js",
+		            "examples/mutator.observable.js",
+		            "examples/mutator.static.js"
+		            ]
 	});
 
 	// set options for the package file generator
