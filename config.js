@@ -86,7 +86,8 @@ module.exports = function(build) {
 	build.addTaskOptions("doc", {
 		markdown : "README",
 		html : "classifyjs.com",
-		files : [ "classify.docs.js" ]
+		files : [ "classify.docs.js" ],
+		examples : [ "examples/doc.js", "examples/Classify.js", "examples/Classify.Class.js", "examples/Classify.Namespace.js", "examples/Classify.Observer.js", "examples/Classify.export.js" ]
 	});
 
 	// set options for the package file generator
