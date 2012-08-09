@@ -201,7 +201,7 @@ var Classify = require('classifyjs').Classify;
 ```javascript
 require({
 	'paths' : {
-		'benchmark' : 'path/to/classify'
+		'classify' : 'path/to/classify'
 	}
 }, [ 'classify' ], function(Classify) {
 	console.log(Classify.version);
