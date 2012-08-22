@@ -45,9 +45,9 @@ module.exports = function(build) {
 
 	// set uglify minification options
 	build.addTaskOptions("min", {
-		strict_semicolons : false,
+		strict_semicolons : true,
 		unsafe : true,
-		lift_vars : false,
+		lift_vars : true,
 		consolidate : false,
 		mangle : {
 			toplevel : false,
