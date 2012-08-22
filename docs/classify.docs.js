@@ -94,6 +94,7 @@ var Classify = function() {
  * @static
  * @memberOf Classify
  * @type String
+ * @refexample Classify.version
  */
 Classify.version = "";
 /**
@@ -102,6 +103,7 @@ Classify.version = "";
  * @static
  * @memberOf Classify
  * @type {Function}
+ * @refexample Classify.Classify
  */
 Classify.Classify = Classify;
 
@@ -112,6 +114,7 @@ Classify.Classify = Classify;
  * @static
  * @memberOf Classify
  * @type Object
+ * @refexample Classify.Class
  */
 Classify.Class = function() {
 };
@@ -120,6 +123,7 @@ Classify.Class = function() {
  *
  * @memberOf Classify.Class
  * @type {Object}
+ * @refexample Classify.Class.prototype
  */
 Classify.Class.prototype = new Object();
 /**
@@ -128,6 +132,7 @@ Classify.Class.prototype = new Object();
  * @static
  * @memberOf Classify.Class
  * @type {Classify.Class}
+ * @refexample Classify.Class.superclass
  */
 Classify.Class.superclass = Classify.Class;
 
@@ -137,6 +142,7 @@ Classify.Class.superclass = Classify.Class;
  * @static
  * @memberOf Classify.Class
  * @type {Array}
+ * @refexample Classify.Class.subclass
  */
 Classify.Class.subclass = new Array();
 /**
@@ -145,6 +151,7 @@ Classify.Class.subclass = new Array();
  * @static
  * @memberOf Classify.Class
  * @type {Array}
+ * @refexample Classify.Class.implement
  */
 Classify.Class.implement = new Array();
 /**
@@ -153,6 +160,7 @@ Classify.Class.implement = new Array();
  * @static
  * @memberOf Classify.Class
  * @type {Array}
+ * @refexample Classify.Class.bindings
  */
 Classify.Class.bindings = new Array();
 /**
@@ -161,6 +169,7 @@ Classify.Class.bindings = new Array();
  * @static
  * @memberOf Classify.Class
  * @type {Object}
+ * @refexample Classify.Class.observables
  */
 Classify.Class.observables = new Object();
 /**
@@ -169,6 +178,7 @@ Classify.Class.observables = new Object();
  * @static
  * @memberOf Classify.Class
  * @type {Boolean}
+ * @refexample Classify.Class.__isclass_
  */
 Classify.Class.__isclass_ = true;
 /**
@@ -178,6 +188,7 @@ Classify.Class.__isclass_ = true;
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.invoke
  */
 Classify.Class.invoke = function() {
 	return new Classify.Class();
@@ -191,6 +202,7 @@ Classify.Class.invoke = function() {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.applicate
  */
 Classify.Class.applicate = function(args) {
 	return new Classify.Class();
@@ -206,6 +218,7 @@ Classify.Class.applicate = function(args) {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.extend
  */
 Classify.Class.extend = function(implement, definition) {
 	return Classify.Class;
@@ -223,6 +236,7 @@ Classify.Class.extend = function(implement, definition) {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.addProperty
  */
 Classify.Class.addProperty = function(name, property, prefix) {
 	return Classify.Class;
@@ -236,6 +250,7 @@ Classify.Class.addProperty = function(name, property, prefix) {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.removeProperty
  */
 Classify.Class.removeProperty = function(name) {
 	return Classify.Class;
@@ -251,6 +266,7 @@ Classify.Class.removeProperty = function(name) {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.addStaticProperty
  */
 Classify.Class.addStaticProperty = function(name, property) {
 	return Classify.Class;
@@ -264,6 +280,7 @@ Classify.Class.addStaticProperty = function(name, property) {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.removeStaticProperty
  */
 Classify.Class.removeStaticProperty = function(name) {
 	return Classify.Class;
@@ -279,6 +296,7 @@ Classify.Class.removeStaticProperty = function(name) {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.addBoundProperty
  */
 Classify.Class.addBoundProperty = function(name, property) {
 	return Classify.Class;
@@ -292,6 +310,7 @@ Classify.Class.addBoundProperty = function(name, property) {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.removeBoundProperty
  */
 Classify.Class.removeBoundProperty = function(name) {
 	return Classify.Class;
@@ -307,6 +326,7 @@ Classify.Class.removeBoundProperty = function(name) {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.addObservableProperty
  */
 Classify.Class.addObservableProperty = function(name, property) {
 	return Classify.Class;
@@ -320,6 +340,7 @@ Classify.Class.addObservableProperty = function(name, property) {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.removeObservableProperty
  */
 Classify.Class.removeObservableProperty = function(name) {
 	return Classify.Class;
@@ -335,6 +356,7 @@ Classify.Class.removeObservableProperty = function(name) {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.addAliasedProperty
  */
 Classify.Class.addAliasedProperty = function(name, property) {
 	return Classify.Class;
@@ -350,6 +372,7 @@ Classify.Class.addAliasedProperty = function(name, property) {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.addUnwrappedProperty
  */
 Classify.Class.addUnwrappedProperty = function(name, property) {
 	return Classify.Class;
@@ -359,6 +382,7 @@ Classify.Class.addUnwrappedProperty = function(name, property) {
  *
  * @memberOf Classify.Class
  * @type {Classify.Class}
+ * @refexample Classify.Class.prototype.constructor
  */
 Classify.Class.prototype.constructor = Classify.Class;
 /**
@@ -366,6 +390,7 @@ Classify.Class.prototype.constructor = Classify.Class;
  *
  * @memberOf Classify.Class
  * @type {Classify.Class}
+ * @refexample Classify.Class.prototype.self
  */
 Classify.Class.prototype.self = Classify.Class;
 /**
@@ -374,6 +399,7 @@ Classify.Class.prototype.self = Classify.Class;
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.prototype.init
  */
 Classify.Class.prototype.init = function() {
 	return new Classify.Class();
@@ -384,6 +410,7 @@ Classify.Class.prototype.init = function() {
  * @memberOf Classify.Class
  * @returns {Object}
  * @type {Object}
+ * @refexample Classify.Class.prototype.parent
  */
 Classify.Class.prototype.parent = function() {
 	return new Object();
@@ -398,6 +425,7 @@ Classify.Class.prototype.parent = function() {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Class.prototype.extend
  */
 Classify.Class.prototype.extend = function(implement, definition) {
 	return Classify.Class;
@@ -412,6 +440,7 @@ Classify.Class.prototype.extend = function(implement, definition) {
  * @memberOf Classify.Class
  * @returns {Object}
  * @type {Object}
+ * @refexample Classify.Class.prototype.invoke
  */
 Classify.Class.prototype.invoke = function(name, args) {
 	return new Object();
@@ -426,6 +455,7 @@ Classify.Class.prototype.invoke = function(name, args) {
  * @param {String}
  *            name The name of the namespace to construct with
  * @memberOf Classify
+ * @refexample Classify.Namespace
  */
 Classify.Namespace = function(name) {
 };
@@ -434,6 +464,7 @@ Classify.Namespace = function(name) {
  *
  * @memberOf Classify.Namespace
  * @type {Classify.Class}
+ * @refexample Classify.Namespace.prototype
  */
 Classify.Namespace.prototype = new Classify.Class();
 /**
@@ -441,6 +472,7 @@ Classify.Namespace.prototype = new Classify.Class();
  *
  * @memberOf Classify.Namespace
  * @type {String}
+ * @refexample Classify.Namespace.prototype.name
  */
 Classify.Namespace.prototype.name = "";
 /**
@@ -449,6 +481,7 @@ Classify.Namespace.prototype.name = "";
  * @private
  * @memberOf Classify.Namespace
  * @type {Object}
+ * @refexample Classify.Namespace.prototype.ref
  */
 Classify.Namespace.prototype.ref = new Object();
 /**
@@ -465,6 +498,7 @@ Classify.Namespace.prototype.ref = new Object();
  * @memberOf Classify.Namespace
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Namespace.prototype.create
  */
 Classify.Namespace.prototype.create = function(name, parent, implement, definition) {
 };
@@ -476,6 +510,7 @@ Classify.Namespace.prototype.create = function(name, parent, implement, definiti
  * @memberOf Classify.Namespace
  * @returns {Classify.Namespace}
  * @type {Classify.Namespace}
+ * @refexample Classify.Namespace.prototype.destroy
  */
 Classify.Namespace.prototype.destroy = function(classname) {
 	return new Classify.Namespace();
@@ -488,6 +523,7 @@ Classify.Namespace.prototype.destroy = function(classname) {
  * @memberOf Classify.Namespace
  * @returns {Boolean}
  * @type {Boolean}
+ * @refexample Classify.Namespace.prototype.exists
  */
 Classify.Namespace.prototype.exists = function(classname) {
 	return true;
@@ -502,6 +538,7 @@ Classify.Namespace.prototype.exists = function(classname) {
  * @memberOf Classify.Namespace
  * @return {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Namespace.prototype.get
  */
 Classify.Namespace.prototype.get = function(name, callback) {
 	return Classify.Class;
@@ -516,6 +553,7 @@ Classify.Namespace.prototype.get = function(name, callback) {
  * @memberOf Classify.Namespace
  * @returns {Classify.Namespace}
  * @type {Classify.Namespace}
+ * @refexample Classify.Namespace.prototype.load
  */
 Classify.Namespace.prototype.load = function(name, callback) {
 	return new Classify.Namespace();
@@ -528,6 +566,7 @@ Classify.Namespace.prototype.load = function(name, callback) {
  * @memberOf Classify.Namespace
  * @returns {Classify.Namespace}
  * @type {Classify.Namespace}
+ * @refexample Classify.Namespace.prototype.setAutoloader
  */
 Classify.Namespace.prototype.setAutoloader = function(callback) {
 	return new Classify.Namespace();
@@ -537,6 +576,7 @@ Classify.Namespace.prototype.setAutoloader = function(callback) {
  *
  * @memberOf Classify.Namespace
  * @type {String}
+ * @refexample Classify.Namespace.prototype.getName
  */
 Classify.Namespace.prototype.getName = function() {
 	return "";
@@ -546,6 +586,7 @@ Classify.Namespace.prototype.getName = function() {
  *
  * @memberOf Classify.Namespace
  * @type {String}
+ * @refexample Classify.Namespace.prototype.toString
  */
 Classify.Namespace.prototype.toString = function() {
 	return "";
@@ -570,6 +611,7 @@ Classify.Namespace.prototype.toString = function() {
  * @param {Function}
  *            [value.setter] The internal set modifier
  * @memberOf Classify
+ * @refexample Classify.Observer
  */
 Classify.Observer = function(value) {
 };
@@ -578,6 +620,7 @@ Classify.Observer = function(value) {
  *
  * @memberOf Classify.Observer
  * @type {Classify.Class}
+ * @refexample Classify.Observer.prototype
  */
 Classify.Observer.prototype = new Classify.Class();
 /**
@@ -585,6 +628,7 @@ Classify.Observer.prototype = new Classify.Class();
  *
  * @memberOf Classify.Observer
  * @type {Classify.Class}
+ * @refexample Classify.Observer.prototype.context
  */
 Classify.Observer.prototype.context = new Classify.Class();
 /**
@@ -592,6 +636,7 @@ Classify.Observer.prototype.context = new Classify.Class();
  *
  * @memberOf Classify.Observer
  * @type {String}
+ * @refexample Classify.Observer.prototype.name
  */
 Classify.Observer.prototype.name = "";
 /**
@@ -599,6 +644,7 @@ Classify.Observer.prototype.name = "";
  *
  * @memberOf Classify.Observer
  * @type {Boolean}
+ * @refexample Classify.Observer.prototype.writable
  */
 Classify.Observer.prototype.writable = true;
 /**
@@ -606,6 +652,7 @@ Classify.Observer.prototype.writable = true;
  *
  * @memberOf Classify.Observer
  * @type {Number}
+ * @refexample Classify.Observer.prototype.delay
  */
 Classify.Observer.prototype.delay = 0;
 /**
@@ -614,6 +661,7 @@ Classify.Observer.prototype.delay = 0;
  * @private
  * @memberOf Classify.Observer
  * @type {Number}
+ * @refexample Classify.Observer.prototype._debounce
  */
 Classify.Observer.prototype._debounce = 0;
 /**
@@ -621,6 +669,7 @@ Classify.Observer.prototype._debounce = 0;
  *
  * @memberOf Classify.Observer
  * @type {Object}
+ * @refexample Classify.Observer.prototype.value
  */
 Classify.Observer.prototype.value = new Object();
 /**
@@ -628,6 +677,7 @@ Classify.Observer.prototype.value = new Object();
  *
  * @memberOf Classify.Observer
  * @type {Array}
+ * @refexample Classify.Observer.prototype.events
  */
 Classify.Observer.prototype.events = new Array();
 /**
@@ -639,6 +689,7 @@ Classify.Observer.prototype.events = new Array();
  * @memberOf Classify.Observer
  * @returns {Object}
  * @type {Object}
+ * @refexample Classify.Observer.prototype.getter
  */
 Classify.Observer.prototype.getter = function(value) {
 	return new Object();
@@ -654,6 +705,7 @@ Classify.Observer.prototype.getter = function(value) {
  * @memberOf Classify.Observer
  * @returns {Object}
  * @type {Object}
+ * @refexample Classify.Observer.prototype.setter
  */
 Classify.Observer.prototype.setter = function(value, original) {
 	return new Object();
@@ -664,6 +716,7 @@ Classify.Observer.prototype.setter = function(value, original) {
  * @memberOf Classify.Observer
  * @returns {Object}
  * @type {Object}
+ * @refexample Classify.Observer.prototype.get
  */
 Classify.Observer.prototype.get = function() {
 	return new Object();
@@ -676,6 +729,7 @@ Classify.Observer.prototype.get = function() {
  * @memberOf Classify.Observer
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Observer.prototype.set
  */
 Classify.Observer.prototype.set = function(value) {
 	return new Classify.Class();
@@ -686,6 +740,7 @@ Classify.Observer.prototype.set = function(value) {
  * @memberOf Classify.Observer
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Observer.prototype.emit
  */
 Classify.Observer.prototype.emit = function() {
 	return new Classify.Class();
@@ -697,6 +752,7 @@ Classify.Observer.prototype.emit = function() {
  *            args Array of arguments to pass to the bound event listeners
  * @private
  * @memberOf Classify.Observer
+ * @refexample Classify.Observer.prototype._triggerEmit
  */
 Classify.Observer.prototype._triggerEmit = function(args) {
 };
@@ -709,6 +765,7 @@ Classify.Observer.prototype._triggerEmit = function(args) {
  * @memberOf Classify.Observer
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Observer.prototype.addListener
  */
 Classify.Observer.prototype.addListener = function(listener) {
 	return new Classify.Class();
@@ -723,6 +780,7 @@ Classify.Observer.prototype.addListener = function(listener) {
  * @memberOf Classify.Observer
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Observer.prototype.on
  */
 Classify.Observer.prototype.on = function(listener) {
 	return new Classify.Class();
@@ -736,6 +794,7 @@ Classify.Observer.prototype.on = function(listener) {
  * @memberOf Classify.Observer
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Observer.prototype.once
  */
 Classify.Observer.prototype.once = function(listener) {
 	return new Classify.Class();
@@ -749,6 +808,7 @@ Classify.Observer.prototype.once = function(listener) {
  * @memberOf Classify.Observer
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Observer.prototype.removeListener
  */
 Classify.Observer.prototype.removeListener = function(listener) {
 	return new Classify.Class();
@@ -759,6 +819,7 @@ Classify.Observer.prototype.removeListener = function(listener) {
  * @memberOf Classify.Observer
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.Observer.prototype.removeAllListeners
  */
 Classify.Observer.prototype.removeAllListeners = function() {
 	return new Classify.Class();
@@ -769,6 +830,7 @@ Classify.Observer.prototype.removeAllListeners = function() {
  * @memberOf Classify.Observer
  * @returns {Array}
  * @type {Array}
+ * @refexample Classify.Observer.prototype.listeners
  */
 Classify.Observer.prototype.listeners = function() {
 	return new Array();
@@ -779,6 +841,7 @@ Classify.Observer.prototype.listeners = function() {
  * @memberOf Classify.Observer
  * @returns {Boolean|Number|String}
  * @type {Boolean|Number|String}
+ * @refexample Classify.Observer.prototype.toValue
  */
 Classify.Observer.prototype.toValue = function() {
 	return new Object();
@@ -789,6 +852,7 @@ Classify.Observer.prototype.toValue = function() {
  * @memberOf Classify.Observer
  * @returns {String}
  * @type {String}
+ * @refexample Classify.Observer.prototype.toString
  */
 Classify.Observer.prototype.toString = function() {
 	return "";
@@ -807,6 +871,7 @@ Classify.Observer.prototype.toString = function() {
  * @memberOf Classify
  * @returns {Classify.Class}
  * @type {Classify.Class}
+ * @refexample Classify.create
  */
 Classify.create = function(parent, implement, definition) {
 	return Classify.Class;
@@ -821,6 +886,7 @@ Classify.create = function(parent, implement, definition) {
  * @memberOf Classify
  * @returns {Classify.Namespace}
  * @type {Classify.Namespace}
+ * @refexample Classify.getNamespace
  */
 Classify.getNamespace = function(namespace) {
 	return new Classify.Namespace();
@@ -833,6 +899,7 @@ Classify.getNamespace = function(namespace) {
  *            namespace Dot separated namespace string
  * @static
  * @memberOf Classify
+ * @refexample Classify.destroyNamespace
  */
 Classify.destroyNamespace = function(namespace) {
 };
@@ -846,6 +913,7 @@ Classify.destroyNamespace = function(namespace) {
  * @memberOf Classify
  * @returns {Classify.Namespace}
  * @type {Classify.Namespace}
+ * @refexample Classify.testNamespace
  */
 Classify.testNamespace = function(namespace) {
 	return new Classify.Namespace();
@@ -858,6 +926,7 @@ Classify.testNamespace = function(namespace) {
  * @memberOf Classify
  * @returns {Classify.Namespace}
  * @type {Classify.Namespace}
+ * @refexample Classify.getGlobalNamespace
  */
 Classify.getGlobalNamespace = function() {
 	return new Classify.Namespace();
@@ -869,6 +938,7 @@ Classify.getGlobalNamespace = function() {
  * @static
  * @memberOf Classify
  * @type {Classify.Namespace}
+ * @refexample Classify.global
  */
 Classify.global = new Classify.Namespace();
 
@@ -890,6 +960,7 @@ Classify.global = new Classify.Namespace();
  * @throws Error
  * @static
  * @memberOf Classify
+ * @refexample Classify.addMutator
  */
 Classify.addMutator = function(name, mutator) {
 };
@@ -902,6 +973,7 @@ Classify.addMutator = function(name, mutator) {
  * @throws Error
  * @static
  * @memberOf Classify
+ * @refexample Classify.removeMutator
  */
 Classify.removeMutator = function(name) {
 };
@@ -917,6 +989,7 @@ Classify.removeMutator = function(name) {
  * @memberOf Classify
  * @returns {Object}
  * @type {Object}
+ * @refexample Classify.extend
  */
 Classify.extend = function(base, args) {
 	return new Object();
@@ -933,6 +1006,7 @@ Classify.extend = function(base, args) {
  * @memberOf Classify
  * @returns {Object}
  * @type {Object}
+ * @refexample Classify.provide
  */
 Classify.provide = function(namespace, base) {
 };

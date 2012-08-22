@@ -29,6 +29,7 @@ function parseDocs(source) {
 	var returnsRegexp = /@returns\s+([\S\s]+?)\s*(\*\s+@|\*\/$)/;
 	var paramsRegexp = /@param\s+([\S\s]+?)\s*(?:\*\s*@|\*\/$)/;
 	var exampleRegexp = /@example\s+<code>([\S\s]+?)<\/code>/g;
+	var referenceExampleRegexp = /@refexample\s+([\S\s]+?)$/m;
 	var staticRegexp = /@static\b/;
 	var privateRegexp = /@private\b/;
 	var constructorRegexp = /@constructor\b/;
@@ -59,6 +60,11 @@ function parseDocs(source) {
 		var exampleMatch = exampleRegexp.exec(block.doc);
 		if (exampleMatch && exampleMatch[1]) {
 			doc.example = exampleMatch[1].trim().replace(/^\s*\* ?/gm, "").replace(/\t/g, "    ").trim();
+		}
+		// parse reference example if any
+		var refExampleMatch = referenceExampleRegexp.exec(block.doc);
+		if (refExampleMatch && refExampleMatch[1]) {
+			doc.refexample = refExampleMatch[1].trim();
 		}
 
 		var memberOfMatch = memberOfRegexp.exec(block.doc);
@@ -176,8 +182,22 @@ function groupByMembers(docblocks) {
 	return sortedGroups;
 }
 
+function getExamples(build) {
+	var examples = {};
+
+	(build.getOption("doc.examples") || []).forEach(function(file) {
+		var block = require(build.dir.doc + "/" + file);
+		Object.keys(block).forEach(function(key) {
+			examples[key] = block[key];
+		});
+	});
+
+	return examples;
+}
+
 function createMarkdown(build, docGroups, callback) {
 	var markdown = [];
+	var examples = getExamples(build);
 	markdown.push("# " + build.name + " `v" + build.version + "`");
 	markdown.push("==================================================");
 	markdown.push("");
@@ -211,11 +231,11 @@ function createMarkdown(build, docGroups, callback) {
 		markdown.push("## `" + key + "`");
 		if (group.base) {
 			markdown.push("");
-			outputMarkdownBlock(group.base, markdown);
+			outputMarkdownBlock(group.base, markdown, examples);
 		}
 		if (group.statics.length > 0) {
 			group.statics.forEach(function(doc) {
-				outputMarkdownBlock(doc, markdown);
+				outputMarkdownBlock(doc, markdown, examples);
 			});
 		}
 		if (group.prototypes.length > 0) {
@@ -223,7 +243,7 @@ function createMarkdown(build, docGroups, callback) {
 			markdown.push("");
 			markdown.push("## `" + key + ".prototype`");
 			group.prototypes.forEach(function(doc) {
-				outputMarkdownBlock(doc, markdown);
+				outputMarkdownBlock(doc, markdown, examples);
 			});
 		}
 		markdown.push("");
@@ -232,7 +252,7 @@ function createMarkdown(build, docGroups, callback) {
 	callback(markdown.join("\n").trim());
 }
 
-function outputMarkdownBlock(block, messages) {
+function outputMarkdownBlock(block, messages, examples) {
 	var name = block.name;
 	if (block.varType === "function") {
 		name += "(";
@@ -310,6 +330,12 @@ function outputMarkdownBlock(block, messages) {
 		messages.push("```javascript");
 		messages.push(block.example);
 		messages.push("```");
+	} else if (block.refexample && examples[block.refexample]) {
+		messages.push("");
+		messages.push("##### Example");
+		messages.push("```javascript");
+		messages.push(highlight(examples[block.refexample].toString().replace(/^\t/gm, "").replace(/\t/g, "    ").replace(/^\s*func.+[\n\r]+/, "").replace(/[\n\r]+\s*\}\s*$/, "")));
+		messages.push("```");
 	}
 	messages.push("");
 }
@@ -357,29 +383,30 @@ function outputHtmlChangelogBlock(build, changelog) {
 
 function createHtmlDoc(build, docGroups) {
 	var markdown = [];
+	var examples = getExamples(build);
 
 	Object.keys(docGroups).forEach(function(key) {
 		var group = docGroups[key];
 		// section header
 		markdown.push("<h3 id=\"doc-header-" + key + "\">" + key + "</h3>");
 		if (group.base) {
-			outputHtmlDocBlock(group.base, markdown);
+			outputHtmlDocBlock(group.base, markdown, examples);
 		}
 		if (group.statics.length > 0) {
 			group.statics.forEach(function(doc) {
-				outputHtmlDocBlock(doc, markdown);
+				outputHtmlDocBlock(doc, markdown, examples);
 			});
 		}
 		if (group.prototypes.length > 0) {
 			group.prototypes.forEach(function(doc) {
-				outputHtmlDocBlock(doc, markdown);
+				outputHtmlDocBlock(doc, markdown, examples);
 			});
 		}
 	});
 	return markdown.join("\n").trim();
 }
 
-function outputHtmlDocBlock(block, messages) {
+function outputHtmlDocBlock(block, messages, examples) {
 	var name = block.name;
 	if (block.varType === "function") {
 		name += "(";
@@ -468,12 +495,18 @@ function outputHtmlDocBlock(block, messages) {
 		messages.push("<pre class=\"code-block javascript\">");
 		messages.push(highlight(block.example));
 		messages.push("</pre>");
+	} else if (block.refexample && examples[block.refexample]) {
+		messages.push("<pre class=\"code-block javascript\">");
+		messages.push(highlight(examples[block.refexample].toString().replace(/^\t/gm, "").replace(/\t/g, "    ").replace(/^\s*func.+[\n\r]+/, "").replace(/[\n\r]+\s*\}\s*$/, "")));
+		messages.push("</pre>");
 	}
 }
 
 function createHtmlIndex(build, docGroups, callback) {
 	build.getMinifiedSource(function(min) {
 		build.getGzippedSource(function(zip) {
+			var examples = getExamples(build);
+
 			var htmlInputName = typeof build.getOption("doc.html") === "string" ? build.getOption("doc.html") : build.name;
 			var template = fs.readFileSync(build.dir.doc + "/" + htmlInputName + ".html", "utf8");
 			template = template.replace(/@VERSION\b/g, build.version);
@@ -482,6 +515,12 @@ function createHtmlIndex(build, docGroups, callback) {
 			template = template.replace(/@MINSIZE\b/g, roundFileSize(zip.length));
 			template = template.replace(/@CHANGELOG\b/g, outputHtmlChangelogBlock(build, parseChangelog(build)));
 			template = template.replace(/@DOCUMENTATION\b/g, createHtmlDoc(build, docGroups));
+			template = template.replace(/@EXAMPLE\[(.+?)]/g, function(m, name) {
+				var block = "<pre class=\"code-block javascript\">";
+				block += highlight(examples[name].toString().replace(/^\t/gm, "").replace(/\t/g, "    ").replace(/^\s*func.+[\n\r]+/, "").replace(/[\n\r]+\s*\}\s*$/, ""));
+				block += "</pre>";
+				return block;
+			});
 			callback(template);
 		});
 	});
