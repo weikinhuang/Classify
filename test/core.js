@@ -1,7 +1,7 @@
 QUnit.module("core");
 
 QUnit.test("basic requirements", function() {
-	QUnit.expect(71);
+	QUnit.expect(72);
 	var test, empty;
 	// test basic properties of the base Object
 	QUnit.ok(Object.prototype, "Object prototype exists");
@@ -26,6 +26,7 @@ QUnit.test("basic requirements", function() {
 	QUnit.ok(!isFunction("string"), "string not a function");
 	QUnit.ok(!isFunction({}), "object not a function");
 	QUnit.ok(!isFunction([]), "array not a function");
+	QUnit.ok(!isFunction(/hi/), "regex not a function");
 	QUnit.ok(!isFunction(new function() {
 	}), "class is not a function");
 	QUnit.ok(isFunction(function() {
