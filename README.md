@@ -226,6 +226,9 @@ Other options include: `clean`, `lint`, `unit`, `concat`, `min`, `size`, `perf`,
 Changelog
 --------------------------------------
 
+#### v0.10.1
+	Android Mobile thinks typeof RegExp == "function"
+
 #### v0.10.0
 	Allow init mutators to override constructor return value & throw on scalar values
 	Adding null value to the prototype for observable properties

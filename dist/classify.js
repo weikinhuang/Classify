@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.10.0
+ * Classify JavaScript Library v0.10.1
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Tue, 03 Jul 2012 20:52:26 GMT
+ * Date: Tue, 25 Sep 2012 20:43:28 GMT
  */
 (function(root, undefined) {
 	"use strict";
@@ -34,11 +34,11 @@ isScalar = function(o) {
 },
 // test if object is a function
 isFunction = function(o) {
-	return typeof o === "function";
+	return toString.call(o) === "[object Function]";
 },
 // test if object is extendable
 isExtendable = function(o) {
-	return o && o.prototype && toString.call(o) === "[object Function]";
+	return o && o.prototype && isFunction(o);
 },
 // quick test for isArray
 isArray = Array.isArray || function(o) {
@@ -97,11 +97,13 @@ each = function(o, iterator, context) {
 	if (!o) {
 		return o;
 	}
-	var n, i = 0, l = o.length;
-	// objects and functions are iterated with the for in statement
+	var n, i = 0, l = o.length, k;
+	// objects and functions iterate through the keys
 	if (l === undefined || isFunction(o)) {
-		for (n in o) {
-			if (iterator.call(context || o[n], o[n], n, o) === false) {
+		k = keys(o);
+		l = k.length;
+		for (n = o[k[0]]; i < l; n = o[k[++i]]) {
+			if (iterator.call(context || n, n, k[i], o) === false) {
 				break;
 			}
 		}
@@ -1082,7 +1084,7 @@ Classify = create({
 // store clean references to these methods
 extend(Classify, {
 	// object version number
-	version : "0.10.0",
+	version : "0.10.1",
 
 	// direct access functions
 	create : create,
