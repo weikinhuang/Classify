@@ -22,11 +22,11 @@ isScalar = function(o) {
 },
 // test if object is a function
 isFunction = function(o) {
-	return typeof o === "function";
+	return toString.call(o) === "[object Function]";
 },
 // test if object is extendable
 isExtendable = function(o) {
-	return o && o.prototype && toString.call(o) === "[object Function]";
+	return o && o.prototype && isFunction(o);
 },
 // quick test for isArray
 isArray = Array.isArray || function(o) {
