@@ -497,7 +497,7 @@ function outputHtmlDocBlock(block, messages, examples) {
 		messages.push("</pre>");
 	} else if (block.refexample && examples[block.refexample]) {
 		messages.push("<pre class=\"code-block javascript\">");
-		messages.push(highlight(examples[block.refexample].toString().replace(/^\t/gm, "").replace(/\t/g, "    ").replace(/^\s*func.+[\n\r]+/, "").replace(/[\n\r]+\s*\}\s*$/, "")));
+		messages.push(highlight(examples[block.refexample].toString().trim().replace(/^\t/gm, "").replace(/\t/g, "    ").replace(/^\s*func.+[\n\r]+/, "").replace(/[\n\r]+\s*\}\s*$/, "")));
 		messages.push("</pre>");
 	}
 }
