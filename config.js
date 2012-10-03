@@ -90,19 +90,19 @@ module.exports = function(build) {
 		html : "classifyjs.com",
 		files : [ "classify.docs.js" ],
 		examples : [
-		            "examples/doc.js",
-		            "examples/Classify.js",
-		            "examples/Classify.Class.js",
-		            "examples/Classify.Namespace.js",
-		            "examples/Classify.Observer.js",
-		            "examples/Classify.export.js",
-		            "examples/mutator.js",
-		            "examples/mutator.alias.js",
-		            "examples/mutator.bind.js",
-		            "examples/mutator.nowrap.js",
-		            "examples/mutator.observable.js",
-		            "examples/mutator.static.js"
-		            ]
+					"examples/doc.js",
+					"examples/Classify.js",
+					"examples/Classify.Class.js",
+					"examples/Classify.Namespace.js",
+					"examples/Classify.Observer.js",
+					"examples/Classify.export.js",
+					"examples/mutator.js",
+					"examples/mutator.alias.js",
+					"examples/mutator.bind.js",
+					"examples/mutator.nowrap.js",
+					"examples/mutator.observable.js",
+					"examples/mutator.static.js"
+					]
 	});
 
 	// set options for the package file generator
@@ -133,43 +133,41 @@ module.exports = function(build) {
 	// set the options for running unit tests against browserstack
 	build.addTaskOptions("browserstack", {
 		browsers : [
-		            // win - ie
-		            { browser : "ie", version : "7.0", os : "win" },
-		            { browser : "ie", version : "8.0", os : "win" },
-		            { browser : "ie", version : "9.0", os : "win" },
-		            { browser : "ie", version : "10.0", os : "win" },
-		            // win - chrome
-		            { browser : "chrome", version : "14.0", os : "win" },
-		            { browser : "chrome", version : "17.0", os : "win" },
-		            { browser : "chrome", version : "20.0", os : "win" },
-		            // win - firefox
-		            { browser : "firefox", version : "3.0", os : "win" },
-		            { browser : "firefox", version : "3.6", os : "win" },
-		            { browser : "firefox", version : "4.0", os : "win" },
-		            { browser : "firefox", version : "13.0", os : "win" },
-		            // win - opera
-		            { browser : "opera", version : "10.0", os : "win" },
-		            { browser : "opera", version : "11.6", os : "win" },
-		            // win - safari
-		            { browser : "safari", version : "4.0", os : "win" },
-		            { browser : "safari", version : "5.1", os : "win" },
-		            // mac - safari
-		            { browser : "safari", version : "4.0", os : "mac" },
-		            { browser : "safari", version : "5.1", os : "mac" },
-		            // mac - chrome
-		            { browser : "chrome", version : "19.0", os : "mac" },
-		            // mac - firefox
-		            { browser : "firefox", version : "5.0", os : "mac" },
-		            { browser : "firefox", version : "13.0", os : "mac" },
-		            // mac - opera
-		            { browser : "opera", version : "11.6", os : "mac" },
-		            { browser : "opera", version : "12.0", os : "mac" }/*,
+					// win - ie
+					{ browser : "ie", version : "6.0", os : "win" },
+					{ browser : "ie", version : "7.0", os : "win" },
+					{ browser : "ie", version : "8.0", os : "win" },
+					{ browser : "ie", version : "9.0", os : "win" },
+					{ browser : "ie", version : "10.0", os : "win" },
+					// win - chrome
+					{ browser : "chrome", version : "14.0", os : "win" },
+					{ browser : "chrome", version : "17.0", os : "win" },
+					{ browser : "chrome", version : "20.0", os : "win" },
+					// win - firefox
+					{ browser : "firefox", version : "3.6", os : "win" },
+					{ browser : "firefox", version : "4.0", os : "win" },
+					{ browser : "firefox", version : "13.0", os : "win" },
+					// win - opera
+					{ browser : "opera", version : "10.0", os : "win" },
+					{ browser : "opera", version : "11.6", os : "win" },
+					// win - safari
+					{ browser : "safari", version : "4.0", os : "win" },
+					{ browser : "safari", version : "5.1", os : "win" },
+					// mac - safari
+					{ browser : "safari", version : "4.0", os : "mac" },
+					{ browser : "safari", version : "5.1", os : "mac" },
+					// mac - chrome
+					{ browser : "chrome", version : "19.0", os : "mac" },
+					// mac - firefox
+					{ browser : "firefox", version : "5.0", os : "mac" },
+					{ browser : "firefox", version : "13.0", os : "mac" },
+					// mac - opera
+					{ browser : "opera", version : "11.6", os : "mac" },
+					{ browser : "opera", version : "12.0", os : "mac" },
 					// mobile
 					{ device: 'iPad 2', version: '4.3.2', os: 'ios' },
-					{ device: 'iPad 3rd (6.0)', version: '6.0', os: 'ios' },
 					{ device: 'Samsung Galaxy Nexus', version: '4.0.3', os: 'android' },
-					{ device: 'Samsung Galaxy S II', version: '2.3', os: 'android' },
-					{ device: 'Samsung Galaxy S', version: '2.1', os: 'android' }*/
-		            ]
+					{ device: 'Samsung Galaxy S II', version: '2.3', os: 'android' }
+					]
 	});
 };
