@@ -136,3 +136,6 @@ var Observer = create({
 
 // alias "on" to addListener
 Observer.prototype.on = Observer.prototype.addListener;
+
+// export methods to the main object
+exportNames.Observer = Observer;

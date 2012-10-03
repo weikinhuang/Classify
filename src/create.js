@@ -17,7 +17,7 @@ refMutator = [ createMutator, propAddMutator, propRemoveMutator, initMutator ],
 // Array of mutator methods that correspond to the mutator quick reference
 refMutatorOrder = [ "onCreate", "onPropAdd", "onPropRemove", "onInit" ],
 // Use native object.create whenever possible
-objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto, props) {
+objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto) {
 //#JSCOVERAGE_IF !Object.create
 	// This method allows for the constructor to not be called when making a new subclass
 	var SubClass = function() {

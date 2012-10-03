@@ -214,3 +214,16 @@ testNamespace = function(namespace) {
 getGlobalNamespace = function() {
 	return getNamespace(global_namespace);
 };
+
+// export methods to the main object
+extend(exportNames, {
+	// direct access functions
+	Namespace : Namespace,
+	getNamespace : getNamespace,
+	destroyNamespace : destroyNamespace,
+	testNamespace : testNamespace,
+	getGlobalNamespace : getGlobalNamespace,
+
+	// shortcut to the global namespace
+	global : getGlobalNamespace()
+});

@@ -5,13 +5,15 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Tue, 25 Sep 2012 20:43:28 GMT
+ * Date: Wed, 03 Oct 2012 01:19:56 GMT
  */
 (function(root, undefined) {
 	"use strict";
 
 	// shortcut for minification compaction
 var prototype = "prototype",
+// export variables into the Classify namespace
+exportNames = {},
 // For IE, check if looping through objects works with toString & valueOf
 isEnumerationBuggy = !({
 	toString : null
@@ -164,7 +166,7 @@ refMutator = [ createMutator, propAddMutator, propRemoveMutator, initMutator ],
 // Array of mutator methods that correspond to the mutator quick reference
 refMutatorOrder = [ "onCreate", "onPropAdd", "onPropRemove", "onInit" ],
 // Use native object.create whenever possible
-objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto, props) {
+objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto) {
 	// This method allows for the constructor to not be called when making a new subclass
 	var SubClass = function() {
 	};
@@ -480,7 +482,7 @@ var create = function() {
 // mutator for adding static properties to a class
 addMutator("static", {
 	// the special identifier is "__static_"
-	onCreate : function(klass, parent) {
+	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
 		// shortcut method for adding static properties
 		klass.addStaticProperty = function(name, property) {
@@ -519,7 +521,7 @@ addMutator("static", {
 // mutator for adding unwrapped function properties to a class
 addMutator("nowrap", {
 	// the special identifier is "__nowrap_"
-	onCreate : function(klass, parent) {
+	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
 		// shortcut method for adding unwrapped properties
 		klass.addUnwrappedProperty = function(name, property) {
@@ -534,7 +536,7 @@ addMutator("nowrap", {
 // mutator for adding aliased function properties to a class
 addMutator("alias", {
 	// the special identifier is "__alias_"
-	onCreate : function(klass, parent) {
+	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
 		// shortcut method for adding aliased properties
 		klass.addAliasedProperty = function(name, property) {
@@ -748,6 +750,9 @@ var Observer = create({
 
 // alias "on" to addListener
 Observer.prototype.on = Observer.prototype.addListener;
+
+// export methods to the main object
+exportNames.Observer = Observer;
 // mutator for adding observable properties to a class
 addMutator("observable", {
 	// the special identifier is "__observable_"
@@ -1025,6 +1030,19 @@ testNamespace = function(namespace) {
 getGlobalNamespace = function() {
 	return getNamespace(global_namespace);
 };
+
+// export methods to the main object
+extend(exportNames, {
+	// direct access functions
+	Namespace : Namespace,
+	getNamespace : getNamespace,
+	destroyNamespace : destroyNamespace,
+	testNamespace : testNamespace,
+	getGlobalNamespace : getGlobalNamespace,
+
+	// shortcut to the global namespace
+	global : getGlobalNamespace()
+});
 // quick reference to the seperator string
 var namespace_separator = "/",
 // Create a wrapped reference to the Classify object.
@@ -1082,23 +1100,14 @@ Classify = create({
 });
 
 // store clean references to these methods
-extend(Classify, {
+extend(Classify, exportNames, {
 	// object version number
 	version : "0.10.1",
 
 	// direct access functions
 	create : create,
-	Namespace : Namespace,
-	getNamespace : getNamespace,
-	destroyNamespace : destroyNamespace,
-	testNamespace : testNamespace,
-	getGlobalNamespace : getGlobalNamespace,
-	Observer : Observer,
 	addMutator : addMutator,
 	removeMutator : removeMutator,
-
-	// shortcut to the global namespace
-	global : getGlobalNamespace(),
 
 	// utility function to provide functionality to quickly add properties to objects
 	extend : extend,

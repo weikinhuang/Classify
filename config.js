@@ -39,6 +39,8 @@ module.exports = function(build) {
 			strict : true,
 			node : true,
 			browser : true,
+			quotmark : "double",
+			maxcomplexity : 7,
 			predef : []
 		}
 	});
@@ -161,7 +163,13 @@ module.exports = function(build) {
 		            { browser : "firefox", version : "13.0", os : "mac" },
 		            // mac - opera
 		            { browser : "opera", version : "11.6", os : "mac" },
-		            { browser : "opera", version : "12.0", os : "mac" }
+		            { browser : "opera", version : "12.0", os : "mac" }/*,
+					// mobile
+					{ device: 'iPad 2', version: '4.3.2', os: 'ios' },
+					{ device: 'iPad 3rd (6.0)', version: '6.0', os: 'ios' },
+					{ device: 'Samsung Galaxy Nexus', version: '4.0.3', os: 'android' },
+					{ device: 'Samsung Galaxy S II', version: '2.3', os: 'android' },
+					{ device: 'Samsung Galaxy S', version: '2.1', os: 'android' }*/
 		            ]
 	});
 };

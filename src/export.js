@@ -55,23 +55,14 @@ Classify = create({
 });
 
 // store clean references to these methods
-extend(Classify, {
+extend(Classify, exportNames, {
 	// object version number
 	version : "@VERSION",
 
 	// direct access functions
 	create : create,
-	Namespace : Namespace,
-	getNamespace : getNamespace,
-	destroyNamespace : destroyNamespace,
-	testNamespace : testNamespace,
-	getGlobalNamespace : getGlobalNamespace,
-	Observer : Observer,
 	addMutator : addMutator,
 	removeMutator : removeMutator,
-
-	// shortcut to the global namespace
-	global : getGlobalNamespace(),
 
 	// utility function to provide functionality to quickly add properties to objects
 	extend : extend,
