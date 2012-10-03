@@ -140,7 +140,6 @@ module.exports = function(build) {
 					{ browser : "ie", version : "9.0", os : "win" },
 					{ browser : "ie", version : "10.0", os : "win" },
 					// win - chrome
-					{ browser : "chrome", version : "14.0", os : "win" },
 					{ browser : "chrome", version : "17.0", os : "win" },
 					{ browser : "chrome", version : "20.0", os : "win" },
 					// win - firefox
@@ -167,7 +166,9 @@ module.exports = function(build) {
 					// mobile
 					{ device: 'iPad 2', version: '4.3.2', os: 'ios' },
 					{ device: 'Samsung Galaxy Nexus', version: '4.0.3', os: 'android' },
-					{ device: 'Samsung Galaxy S II', version: '2.3', os: 'android' }
+					{ device: 'Samsung Galaxy S II', version: '2.3', os: 'android' },
+					{ device: 'Google Nexus 7', version: '4.1', os: 'android' },
+					{ device: 'Samsung Galaxy S II', version: '480x800', os: 'opera' }
 					]
 	});
 };
