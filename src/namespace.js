@@ -225,5 +225,10 @@ extend(exportNames, {
 	getGlobalNamespace : getGlobalNamespace,
 
 	// shortcut to the global namespace
-	global : getGlobalNamespace()
+	global : getGlobalNamespace(),
+
+	// utility function to provide functionality to allow for name provisioning
+	provide : function(namespace, base) {
+		return provide(namespace.split("."), base || root || {});
+	}
 });

@@ -65,11 +65,7 @@ extend(Classify, exportNames, {
 	removeMutator : removeMutator,
 
 	// utility function to provide functionality to quickly add properties to objects
-	extend : extend,
-	// utility function to provide functionality to allow for name provisioning
-	provide : function(namespace, base) {
-		return provide(namespace.split("."), base || root || {});
-	}
+	extend : extend
 });
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the

@@ -5,7 +5,7 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Wed, 03 Oct 2012 01:19:56 GMT
+ * Date: Wed, 03 Oct 2012 03:06:23 GMT
  */
 (function(root, undefined) {
 	"use strict";
@@ -1041,7 +1041,12 @@ extend(exportNames, {
 	getGlobalNamespace : getGlobalNamespace,
 
 	// shortcut to the global namespace
-	global : getGlobalNamespace()
+	global : getGlobalNamespace(),
+
+	// utility function to provide functionality to allow for name provisioning
+	provide : function(namespace, base) {
+		return provide(namespace.split("."), base || root || {});
+	}
 });
 // quick reference to the seperator string
 var namespace_separator = "/",
@@ -1110,11 +1115,7 @@ extend(Classify, exportNames, {
 	removeMutator : removeMutator,
 
 	// utility function to provide functionality to quickly add properties to objects
-	extend : extend,
-	// utility function to provide functionality to allow for name provisioning
-	provide : function(namespace, base) {
-		return provide(namespace.split("."), base || root || {});
-	}
+	extend : extend
 });
 
 // Export the Classify object for **CommonJS**, with backwards-compatibility for the
