@@ -1,3 +1,5 @@
+var fs = require("fs");
+
 module.exports = function(grunt) {
 	"use strict";
 
@@ -10,8 +12,11 @@ module.exports = function(grunt) {
 
 		concat : {
 			dist : {
-				src : [ "src/intro.js", "src/core.js", "src/create.js", "src/mutator.static.js", "src/mutator.nowrap.js", "src/mutator.alias.js", "src/mutator.bind.js", "src/observer.js", "src/mutator.observable.js", "src/namespace.js", "src/export.js", "src/outro.js" ],
+				src : [ "srcwrap/intro.js", "src/core.js", "src/create.js", "src/mutator.static.js", "src/mutator.nowrap.js", "src/mutator.alias.js", "src/mutator.bind.js", "src/observer.js", "src/mutator.observable.js", "src/namespace.js", "src/export.js", "srcwrap/outro.js" ],
 				dest : "dist/classify.js",
+			},
+			options : {
+				banner : fs.readFileSync("srcwrap/copyright.js", "utf8")
 			}
 		},
 
