@@ -46,6 +46,20 @@ module.exports = function(grunt) {
 					mangle : true
 				}
 			}
+		},
+
+		qunit : {
+			all : [ 'test/*.html' ]
+		},
+
+		"qunit-cov" : {
+			test : {
+				minimum : 0.95,
+				srcDir : "src",
+				depDirs : [ "test" ],
+				outDir : "coverage",
+				testFiles : [ "test/*.html" ]
+			}
 		}
 	});
 
@@ -53,7 +67,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks("grunt-contrib-uglify");
+	grunt.loadNpmTasks("grunt-contrib-qunit");
+	grunt.loadNpmTasks("grunt-qunit-cov");
 
 	// Default grunt
-	grunt.registerTask("default", [ "concat", "jshint", "uglify" ]);
+	grunt.registerTask("default", [ "concat", "jshint", "uglify", "qunit", "qunit-cov" ]);
 };
