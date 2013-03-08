@@ -125,12 +125,12 @@
 				</p>
 				<table class="download-table">
 					<tr>
-						<th class="download-link"><a href="https://raw.github.com/weikinhuang/Classify/master/dist/classify.js">Development Version</a> (v0.10.0)</th>
-						<td class="download-detail">11.95 kb,  Uncompressed and Fully Commented</td>
+						<th class="download-link"><a href="https://raw.github.com/weikinhuang/Classify/master/dist/classify.js">Development Version</a> (v0.10.2)</th>
+						<td class="download-detail">11.91 kb,  Uncompressed and Fully Commented</td>
 					</tr>
 					<tr>
-						<th class="download-link"><a href="https://raw.github.com/weikinhuang/Classify/master/dist/classify.min.js">Production Version</a> (v0.10.0)</th>
-						<td class="download-detail">3.94 kb, Minified and Gzipped</td>
+						<th class="download-link"><a href="https://raw.github.com/weikinhuang/Classify/master/dist/classify.min.js">Production Version</a> (v0.10.2)</th>
+						<td class="download-detail">3.93 kb, Minified and Gzipped</td>
 					</tr>
 				</table>
 			</div>
@@ -155,53 +155,56 @@ The Main interface function that returns namespaces and creates objects.
 
 <span class="comment">// Calling Classify with a string returns a namespace</span>
 <span class="comment">// @see Classify.getNamespace</span>
-Classify(<span class="string">"Life"</span>) === Classify.getNamespace(<span class="string">"Life"</span>);
+Classify(<span class="string">"Vehicles"</span>) === Classify.getNamespace(<span class="string">"Vehicles"</span>);
 
 <span class="comment">// Calling Classify with a string ending in a "/" returns a namespace</span>
 <span class="comment">// @see Classify.getNamespace</span>
-Classify(<span class="string">"Life/"</span>) === Classify.getNamespace(<span class="string">"Life"</span>);
+Classify(<span class="string">"Vehicles"</span>) === Classify.getNamespace(<span class="string">"Vehicles"</span>);
 
-<span class="comment">// Calling Classify with a string separated by "/" returns a defined class within a namespace</span>
+<span class="comment">// Calling Classify with a string separated by "/" returns a defined</span>
+<span class="comment">// class within a namespace</span>
 <span class="comment">// @see Classify.Namespace.get</span>
-Classify(<span class="string">"Life/Eukaryotes"</span>) === Classify.getNamespace(<span class="string">"Life"</span>).get(<span class="string">"Eukaryotes"</span>);
+Classify(<span class="string">"Vehicles/Ship"</span>) === Classify.getNamespace(<span class="string">"Vehicles"</span>).get(<span class="string">"Ship"</span>);
 
-<span class="comment">// Calling Classify with 2 string parameters returns a defined class within a namespace</span>
+<span class="comment">// Calling Classify with 2 string parameters returns a defined class within</span>
+<span class="comment">// a namespace</span>
 <span class="comment">// @see Classify.Namespace.get</span>
-Classify(<span class="string">"Life"</span>, <span class="string">"Eukaryotes"</span>) === Classify.getNamespace(<span class="string">"Life"</span>).get(<span class="string">"Eukaryotes"</span>);
+Classify(<span class="string">"Vehicles"</span>, <span class="string">"Ship"</span>) === Classify.getNamespace(<span class="string">"Vehicles"</span>).get(<span class="string">"Ship"</span>);
 
-<span class="comment">// Calling Classify with first parameter as a string, and second parameter as an object, creates</span>
-<span class="comment">// a class within the namespace</span>
-<span class="keyword">var</span> Eukaryotes = Classify(<span class="string">"Life/Eukaryotes"</span>, {
+<span class="comment">// Calling Classify with first parameter as a string, and second parameter as</span>
+<span class="comment">// an object, creates a class within the namespace</span>
+<span class="keyword">var</span> Ship = Classify(<span class="string">"Vehicles/Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
-<span class="comment">// Calling Classify with first parameter as a string, second parameter as a string, and third</span>
-<span class="comment">// parameter as an object, creates a class within the namespace</span>
-<span class="keyword">var</span> Eukaryotes = Classify(<span class="string">"Life"</span>, <span class="string">"Eukaryotes"</span>, {
+<span class="comment">// Calling Classify with first parameter as a string, second parameter as a string, and</span>
+<span class="comment">// third parameter as an object, creates a class within the namespace</span>
+<span class="keyword">var</span> Ship = Classify(<span class="string">"Vehicles"</span>, <span class="string">"Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
 <span class="comment">// The above 2 statements are the same as the following statement to create classes</span>
 <span class="comment">// @see Classify.Namespace.create</span>
-<span class="keyword">var</span> Eukaryotes = Classify.getNamespace(<span class="string">"Life"</span>).create(<span class="string">"Eukaryotes"</span>, {
+<span class="keyword">var</span> Ship = Classify.getNamespace(<span class="string">"Vehicles"</span>).create(<span class="string">"Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
 
-<span class="comment">// To inherit from other classes, the first parameter is the class name, second parameter is the</span>
-<span class="comment">// parent (can be from other namespaces with "Namespace/Class"), third parameter is the descriptor</span>
-<span class="keyword">var</span> Plantae = Classify(<span class="string">"Life/Plantae"</span>, <span class="string">"Eukaryotes"</span>, {
+<span class="comment">// To inherit from other classes, the first parameter is the class name, second parameter</span>
+<span class="comment">// is the parent (can be from other namespaces with "Namespace/Class"), third parameter</span>
+<span class="comment">// is the descriptor</span>
+<span class="keyword">var</span> Battleship = Classify(<span class="string">"Vehicles/Battleship"</span>, <span class="string">"Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
 <span class="comment">// The same can be achieved with the following signature</span>
-<span class="keyword">var</span> Plantae = Classify(<span class="string">"Life"</span>, <span class="string">"Plantae"</span>, <span class="string">"Eukaryotes"</span>, {
+<span class="keyword">var</span> Battleship = Classify(<span class="string">"Vehicles"</span>, <span class="string">"Battleship"</span>, <span class="string">"Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
 <span class="comment">// The above 2 statements are the same as the following statement to create classes</span>
 <span class="comment">// @see Classify.Namespace.create</span>
-<span class="keyword">var</span> Plantae = Classify.getNamespace(<span class="string">"Life"</span>).create(<span class="string">"Plantae"</span>, <span class="string">"Eukaryotes"</span>, {
+<span class="keyword">var</span> Battleship = Classify.getNamespace(<span class="string">"Vehicles"</span>).create(<span class="string">"Battleship"</span>, <span class="string">"Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
@@ -210,12 +213,12 @@ Classify(<span class="string">"Life"</span>, <span class="string">"Eukaryotes"</
 <span class="comment">// Using the Classify method in this manner is analogous to calling Classify.create()</span>
 <span class="comment">// Please see Classify.create for documentation</span>
 <span class="comment">// @see Classify.create</span>
-<span class="keyword">var</span> Embryophytes = Classify({
+<span class="keyword">var</span> Energy = Classify({
     init : <span class="keyword">function</span>() {
     }
 });
 <span class="comment">// The above statement is the same as</span>
-<span class="keyword">var</span> Embryophytes = Classify.create({
+<span class="keyword">var</span> Energy = Classify.create({
     init : <span class="keyword">function</span>() {
     }
 });
@@ -1007,7 +1010,7 @@ Checks if a class exists within this namespace.
 </div>
 <div id="doc-Classify.Namespace.prototype.get" class="doc-block doc-type-function">
 <h4 id="def-Classify.Namespace.prototype.get">Classify.Namespace.prototype.get</h4>
-<code class="def-definition">Classify.Namespace.prototype.get(name[, callback])</code>
+<code class="def-definition">Classify.Namespace.prototype.get(name)</code>
 <div class="doc-comment">
 Attempt to retrieve a class within this namespace or the global one.
 </div>
@@ -1018,16 +1021,12 @@ Attempt to retrieve a class within this namespace or the global one.
 <span class="def-arg-count">1.</span>
 <code>name</code> <code>{String}</code> The name of the class to retrieve
 </li>
-<li>
-<span class="def-arg-count">2.</span>
-<code>[callback]</code> <code>{Function}</code> If passed in the first parameter will the found class
-</li>
 </ol>
 </div>
 </div>
 <div id="doc-Classify.Namespace.prototype.load" class="doc-block doc-type-function">
 <h4 id="def-Classify.Namespace.prototype.load">Classify.Namespace.prototype.load</h4>
-<code class="def-definition">Classify.Namespace.prototype.load(name, callback)</code>
+<code class="def-definition">Classify.Namespace.prototype.load(name)</code>
 <div class="doc-comment">
 Default loader function that loads the internal classes from.
 </div>
@@ -1037,10 +1036,6 @@ Default loader function that loads the internal classes from.
 <li>
 <span class="def-arg-count">1.</span>
 <code>name</code> <code>{String}</code> The name of the class to load
-</li>
-<li>
-<span class="def-arg-count">2.</span>
-<code>callback</code> <code>{Function}</code> The function to call when the class has loaded
 </li>
 </ol>
 </div>
@@ -1419,7 +1414,19 @@ Returns the special name of this object.
 				<h2 id="changelog">Change Log</h2>
 				<div>
 					<div class="changelog">
+<b class="changelog-header">v0.10.2</b>
+<ul class="changelog-list">
+<li>Fix requirejs and amd definitions, remove async autoloader to support it</li>
+</ul>
+</div>
+<div class="changelog">
 <b class="changelog-header">v0.10.1</b>
+<ul class="changelog-list">
+<li>Android Mobile thinks typeof RegExp == "function"</li>
+</ul>
+</div>
+<div class="changelog">
+<b class="changelog-header">v0.10.0</b>
 <ul class="changelog-list">
 <li>Allow init mutators to override constructor return value & throw on scalar values</li>
 <li>Adding null value to the prototype for observable properties</li>
