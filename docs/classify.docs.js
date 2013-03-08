@@ -464,14 +464,12 @@ Classify.Namespace.prototype.exists = function(classname) {
  *
  * @param {String}
  *            name The name of the class to retrieve
- * @param {Function}
- *            [callback] If passed in the first parameter will the found class
  * @memberOf Classify.Namespace
  * @return {Classify.Class}
  * @type {Classify.Class}
  * @refexample Classify.Namespace.prototype.get
  */
-Classify.Namespace.prototype.get = function(name, callback) {
+Classify.Namespace.prototype.get = function(name) {
 	return Classify.Class;
 };
 /**
@@ -479,14 +477,12 @@ Classify.Namespace.prototype.get = function(name, callback) {
  *
  * @param {String}
  *            name The name of the class to load
- * @param {Function}
- *            callback The function to call when the class has loaded
  * @memberOf Classify.Namespace
  * @returns {Classify.Namespace}
  * @type {Classify.Namespace}
  * @refexample Classify.Namespace.prototype.load
  */
-Classify.Namespace.prototype.load = function(name, callback) {
+Classify.Namespace.prototype.load = function(name) {
 	return new Classify.Namespace();
 };
 /**

@@ -16,10 +16,10 @@ provide = function(namespace, base) {
 	return base;
 },
 // ability to de-reference string into it's classes
-dereference = function(base, arg, ref) {
+dereference = function(ns, arg, ref) {
 	// Allow parent classes to be passed in as a string for lookup
 	if (typeof arg === "string") {
-		ref = base[arg] || getGlobalNamespace().get(arg) || null;
+		ref = ns.get(arg);
 		if (!ref) {
 			throw new Error("Invalid parent class [" + arg + "] specified.");
 		}
@@ -28,7 +28,7 @@ dereference = function(base, arg, ref) {
 	// if we have an object, then that's what we want, otherwise arrays
 	// we need to loop through and convert them to the proper objects
 	return !isArray(arg) ? arg : map(arg, function(prop) {
-		return dereference(base, prop);
+		return dereference(ns, prop);
 	});
 };
 
@@ -51,12 +51,10 @@ var Namespace = create({
 		self = this,
 		// Retrieve the namespaced container
 		ref = provide(namespace, self),
-		// Create a reference to the master classes array
-		deref = self.ref,
 
 		// fix the arguments & create the class
 		c = create.apply(null, map(args, function(v) {
-			return dereference(deref, v);
+			return dereference(self, v);
 		}));
 		// Assign the magic properties of the class's name and namespace
 		c._name_ = name;
@@ -64,7 +62,7 @@ var Namespace = create({
 		// fix the issue with the extends function referencing string classes
 		c.extend = c.prototype.extend = function() {
 			return create.apply(null, [ c ].concat(map(arguments, function(v) {
-				return dereference(deref, v);
+				return dereference(self, v);
 			})));
 		};
 		// give classes the ability to always store the namespace for chaining
@@ -76,7 +74,7 @@ var Namespace = create({
 		};
 		// Assign the classes to the namespaced references
 		ref[name] = c;
-		deref[fullname] = c;
+		self.ref[fullname] = c;
 		// Return the new class
 		return c;
 	},
@@ -135,24 +133,27 @@ var Namespace = create({
 	exists : function(classname) {
 		return !!this.ref[classname];
 	},
-	get : function(name, callback) {
-		// ability to load a class async if a callback is passed in
-		if (isFunction(callback)) {
-			if (this.ref[name]) {
-				callback(this.ref[name]);
-			} else {
-				this.load(name, callback);
-			}
-			return this;
+	get : function(name) {
+		var tmp;
+		// already defined, return it
+		if (this.ref[name]) {
+			return this.ref[name];
 		}
-		// otherwise just return the class if it is already avaliable or reach into the global namespace
-		return this.ref[name] || (this.name !== global_namespace && getGlobalNamespace().get(name)) || null;
+		// use the autoloader if defined
+		tmp = this.load(name);
+		// return if loaded
+		if (tmp !== null) {
+			return tmp;
+		}
+		// reach into the global namespace
+		if (this.name !== global_namespace) {
+			return getGlobalNamespace().get(name);
+		}
+		// no class found
+		return null;
 	},
 	load : function(name, callback) {
-		if (callback) {
-			callback(this.ref[name] || null);
-		}
-		return this;
+		return this.ref[name] || null;
 	},
 	setAutoloader : function(callback) {
 		// make sure the callback is a function

@@ -1,21 +1,17 @@
 QUnit.module("namespace");
 
 QUnit.test("retrieval and creation", function() {
-	QUnit.expect(8);
+	QUnit.expect(6);
 	var ns = getNamespace("Namespace1");
 
 	QUnit.ok(ns instanceof Namespace, "getNamespace returned a namespace");
 	QUnit.equal(ns, getNamespace("Namespace1"), "multiple calls to getNamespace returns the same object");
 	QUnit.equal(ns.getName(), "Namespace1", "the name of the current namespace is stored");
 	QUnit.equal(ns.get("A"), null, "get class with no callback returns the class for use");
-	QUnit.equal(ns.get("A", function(c) {
-		QUnit.equal(c, null, "async call to get returns null as class doesn't yet exist");
-	}), ns, "get class returns the namespace for chaining and gives ability to load up a class in a async manner");
 
 	QUnit.equal(getNamespace(ns), ns, "Passing a instance of Namespace to getNamespace returns object as is.");
 
 	QUnit.equal(ns + "", "[namespace Namespace1]", "Namespace toString returns [namespace Name]");
-
 });
 
 QUnit.test("class creation", function() {
@@ -23,9 +19,7 @@ QUnit.test("class creation", function() {
 	var ns = getNamespace("Namespace2");
 
 	QUnit.ok(!ns.exists("A"), "checking for existience of undefined class");
-	ns.get("A", function(k) {
-		QUnit.equal(k, null, "attempting to retieve a undefined class");
-	});
+	QUnit.equal(ns.get("A"), null, "attempting to retieve a undefined class");
 
 	// creating a single class
 	var c = ns.create("A", {
@@ -39,9 +33,7 @@ QUnit.test("class creation", function() {
 	QUnit.ok(!!c.__isclass_, "class created is a class object");
 	QUnit.ok(new c() instanceof base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
-	ns.get("A", function(k) {
-		QUnit.equal(k, c, "class reference is stored in internal reference array");
-	});
+	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
 	QUnit.equal(c.getNamespace(), ns, "namespaced class has a getter for the current namespace");
 
 	QUnit.equal(c + "", "[object A]", "namespaced class has overriden toString method");
@@ -59,9 +51,7 @@ QUnit.test("class creation", function() {
 	QUnit.ok(new d() instanceof base, "class creation created by extending the base class");
 	QUnit.equal(ns.B.C, d, "class reference is stored directly within namespace object (nested)");
 	QUnit.equal(ns.B.C(), "invoke", "class reference within namespace object can still be invoked");
-	ns.get("B.C", function(k) {
-		QUnit.equal(k, d, "class reference is stored in internal reference array (nested)");
-	});
+	QUnit.equal(ns.get("B.C"), d, "class reference is stored in internal reference array (nested)");
 });
 
 QUnit.test("class extension and implementation using named references", function() {
@@ -154,13 +144,9 @@ QUnit.test("removing named classes", function() {
 	// destroy a class namespace
 	ns.destroy("A");
 	QUnit.equal(typeof ns.A, "undefined", "removing a named class from the namespace");
-	ns.get("A.C", function(k) {
-		QUnit.equal(k, null, "removed leaf classes from branch namespace");
-	});
+	QUnit.equal(ns.get("A.C"), null, "removed leaf classes from branch namespace");
 	QUnit.equal(typeof ns.F, "undefined", "removed class that extended a destroyed class");
-	ns.get("F", function(k) {
-		QUnit.equal(k, null, "removed branch namespace that inherited from a removed branch");
-	});
+	QUnit.equal(ns.get("F"), null, "removed branch namespace that inherited from a removed branch");
 
 	// destroy an nested class
 	ns.destroy("G.a");
@@ -204,27 +190,21 @@ QUnit.test("class autoloading", function() {
 	QUnit.expect(5);
 	var ns = getNamespace("Namespace6");
 
-	ns.get("A", function(k) {
-		QUnit.equal(k, null, "attempting to retieve a undefined class");
-	});
+	QUnit.equal(ns.get("A"), null, "attempting to retieve a undefined class");
 
 	// create temp class
 	var ca = ns.create("A", {});
 
 	var temp = {};
 	// setting the autoloader for a specific namespace
-	ns.setAutoloader(function(name, callback) {
+	ns.setAutoloader(function(name) {
 		QUnit.equal(name, "B", "autoloader only being called if class doesn't exist.");
-		callback(temp);
+		return temp;
 	});
 
 	// testing autoloader
-	ns.get("B", function(k) {
-		QUnit.equal(k, temp, "retrieving class through autoloader method");
-	});
-	ns.get("A", function(k) {
-		QUnit.equal(k, ca, "retrieving class already existing class");
-	});
+	QUnit.equal(ns.get("B"), temp, "retrieving class through autoloader method");
+	QUnit.equal(ns.get("A"), ca, "retrieving an already existing class");
 
 	// attempt to set autoloader to a non function
 	QUnit.raises(function(){

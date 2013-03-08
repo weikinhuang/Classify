@@ -68,19 +68,21 @@ extend(Classify, exportNames, {
 	extend : extend
 });
 
-// Export the Classify object for **CommonJS**, with backwards-compatibility for the
-// old "require()" API. If we're not in CommonJS, add "Classify" to the global object.
-if (typeof module !== "undefined" && module.exports) {
-	module.exports = Classify;
-	// create a circular reference
-	Classify.Classify = Classify;
-} else if (typeof root.define === "function" && root.define.amd) {
+/*global define */
+if (typeof define === "function" && define.amd) {
 	// Export Classify as an AMD module only if there is a AMD module loader,
 	// use lowercase classify, because AMD modules are usually loaded with filenames
 	// and Classify would usually be loaded with lowercase classify.js
-	root.define("classify", function() {
+	define(function() {
 		return Classify;
 	});
+}
+if (typeof module !== "undefined" && module.exports) {
+	// Export the Classify object for **CommonJS**, with backwards-compatibility for the
+	// old "require()" API. If we're not in CommonJS, add "Classify" to the global object.
+	module.exports = Classify;
+	// create a circular reference
+	Classify.Classify = Classify;
 } else {
 	// store previous value of root.Classify
 	var root_value = root.Classify;
