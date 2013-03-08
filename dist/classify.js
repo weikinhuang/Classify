@@ -5,7 +5,7 @@
  * Copyright 2011-2012, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Fri, 08 Mar 2013 21:52:25 GMT
+ * Date: Fri, 08 Mar 2013 23:27:28 GMT
  */
 (function(root, undefined) {
 	"use strict";
@@ -968,7 +968,7 @@ var Namespace = create({
 		// no class found
 		return null;
 	},
-	load : function(name, callback) {
+	load : function(name) {
 		return this.ref[name] || null;
 	},
 	setAutoloader : function(callback) {

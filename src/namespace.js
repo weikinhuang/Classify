@@ -152,7 +152,7 @@ var Namespace = create({
 		// no class found
 		return null;
 	},
-	load : function(name, callback) {
+	load : function(name) {
 		return this.ref[name] || null;
 	},
 	setAutoloader : function(callback) {
