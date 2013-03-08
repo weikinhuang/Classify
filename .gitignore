@@ -12,3 +12,4 @@
 test/dev.html
 build/.*.json
 coverage/*
+node_modules
