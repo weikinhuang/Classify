@@ -226,6 +226,9 @@ Other options include: `clean`, `lint`, `unit`, `concat`, `min`, `size`, `perf`,
 Changelog
 --------------------------------------
 
+#### v0.10.2
+	Fix requirejs and amd definitions, remove async autoloader to support it
+
 #### v0.10.1
 	Android Mobile thinks typeof RegExp == "function"
 

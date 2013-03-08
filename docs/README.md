@@ -1,4 +1,4 @@
-# classify `v0.10.0`
+# classify `v0.10.2`
 ==================================================
 
 ## `Classify`
@@ -114,37 +114,37 @@ The Main interface function that returns namespaces and creates objects.
 
 <span class="comment">// Calling Classify with a string returns a namespace</span>
 <span class="comment">// @see Classify.getNamespace</span>
-Classify(<span class="string">"Life"</span>) === Classify.getNamespace(<span class="string">"Life"</span>);
+Classify(<span class="string">"Vehicles"</span>) === Classify.getNamespace(<span class="string">"Vehicles"</span>);
 
 <span class="comment">// Calling Classify with a string ending in a "/" returns a namespace</span>
 <span class="comment">// @see Classify.getNamespace</span>
-Classify(<span class="string">"Life/"</span>) === Classify.getNamespace(<span class="string">"Life"</span>);
+Classify(<span class="string">"Vehicles"</span>) === Classify.getNamespace(<span class="string">"Vehicles"</span>);
 
 <span class="comment">// Calling Classify with a string separated by "/" returns a defined</span>
 <span class="comment">// class within a namespace</span>
 <span class="comment">// @see Classify.Namespace.get</span>
-Classify(<span class="string">"Life/Eukaryotes"</span>) === Classify.getNamespace(<span class="string">"Life"</span>).get(<span class="string">"Eukaryotes"</span>);
+Classify(<span class="string">"Vehicles/Ship"</span>) === Classify.getNamespace(<span class="string">"Vehicles"</span>).get(<span class="string">"Ship"</span>);
 
 <span class="comment">// Calling Classify with 2 string parameters returns a defined class within</span>
 <span class="comment">// a namespace</span>
 <span class="comment">// @see Classify.Namespace.get</span>
-Classify(<span class="string">"Life"</span>, <span class="string">"Eukaryotes"</span>) === Classify.getNamespace(<span class="string">"Life"</span>).get(<span class="string">"Eukaryotes"</span>);
+Classify(<span class="string">"Vehicles"</span>, <span class="string">"Ship"</span>) === Classify.getNamespace(<span class="string">"Vehicles"</span>).get(<span class="string">"Ship"</span>);
 
 <span class="comment">// Calling Classify with first parameter as a string, and second parameter as</span>
 <span class="comment">// an object, creates a class within the namespace</span>
-<span class="keyword">var</span> Eukaryotes = Classify(<span class="string">"Life/Eukaryotes"</span>, {
+<span class="keyword">var</span> Ship = Classify(<span class="string">"Vehicles/Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
 <span class="comment">// Calling Classify with first parameter as a string, second parameter as a string, and</span>
 <span class="comment">// third parameter as an object, creates a class within the namespace</span>
-<span class="keyword">var</span> Eukaryotes = Classify(<span class="string">"Life"</span>, <span class="string">"Eukaryotes"</span>, {
+<span class="keyword">var</span> Ship = Classify(<span class="string">"Vehicles"</span>, <span class="string">"Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
 <span class="comment">// The above 2 statements are the same as the following statement to create classes</span>
 <span class="comment">// @see Classify.Namespace.create</span>
-<span class="keyword">var</span> Eukaryotes = Classify.getNamespace(<span class="string">"Life"</span>).create(<span class="string">"Eukaryotes"</span>, {
+<span class="keyword">var</span> Ship = Classify.getNamespace(<span class="string">"Vehicles"</span>).create(<span class="string">"Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
@@ -152,18 +152,18 @@ Classify(<span class="string">"Life"</span>, <span class="string">"Eukaryotes"</
 <span class="comment">// To inherit from other classes, the first parameter is the class name, second parameter</span>
 <span class="comment">// is the parent (can be from other namespaces with "Namespace/Class"), third parameter</span>
 <span class="comment">// is the descriptor</span>
-<span class="keyword">var</span> Plantae = Classify(<span class="string">"Life/Plantae"</span>, <span class="string">"Eukaryotes"</span>, {
+<span class="keyword">var</span> Battleship = Classify(<span class="string">"Vehicles/Battleship"</span>, <span class="string">"Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
 <span class="comment">// The same can be achieved with the following signature</span>
-<span class="keyword">var</span> Plantae = Classify(<span class="string">"Life"</span>, <span class="string">"Plantae"</span>, <span class="string">"Eukaryotes"</span>, {
+<span class="keyword">var</span> Battleship = Classify(<span class="string">"Vehicles"</span>, <span class="string">"Battleship"</span>, <span class="string">"Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
 <span class="comment">// The above 2 statements are the same as the following statement to create classes</span>
 <span class="comment">// @see Classify.Namespace.create</span>
-<span class="keyword">var</span> Plantae = Classify.getNamespace(<span class="string">"Life"</span>).create(<span class="string">"Plantae"</span>, <span class="string">"Eukaryotes"</span>, {
+<span class="keyword">var</span> Battleship = Classify.getNamespace(<span class="string">"Vehicles"</span>).create(<span class="string">"Battleship"</span>, <span class="string">"Ship"</span>, {
     init : <span class="keyword">function</span>() {
     }
 });
@@ -172,12 +172,12 @@ Classify(<span class="string">"Life"</span>, <span class="string">"Eukaryotes"</
 <span class="comment">// Using the Classify method in this manner is analogous to calling Classify.create()</span>
 <span class="comment">// Please see Classify.create for documentation</span>
 <span class="comment">// @see Classify.create</span>
-<span class="keyword">var</span> Embryophytes = Classify({
+<span class="keyword">var</span> Energy = Classify({
     init : <span class="keyword">function</span>() {
     }
 });
 <span class="comment">// The above statement is the same as</span>
-<span class="keyword">var</span> Embryophytes = Classify.create({
+<span class="keyword">var</span> Energy = Classify.create({
     init : <span class="keyword">function</span>() {
     }
 });
@@ -642,23 +642,21 @@ Checks if a class exists within this namespace.
 ##### Returns
 `Boolean`
 
-### <a id="Classify.Namespace.prototype.get" href="#">`Classify.Namespace.prototype.get(name[, callback])`</a>
+### <a id="Classify.Namespace.prototype.get" href="#">`Classify.Namespace.prototype.get(name)`</a>
 Attempt to retrieve a class within this namespace or the global one.
 [&#9650;](#)
 
 
 ##### Arguments
 1. `name` `{String}`: The name of the class to retrieve
-2. `[callback]` `{Function}`: If passed in the first parameter will the found class
 
-### <a id="Classify.Namespace.prototype.load" href="#">`Classify.Namespace.prototype.load(name, callback)`</a>
+### <a id="Classify.Namespace.prototype.load" href="#">`Classify.Namespace.prototype.load(name)`</a>
 Default loader function that loads the internal classes from.
 [&#9650;](#)
 
 
 ##### Arguments
 1. `name` `{String}`: The name of the class to load
-2. `callback` `{Function}`: The function to call when the class has loaded
 
 ##### Returns
 `Classify.Namespace`
