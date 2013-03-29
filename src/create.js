@@ -1,3 +1,6 @@
+/**
+ * @module create
+ */
 // regex for keyword properties
 var keywordRegexp = /^(?:superclass|subclass|implement|observable|bindings|extend|prototype|applicate|(?:add|remove)(?:Static|Observable|Aliased|Bound)Property)$/,
 // regex to test for a mutator name to avoid a loop
@@ -35,6 +38,12 @@ base = (function() {
 	var fn = function() {
 	};
 	// Make sure we always have a constructor
+	/**
+	 * True constructor method for this object, will be called when object is called with the "new" keyword
+	 * @for Classify.Class
+	 * @method init
+	 * @return {Class}
+	 */
 	fn.prototype.init = function() {
 	};
 	fn.superclass = null;
@@ -48,6 +57,13 @@ base = (function() {
 // wraps a function so that the "this.parent" is bound to the function
 wrapParentProperty = function(parentPrototype, property) {
 	return store(function() {
+		/**
+		 * Internal reference property for methods that override a parent method,
+		 * allow for access to the parent version of the function.
+		 * @for Classify.Class
+		 * @method parent
+		 * @return {Object}
+		 */
 		var tmp = this.parent, ret;
 		this.parent = parentPrototype;
 		ret = property.apply(this, arguments);
@@ -59,7 +75,19 @@ wrapParentProperty = function(parentPrototype, property) {
 		return ret;
 	}, property);
 },
-// function to add external mutators to modify the class with certain hooks
+/**
+ * Adds a global class mutator that modifies the defined classes at different points with hooks
+ * @param {String} name The name of the mutator reference to add
+ * @param {Object} mutator The mutator definition with optional hooks
+ * @param {Function} [mutator.onCreate] The hook to be called when a class is defined
+ * @param {Function} [mutator.onPropAdd] The hook to be called when a property with the __name_ prefix is added
+ * @param {Function} [mutator.onPropRemove] The hook to be called when a property with the __name_ prefix is removed
+ * @param {Function} [mutator.onInit] The hook to be called during each object's initialization
+ * @throws Error
+ * @static
+ * @for Classify
+ * @method addMutator
+ */
 addMutator = function(name, mutator) {
 	if (mutators[name]) {
 		throw new Error("Adding duplicate mutator \"" + name + "\".");
@@ -74,7 +102,14 @@ addMutator = function(name, mutator) {
 		}
 	});
 },
-// function to remove external mutators
+/**
+ * Removes a global class mutator that modifies the defined classes at different points
+ * @param {String} name The name of the mutator to be removed
+ * @throws Error
+ * @static
+ * @for Classify
+ * @method removeMutator
+ */
 removeMutator = function(name) {
 	var mutator = mutators[name];
 	if (!mutator) {
@@ -180,6 +215,16 @@ removeProperty = function(klass, name) {
 };
 
 // Master inheritance based class system creation
+/**
+ * Creates a new Classify class
+ * @param {Class} [parent] Optional first parameter defines what object to inherit from
+ * @param {Object[]} [implement] Optional second parameter defines where to implement traits from
+ * @param {Object} definition The description of the class to be created
+ * @static
+ * @for Classify
+ * @method create
+ * @return {Class}
+ */
 var create = function() {
 	var parent = base,
 	// a hash of methods and properties to be inserted into the new class
@@ -213,7 +258,12 @@ var create = function() {
 	if (!parent.__isclass_ && !methods.init) {
 		methods.init = parent;
 	}
-	// Constructor function
+	/**
+	 * Placeholder for class descriptors created with the create method
+	 * @constructor
+	 * @for Classify
+	 * @type Object
+	 */
 	klass = function() {
 		var tmp, i, l;
 		// We're not creating a instantiated object so we want to force a instantiation or call the invoke function
@@ -247,6 +297,15 @@ var create = function() {
 	};
 	// ability to create a new instance using an array of arguments, cannot be overriden
 	delete methods.applicate;
+	/**
+	 * Create a new instance of the class using arguments passed in as an array
+	 *
+	 * @param {Array} args Array of arguments to construct the object with
+	 * @static
+	 * @for Classify.Class
+	 * @method applicate
+	 * @return {Class}
+	 */
 	klass.applicate = function(a) {
 		var TempClass = function() {
 			return klass.apply(this, a);
@@ -254,21 +313,67 @@ var create = function() {
 		TempClass.prototype = klass.prototype;
 		return new TempClass();
 	};
-	// Use the defined invoke method if possible, otherwise use the default one
+	/**
+	 * Default invocation function when the defined class is called without the "new" keyword.
+	 * The default behavior is to return a new instance of itself
+	 * @static
+	 * @for Classify.Class
+	 * @method invoke
+	 * @return {Class}
+	 */
 	klass.invoke = methods.invoke || (parent.invoke && isFunction(parent.invoke) && !parent.invoke.__original_ ? parent.invoke : null) || store(function() {
 		return klass.applicate(arguments);
 	}, true);
 	// Remove the invoke method from the prototype chain
 	delete methods.invoke;
 	// Keep a list of the inheritance chain
+	/**
+	 * Reference to the parent that this object extends from
+	 * @static
+	 * @for Classify.Class
+	 * @property superclass
+	 * @type {Class}
+	 */
 	klass.superclass = parent;
+	/**
+	 * Array containing a reference to all the children that inherit from this object
+	 * @static
+	 * @for Classify.Class
+	 * @property subclass
+	 * @type {Array}
+	 */
 	klass.subclass = [];
+	/**
+	 * Array containing all the objects and classes that this object implements methods and properties from
+	 * @static
+	 * @for Classify.Class
+	 * @property implement
+	 * @type {Array}
+	 */
 	klass.implement = (isArray(parent.implement) ? parent.implement : []).concat(implement);
 
 	// assign child prototype to be that of the parent's by default (inheritance)
 	proto = klass.prototype = objectCreate(parent.prototype);
 
 	// Give this class the ability to create sub classes
+	/**
+	 * Creates a new class that is a child of the current class
+	 * @param {Object[]} [implement] Optional parameter defines where to implement traits from
+	 * @param {Object} definition The description of the class to be created
+	 * @static
+	 * @for Classify.Class
+	 * @method extend
+	 * @return {Class}
+	 */
+	/**
+	 * Creates a new class that is a child of the current class
+	 *
+	 * @param {Object[]} [implement] Optional parameter defines where to implement traits from
+	 * @param {Object} definition The description of the class to be created
+	 * @for Classify.Class
+	 * @method extend
+	 * @return {Class}
+	 */
 	klass.extend = proto.extend = function() {
 		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
 	};
@@ -278,6 +383,14 @@ var create = function() {
 		parent.subclass.push(klass);
 	}
 	// Create a magic method that can invoke any of the parent methods
+	/**
+	 * Magic method that can invoke any of the parent methods
+	 * @param {Object} name The name of the parent method to invoke
+	 * @param {Array} args The arguments to pass through to invoke
+	 * @for Classify.Class
+	 * @method invoke
+	 * @return {Object}
+	 */
 	methods.invoke = function(name, args) {
 		if (name in parent.prototype && name !== "invoke" && isFunction(parent.prototype[name])) {
 			var tmp = this.invoke, ret;
@@ -288,7 +401,16 @@ var create = function() {
 		}
 		throw new Error("Function \"" + name + "\" of parent class being invoked is undefined.");
 	};
-	// Bind the special add property function
+	/**
+	 * Adds a new property to the object's prototype of base
+	 * @param {String|Object} name The property name to add or if object is passed in then it will iterate through it to add properties
+	 * @param {Object} [property] The property to add to the class
+	 * @param {String} [prefix=""] Prefix of the property name if any
+	 * @static
+	 * @for Classify.Class
+	 * @method addProperty
+	 * @return {Class}
+	 */
 	klass.addProperty = function(name, property, prefix) {
 		// the prefix parameter is for internal use only
 		prefix = prefix || "";
@@ -301,7 +423,14 @@ var create = function() {
 		}
 		return klass;
 	};
-	// Bind the special remove property function
+	/**
+	 * Removes a property from the object's prototype or base
+	 * @param {String} name The name of the property to remove
+	 * @static
+	 * @for Classify.Class
+	 * @method removeProperty
+	 * @return {Class}
+	 */
 	klass.removeProperty = function(name) {
 		removeProperty(klass, name);
 		return klass;
@@ -327,8 +456,28 @@ var create = function() {
 
 	// Now extend each of those methods and allow for a parent accessor
 	klass.addProperty(methods);
+	/**
+	 * Reference to the constructor function of this object
+	 * @for Classify.Class
+	 * @property constructor
+	 * @type {Class}
+	 */
 	proto.constructor = klass;
+	/**
+	 * Reference to the constructor function of this object
+	 * @for Classify.Class
+	 * @property self
+	 * @type {Class}
+	 */
 	proto.self = klass;
+	/**
+	 * Flag to determine if this object is created by Classify.create
+	 * @static
+	 * @for Classify.Class
+	 * @property __isclass_
+	 * @private
+	 * @type {Boolean}
+	 */
 	klass.__isclass_ = true;
 	return klass;
 };

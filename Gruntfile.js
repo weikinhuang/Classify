@@ -67,6 +67,19 @@ module.exports = function(grunt) {
 				outDir : "coverage",
 				testFiles : [ "test/*.html" ]
 			}
+		},
+
+		yuidoc : {
+			compile : {
+				name : '<%= pkg.name %>',
+				description : '<%= pkg.description %>',
+				version : '<%= pkg.version %>',
+				url : '<%= pkg.homepage %>',
+				options : {
+					paths : 'src/',
+					outdir : 'docs/yuidoc/'
+				}
+			}
 		}
 	});
 
@@ -77,6 +90,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-contrib-qunit");
 	// grunt.loadNpmTasks("grunt-contrib-nodeunit");
 	grunt.loadNpmTasks("grunt-qunit-cov");
+	grunt.loadNpmTasks('grunt-contrib-yuidoc');
 
 	// Default grunt
 	grunt.registerTask("default", [ "concat", "jshint", "uglify" ]);
@@ -85,5 +99,6 @@ module.exports = function(grunt) {
 	grunt.registerTask("all", [ "concat", "jshint", "qunit", "uglify", "compare_size" ]);
 	grunt.registerTask("lint", [ "concat", "jshint" ]);
 	grunt.registerTask("test", [ "qunit" ]);
+	grunt.registerTask("doc", [ "yuidoc" ]);
 	grunt.registerTask("coverage", [ "qunit", "qunit-cov" ]);
 };

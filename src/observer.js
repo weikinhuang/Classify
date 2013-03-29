@@ -1,5 +1,91 @@
+/**
+ * @module observer
+ */
 // Observer class that handles an abstraction layer to class properties (getter and setter methods)
 var Observer = create({
+	/**
+	 * The context that this object is created within
+	 * @for Classify.Observer
+	 * @property context
+	 * @type {Class}
+	 */
+	context : null,
+	/**
+	 * The name of the property that this object observes
+	 * @for Classify.Observer
+	 * @property name
+	 * @type {String}
+	 */
+	name : null,
+	/**
+	 * Array containing all the event listeners for when this value changes
+	 * @for Classify.Observer
+	 * @property events
+	 * @type {Array}
+	 */
+	events : null,
+	/**
+	 * Flag to check if this property is writable
+	 * @for Classify.Observer
+	 * @property writable
+	 * @type {Boolean}
+	 */
+	writable : null,
+	/**
+	 * Number of seconds to delay the event emitter, 0 will disable delays
+	 * @for Classify.Observer
+	 * @property delay
+	 * @type {Number}
+	 */
+	delay : null,
+	/**
+	 * Flag to hold the delay timer
+	 * @private
+	 * @for Classify.Observer
+	 * @property _debounce
+	 * @type {Number}
+	 */
+	_debounce : null,
+	/**
+	 * The internal value of this object
+	 * @for Classify.Observer
+	 * @property value
+	 * @type {Object}
+	 */
+	value : null,
+	/**
+	 * Internal getter method that modifies the internal value being returned by
+	 * the Classify.Observer.prototype.get method
+	 * @param {Object} value The internal value of this object
+	 * @private
+	 * @for Classify.Observer
+	 * @method getter
+	 * @return {Object}
+	 */
+	getter : null,
+	/**
+	 * Internal setter method that modifies the internal value being set by
+	 * the Classify.Observer.prototype.set method
+	 * @param {Object} value The new value that will be set
+	 * @param {Object} original The original internal value of this object
+	 * @private
+	 * @for Classify.Observer
+	 * @method setter
+	 * @return {Object}
+	 */
+	setter : null,
+	/**
+	 * Wrapper object that allows for getter/setter/event listeners of object properties
+	 * @constructor
+	 * @for Classify.Observer
+	 * @extends {Class}
+	 * @param {Object} value The internal value can be either an object or a value
+	 * @param {Object} value.value The internal value if the parameter was passed in as an object
+	 * @param {Boolean} [value.writable=true] Marks this object as writable or readonly
+	 * @param {Number} [value.delay=0] Only fire the event emitter after a delay of value.delay ms
+	 * @param {Function} [value.getter] The internal get modifier
+	 * @param {Function} [value.setter] The internal set modifier
+	 */
 	init : function(context, name, value) {
 		// an Observer can only be instantiated with an instance of an object
 		if (!context) {
@@ -29,10 +115,23 @@ var Observer = create({
 			this.value = value;
 		}
 	},
+	/**
+	 * Gets the value of the internal property
+	 * @for Classify.Observer
+	 * @method get
+	 * @return {Object}
+	 */
 	get : function() {
 		// getter method is called for return value if specified
 		return this.getter ? this.getter.call(this.context, this.value) : this.value;
 	},
+	/**
+	 * Sets the value of the internal property
+	 * @param {Object} value Mixed value to store internally
+	 * @for Classify.Observer
+	 * @method set
+	 * @return {Class}
+	 */
 	set : function(value) {
 		var original = this.value, context = this.context;
 		// if this is not writable then we can't do anything
@@ -48,6 +147,12 @@ var Observer = create({
 		}
 		return context;
 	},
+	/**
+	 * Starts the timers to call the registered event listeners
+	 * @for Classify.Observer
+	 * @method emit
+	 * @return {Class}
+	 */
 	emit : function() {
 		var self = this, args = argsToArray(arguments);
 		if (this.delay > 0) {
@@ -63,6 +168,13 @@ var Observer = create({
 		}
 		return this.context;
 	},
+	/**
+	 * Fires the event listeners in the order they were added
+	 * @param {Array} args Array of arguments to pass to the bound event listeners
+	 * @private
+	 * @for Classify.Observer
+	 * @method _triggerEmit
+	 */
 	_triggerEmit : function(args) {
 		var i = 0, l = this.events.length, context = this.context, events = this.events;
 		args.unshift(this.value);
@@ -71,6 +183,14 @@ var Observer = create({
 			events[i].apply(context, args);
 		}
 	},
+	/**
+	 * Add an event listener for when the internal value is changed
+	 * @param {Function} listener The event listener to add
+	 * @throws Error
+	 * @for Classify.Observer
+	 * @method addListener
+	 * @return {Class}
+	 */
 	addListener : function(listener) {
 		// event listeners can only be functions
 		if (!isFunction(listener)) {
@@ -80,6 +200,14 @@ var Observer = create({
 		this.events[this.events.length] = listener;
 		return this.context;
 	},
+	/**
+	 * Add an event listener to be called only once when the internal value is changed
+	 * @param {Function} listener The event listener to add
+	 * @throws Error
+	 * @for Classify.Observer
+	 * @method once
+	 * @return {Class}
+	 */
 	once : function(listener) {
 		// event listeners can only be functions
 		if (!isFunction(listener)) {
@@ -93,6 +221,14 @@ var Observer = create({
 		this.addListener(temp);
 		return this.context;
 	},
+	/**
+	 * Remove an event listener from being fired when the internal value is changed
+	 * @param {Function} listener The event listener to remove
+	 * @throws Error
+	 * @for Classify.Observer
+	 * @method removeListener
+	 * @return {Class}
+	 */
 	removeListener : function(listener) {
 		// event listeners can only be functions
 		if (!isFunction(listener)) {
@@ -113,6 +249,12 @@ var Observer = create({
 		events.splice(i, 1);
 		return context;
 	},
+	/**
+	 * Remove all event listeners from this object
+	 * @for Classify.Observer
+	 * @method removeAllListeners
+	 * @return {Class}
+	 */
 	removeAllListeners : function() {
 		// garbage collection
 		this.events = null;
@@ -120,14 +262,32 @@ var Observer = create({
 		this.events = [];
 		return this.context;
 	},
+	/**
+	 * Returns the array of internal listeners
+	 * @for Classify.Observer
+	 * @method listeners
+	 * @return {Array}
+	 */
 	listeners : function() {
 		// gets the list of all the listeners
 		return this.events;
 	},
+	/**
+	 * Returns the internal value of this object in the scalar form
+	 * @for Classify.Observer
+	 * @method toValue
+	 * @return {Boolean|Number|String}
+	 */
 	toValue : function() {
 		// gets the scalar value of the internal property
 		return this.value && this.value.toValue ? this.value.toValue() : this.value;
 	},
+	/**
+	 * Returns the special name of this object
+	 * @for Classify.Observer
+	 * @method toString
+	 * @return {String}
+	 */
 	toString : function() {
 		// overriden toString function to say this is an instance of an observer
 		return "[observer " + this.name + "]";
@@ -135,6 +295,16 @@ var Observer = create({
 });
 
 // alias "on" to addListener
+/**
+ * Add an event listener for when the internal value is changed, alias to addListener
+ *
+ * @param {Function} listener The event listener to add
+ * @throws Error
+ * @see Classify.Observer.prototype.addListener
+ * @for Classify.Observer
+ * @method on
+ * @return {Class}
+ */
 Observer.prototype.on = Observer.prototype.addListener;
 
 // export methods to the main object

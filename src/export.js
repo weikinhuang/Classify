@@ -1,3 +1,6 @@
+/**
+ * @module export
+ */
 // quick reference to the seperator string
 var namespace_separator = "/",
 // Create a wrapped reference to the Classify object.
@@ -38,6 +41,11 @@ Classify = create({
 		// otherwise they are just class creation parameters
 		return create.apply(null, args);
 	},
+	/**
+	 * The Main interface function that returns namespaces and creates objects
+	 * @class Classify
+	 * @return {Classify.Class}
+	 */
 	init : function() {
 		var args = argsToArray(arguments), params, tmp;
 		if (args.length < 1) {
@@ -56,7 +64,14 @@ Classify = create({
 
 // store clean references to these methods
 extend(Classify, exportNames, {
-	// object version number
+	/**
+	 * The version number of this file
+	 * @static
+	 * @final
+	 * @for Classify
+	 * @type {String}
+	 * @property version
+	 */
 	version : "@VERSION",
 
 	// direct access functions
@@ -64,7 +79,15 @@ extend(Classify, exportNames, {
 	addMutator : addMutator,
 	removeMutator : removeMutator,
 
-	// utility function to provide functionality to quickly add properties to objects
+	/**
+	 * Utility function to provide functionality to quickly add properties to objects
+	 * @param {Object} base The base object to copy properties into
+	 * @param {Object[]} args Set of objects to copy properties from
+	 * @static
+	 * @for Classify
+	 * @method extend
+	 * @return {Object}
+	 */
 	extend : extend
 });
 
@@ -81,7 +104,13 @@ if (typeof module !== "undefined" && module.exports) {
 	// Export the Classify object for **CommonJS**, with backwards-compatibility for the
 	// old "require()" API. If we're not in CommonJS, add "Classify" to the global object.
 	module.exports = Classify;
-	// create a circular reference
+	/**
+	 * Circular reference to itself
+	 * @static
+	 * @property Classify
+	 * @for Classify
+	 * @type {Function}
+	 */
 	Classify.Classify = Classify;
 } else {
 	// store previous value of root.Classify
@@ -90,8 +119,19 @@ if (typeof module !== "undefined" && module.exports) {
 	// otherwise attempt to make a global reference
 	root.Classify = Classify;
 
-	// Run Classify.js in "noConflict" mode, returning the "Classify" variable to its
-	// previous value. Returns a reference to the Classify object.
+	/**
+	 * Run Classify.js in "noConflict" mode, returning the "Classify" variable to its
+	 * previous value. Returns a reference to the Classify object.
+	 * @static
+	 * @method noConflict
+	 * @for Classify
+	 * @return {Classify}
+	 * @example
+	 *     (function(Classify) {
+	 *         // here you can use the Classify object and remove the global reference to it
+	 *         // this function is only available on browser environments
+	 *     })(Classify.noConflict());
+	 */
 	Classify.noConflict = function() {
 		if (root_value === undefined) {
 			delete root.Classify;
