@@ -33,6 +33,7 @@
     "main": "dist/classify",
     "devDependencies": {
         "grunt": "~0.4.1",
+        "grunt-cli": "~0.1.7",
         "grunt-contrib-jshint": "~0.4.3",
         "grunt-contrib-qunit": "~0.2.1",
         "grunt-contrib-uglify": "~0.2.0",
