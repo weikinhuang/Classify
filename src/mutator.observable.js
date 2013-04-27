@@ -1,15 +1,40 @@
+/**
+ * @module mutator.observable
+ */
 // mutator for adding observable properties to a class
 addMutator("observable", {
 	// the special identifier is "__observable_"
 	onCreate : function(klass, parent) {
 		var mutator = this;
 		// re-assign the observable so that it produces copies across child classes
+		/**
+		 * Hashtable containing the definitions of all the observable properties that is implemented by this object
+		 * @static
+		 * @for Classify.Class
+		 * @property observable
+		 * @type {Object}
+		 */
 		klass.observable = extend({}, parent.observable || {});
-		// shortcut method for adding observable properties
+		/**
+		 * Adds a new observable property to the object's prototype
+		 * @param {String} name The name of the observable property to add
+		 * @param {Object} property The descriptor of the observable property
+		 * @static
+		 * @for Classify.Class
+		 * @method addObservableProperty
+		 * @return {Class}
+		 */
 		klass.addObservableProperty = function(name, property) {
 			return klass.addProperty(name, property, mutator.propPrefix);
 		};
-		// shortcut method for removing observable properties
+		/**
+		 * Removes a observable property to the object's prototype
+		 * @param {String} name The name of the observable property to remove
+		 * @static
+		 * @for Classify.Class
+		 * @method removeObservableProperty
+		 * @return {Class}
+		 */
 		klass.removeObservableProperty = function(name) {
 			return klass.removeProperty(mutator.propPrefix + name);
 		};

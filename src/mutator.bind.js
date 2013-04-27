@@ -1,15 +1,40 @@
+/**
+ * @module mutator.bind
+ */
 // mutator for adding bound properties to a class
 addMutator("bind", {
 	// the special identifier is "__bind_"
 	onCreate : function(klass, parent) {
 		var mutator = this;
 		// re-assign the bindings so that it produces copies across child classes
+		/**
+		 * Array containing the list of all the bound properties that is wrapped during object initialization
+		 * @static
+		 * @for Classify.Class
+		 * @property bindings
+		 * @type {Array}
+		 */
 		klass.bindings = (parent.bindings || []).slice(0);
-		// shortcut method for adding observable properties
+		/**
+		 * Adds a context bound property to the object's prototype
+		 * @param {String} name The name of the property to add
+		 * @param {Function} property The property to always bind the object's context with
+		 * @static
+		 * @for Classify.Class
+		 * @method addBoundProperty
+		 * @return {Class}
+		 */
 		klass.addBoundProperty = function(name, property) {
 			return klass.addProperty(name, property, mutator.propPrefix);
 		};
-		// shortcut method for removing observable properties
+		/**
+		 * Removes a context bound property from the object's base
+		 * @param {String} name The name of the property to remove
+		 * @static
+		 * @for Classify.Class
+		 * @method removeBoundProperty
+		 * @return {Class}
+		 */
 		klass.removeBoundProperty = function(name) {
 			return klass.removeProperty(mutator.propPrefix + name);
 		};

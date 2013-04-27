@@ -1,13 +1,31 @@
+/**
+ * @module mutator.static
+ */
 // mutator for adding static properties to a class
 addMutator("static", {
 	// the special identifier is "__static_"
 	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
-		// shortcut method for adding static properties
+		/**
+		 * Adds a static property to the object's base
+		 * @param {String} name The name of the property to add
+		 * @param {Object} property The property to store into the object's base
+		 * @static
+		 * @for Classify.Class
+		 * @method addStaticProperty
+		 * @return {Class}
+		 */
 		klass.addStaticProperty = function(name, property) {
 			return klass.addProperty(name, property, mutatorPrefix);
 		};
-		// shortcut method for removing static properties
+		/**
+		 * Removes a static property from the object's base
+		 * @param {String} name The name of the property to remove
+		 * @static
+		 * @for Classify.Class
+		 * @method removeStaticProperty
+		 * @return {Class}
+		 */
 		klass.removeStaticProperty = function(name) {
 			return klass.removeProperty(mutatorPrefix + name);
 		};
