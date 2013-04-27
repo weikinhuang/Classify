@@ -19,9 +19,9 @@ var sandbox = {
 	clearInterval : clearInterval,
 	console : console,
 	attachEvent : function(event, method) {
-		setImmediate(function() {
+		setTimeout(function() {
 			method.call(sandbox);
-		});
+		}, 1);
 	}
 };
 // window/global/root is a circualr reference
