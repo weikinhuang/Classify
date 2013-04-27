@@ -5,7 +5,7 @@
  * Copyright 2011-2013, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Fri Mar 29 2013 16:06:01
+ * Date: Sat Apr 27 2013 12:50:49
  */
 (function(root, undefined) {
 	"use strict";
