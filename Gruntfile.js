@@ -216,13 +216,6 @@ module.exports = function(grunt) {
 				done();
 			}
 		});
-
-		child.on("exit", function(exit_code) {
-			console.log(exit_code);
-			if (exit_code > 0 && exit_code !== 143) {
-				done(false);
-			}
-		});
 	});
 
 	// Default grunt
