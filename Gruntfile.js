@@ -62,7 +62,10 @@ module.exports = function(grunt) {
 		"qunit-node" : {
 			all : {
 				code : [ "src/core.js", "src/create.js", "src/mutator.static.js", "src/mutator.nowrap.js", "src/mutator.alias.js", "src/mutator.bind.js", "src/observer.js", "src/mutator.observable.js", "src/namespace.js", "src/export.js" ],
-				tests : [ "test/core.js", "test/create.js", "test/mutator.static.js", "test/mutator.nowrap.js", "test/mutator.alias.js", "test/mutator.bind.js", "test/observer.js", "test/mutator.observable.js", "test/namespace.js", "test/export.js" ]
+				tests : [ "test/core.js", "test/create.js", "test/mutator.static.js", "test/mutator.nowrap.js", "test/mutator.alias.js", "test/mutator.bind.js", "test/observer.js", "test/mutator.observable.js", "test/namespace.js", "test/export.js" ],
+				setUp : function() {
+					this.root = this;
+				}
 			}
 		},
 
@@ -141,7 +144,8 @@ module.exports = function(grunt) {
 
 		child = require("child_process").fork(path.join(__dirname, "test/bridge/qunit-node-bridge.js"), [ JSON.stringify({
 			data : this.data,
-			dir : __dirname
+			dir : __dirname,
+			setUp : (this.data.setUp || "").toString()
 		}) ], {
 			env : process.env
 		});
@@ -214,7 +218,7 @@ module.exports = function(grunt) {
 		});
 
 		child.on("exit", function(exit_code) {
-			if (exit_code > 0) {
+			if (exit_code > 0 && exit_code !== 143) {
 				done(false);
 			}
 		});

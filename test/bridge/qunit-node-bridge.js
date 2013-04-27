@@ -27,22 +27,36 @@ var sandbox = {
 // window/global/root is a circualr reference
 sandbox.window = sandbox;
 sandbox.global = sandbox;
-sandbox.root = sandbox;
 
 // create a new context
 var context = vm.createContext(sandbox);
 
-try {
-	vm.runInContext(fs.readFileSync(path.join(options.dir, "test/qunit/qunit/qunit.js"), "utf8"), context);
-} catch (err) {
-	console.log(err.message);
-	process.exit(1);
+// load source and tests into the sandbox
+function load(src) {
+	if (!src) {
+		return;
+	}
+	if (!Array.isArray(src)) {
+		src = [ src ];
+	}
+	// build up the source file
+	src.forEach(function(file) {
+		try {
+			vm.runInContext(fs.readFileSync(path.join(options.dir, file), "utf8"), context, path.join(options.dir, file));
+		} catch (e) {
+			console.log(e.message + " in " + file);
+			process.exit(1);
+		}
+	});
 }
+
+// load up qunit
+load("test/qunit/qunit/qunit.js");
 
 // have a global reference to QUnit within the sandbox
 context.QUnit = context.exports;
 context.exports = {};
-delete sandbox.window;
+delete context.window;
 
 // don't have qunit reorder tests
 context.QUnit.config = context.QUnit.config || {};
@@ -106,29 +120,8 @@ context.QUnit.done((function() {
 	};
 })());
 
-// load source and tests into the sandbox
-function load(src) {
-	if (!src) {
-		return;
-	}
-	var files = [];
-	// build up the source file
-	src.forEach(function(file) {
-		try {
-			files.push(fs.readFileSync(path.join(options.dir, file), "utf8"));
-		} catch (e) {
-			console.log(e.message + " in " + file);
-			process.exit(1);
-		}
-	});
-
-	// run the source in the sandbox
-	try {
-		vm.runInContext(files.join("\n"), context);
-	} catch (e) {
-		console.log(e.message);
-		process.exit(1);
-	}
+if (options.setUp) {
+	vm.runInContext("(" + options.setUp + ").call(this);", context);
 }
 
 // load dependencies
