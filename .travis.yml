@@ -2,6 +2,10 @@ language: node_js
 node_js:
   - 0.8
   - 0.10
+env:
+  - global:
+      - secure: "sp+xCwAjzOHTK3QwLmQLfrmp3ZSYe0TJfkAOzRF1Tz6sUcLqHTTtfi/tzoGc\n93ldVn+fl8jFoxDqvSbl2sPeiHfTRoxjEEoQcQ5belqNJpE7KeoHszsT+1ot\nrXoUXzZwbN9hF1GxrXKyB6SwIusqdGU4O5Uee0kQqrAN7d5vO6o="
+      - secure: "lUIMLWkKvmlZWlqXouXjsY1ldlX2ufOnWBrsj168ZSHdmxZ7GyfZ4q2zetNc\nGs7fqAiEye6Up4uuX74dY5Iztfes00zCQIlpfz68slEFu1DW71AmIlVlsqMv\niynhEKaYYikvr1rGKyH9WyeKV/+HCcTEOKbUeJ3LHZ/iTOptHiM="
 notifications:
   email: false
-script: grunt all
+script: grunt travis
