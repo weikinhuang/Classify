@@ -194,16 +194,16 @@ npm install classifyjs
 ```
 
 ```javascript
-var Classify = require('classifyjs').Classify;
+var Classify = require("classifyjs").Classify;
 ```
 
 ### With an AMD loader like [RequireJS](http://requirejs.org/):
 ```javascript
 require({
-	'paths' : {
-		'classify' : 'path/to/classify'
+	"paths" : {
+		"classify" : "path/to/classify"
 	}
-}, [ 'classify' ], function(Classify) {
+}, [ "classify" ], function(Classify) {
 	console.log(Classify.version);
 });
 ```
@@ -232,6 +232,21 @@ Install node modules.
 Run grunt.
 
 `grunt`
+
+Running the tests:
+
+`grunt test`
+
+For saucelabs users, test can be run from the test task with:
+
+```bash
+export SAUCE_USERNAME=[saucelabs username]
+export SAUCE_ACCESS_KEY=[saucelabs access token]
+```
+
+To skip the saucelabs tests
+
+`grunt test:local`
 
 There are many other tasks that can be run through grunt. For a list of all tasks:
 

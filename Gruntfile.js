@@ -378,6 +378,6 @@ module.exports = function(grunt) {
 	grunt.registerTask("test:local", unit_test_tasks);
 	grunt.registerTask("test", unit_test_all_tasks);
 	grunt.registerTask("doc", [ "yuidoc" ]);
-	grunt.registerTask("coverage", [ "qunit", "qunit-cov" ]);
+	grunt.registerTask("coverage", [ "connect", "qunit", "qunit-cov" ]);
 	grunt.registerTask("dev", [ "lint" ].concat(unit_test_tasks));
 };
