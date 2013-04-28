@@ -134,8 +134,52 @@ module.exports = function(grunt) {
 						concurrency : 3,
 						browsers : [ {
 							browserName : "firefox",
-							version : "19",
-							platform : "XP"
+							platform : "Windows 7",
+							version : "21"
+						}, {
+							browserName : "firefox",
+							platform : "Windows XP",
+							version : "4"
+						}, {
+							browserName : "chrome",
+							platform : "Windows 7",
+							version : "24"
+						}, {
+							browserName : "chrome",
+							platform : "Linux",
+							version : "25"
+						}, {
+							browserName : "internet explorer",
+							platform : "Windows 8",
+							version : "10"
+						}, {
+							browserName : "internet explorer",
+							platform : "Windows 7",
+							version : "9"
+						}, {
+							browserName : "internet explorer",
+							platform : "Windows XP",
+							version : "8"
+						}, {
+							browserName : "internet explorer",
+							platform : "Windows XP",
+							version : "7"
+						}, {
+							browserName : "opera",
+							platform : "Windows 7",
+							version : "12"
+						}, {
+							browserName : "opera",
+							platform : "Windows 7",
+							version : "11"
+						}, {
+							platform : "OS X 10.6",
+							browserName : "safari",
+							version : "5"
+						}, {
+							platform : "OS X 10.8",
+							browserName : "safari",
+							version : "6"
 						} ]
 					}
 				},
