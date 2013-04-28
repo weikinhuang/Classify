@@ -3,7 +3,8 @@ var fs = require("fs");
 module.exports = function(grunt) {
 	"use strict";
 
-	grunt.initConfig({
+	grunt
+			.initConfig({
 				pkg : grunt.file.readJSON("package.json"),
 
 				compare_size : {
@@ -196,7 +197,8 @@ module.exports = function(grunt) {
 		// other vars
 		child;
 
-		// Allow an error message to retain its color when split across multiple lines.
+		// Allow an error message to retain its color when split across multiple
+		// lines.
 		var formatMessage = function(str) {
 			return String(str).split("\n").map(function(s) {
 				return s.magenta;
