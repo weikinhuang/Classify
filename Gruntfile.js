@@ -362,18 +362,22 @@ module.exports = function(grunt) {
 	// Default grunt
 	grunt.registerTask("default", [ "concat", "jshint", "uglify" ]);
 
-	// Other tasks
-	grunt.registerTask("all", [ "connect", "concat", "jshint", "qunit", "qunit-node", "saucelabs-qunit", "uglify", "compare_size" ]);
-	// only the latest version of travis should do saucelabs testings
-	if (process.env.CI && !/^v0\.10\.\d+$/.test(process.version)) {
-		grunt.registerTask("travis", [ "connect", "concat", "jshint", "qunit", "qunit-node", "uglify" ]);
-	} else {
-		grunt.registerTask("travis", [ "connect", "concat", "jshint", "qunit", "qunit-node", "saucelabs-qunit", "uglify" ]);
+	var unit_test_tasks = [ "connect", "qunit", "qunit-node" ];
+	var unit_test_all_tasks = unit_test_tasks.slice(0);
+
+	// only the latest version of travis should do saucelabs testings or locally
+	// if there is a saucelabs key
+	if ((process.env.CI && /^v0\.10\.\d+$/.test(process.version)) || (!process.env.CI && process.env.SAUCE_ACCESS_KEY)) {
+		unit_test_all_tasks.push("saucelabs-qunit");
 	}
+
+	// Other tasks
+	grunt.registerTask("all", [ "concat", "jshint" ].concat(unit_test_all_tasks).concat([ "uglify", "compare_size" ]));
+	grunt.registerTask("travis", [ "concat", "jshint" ].concat(unit_test_all_tasks).concat([ "uglify" ]));
 	grunt.registerTask("lint", [ "concat", "jshint" ]);
-	grunt.registerTask("test:local", [ "connect", "qunit", "qunit-node" ]);
-	grunt.registerTask("test", [ "connect", "qunit", "qunit-node", "saucelabs-qunit" ]);
+	grunt.registerTask("test:local", unit_test_tasks);
+	grunt.registerTask("test", unit_test_all_tasks);
 	grunt.registerTask("doc", [ "yuidoc" ]);
 	grunt.registerTask("coverage", [ "qunit", "qunit-cov" ]);
-	grunt.registerTask("dev", [ "connect", "lint", "qunit" ]);
+	grunt.registerTask("dev", [ "lint" ].concat(unit_test_tasks));
 };
