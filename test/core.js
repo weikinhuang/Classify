@@ -1,7 +1,19 @@
+/* global isScalar */
+/* global isFunction */
+/* global isArray */
+/* global isExtendable */
+/* global keys */
+/* global toArray */
+/* global argsToArray */
+/* global indexOf */
+/* global store */
+/* global each */
+/* global map */
+/* global filter */
 QUnit.module("core");
 
 QUnit.test("basic requirements", function() {
-	QUnit.expect(72);
+	QUnit.expect(70);
 	var test, empty;
 	// test basic properties of the base Object
 	QUnit.ok(Object.prototype, "Object prototype exists");
@@ -9,6 +21,7 @@ QUnit.test("basic requirements", function() {
 	QUnit.ok(Object.prototype.hasOwnProperty, "Object prototype hasOwnProperty exists");
 
 	// test basic internal functions
+	var fn = function(){};
 
 	// test detection of scalar value
 	QUnit.ok(isScalar(), "undefined is scalar");
@@ -18,7 +31,7 @@ QUnit.test("basic requirements", function() {
 	QUnit.ok(isScalar("string"), "string is scalar");
 	QUnit.ok(!isScalar([]), "array is not scalar");
 	QUnit.ok(!isScalar({}), "object is not scalar");
-	QUnit.ok(!isScalar(function(){}), "function is not scalar");
+	QUnit.ok(!isScalar(fn), "function is not scalar");
 
 	// test detection of a function
 	QUnit.ok(!isFunction(), "undefined not a function");
@@ -27,10 +40,8 @@ QUnit.test("basic requirements", function() {
 	QUnit.ok(!isFunction({}), "object not a function");
 	QUnit.ok(!isFunction([]), "array not a function");
 	QUnit.ok(!isFunction(/hi/), "regex not a function");
-	QUnit.ok(!isFunction(new function() {
-	}), "class is not a function");
-	QUnit.ok(isFunction(function() {
-	}), "function is a function");
+	QUnit.ok(!isFunction(new fn()), "class is not a function");
+	QUnit.ok(isFunction(fn), "function is a function");
 
 	// test detection of a array
 	QUnit.ok(!isArray(), "undefined is not an array");
@@ -47,8 +58,6 @@ QUnit.test("basic requirements", function() {
 		shift : Array.prototype.shift,
 		unshift : Array.prototype.unshift
 	}), "object with array-like properties is not an array");
-	QUnit.ok(isArray(new Array()), "classical empty array is an array");
-	QUnit.ok(isArray(new Array(1, 2, 3)), "classical non empty array is an array");
 	QUnit.ok(isArray([]), "empty array is an array");
 	QUnit.ok(isArray([ 1, 2, 3 ]), "non empty array is an array");
 
@@ -64,8 +73,7 @@ QUnit.test("basic requirements", function() {
 	QUnit.ok(!isExtendable(Math), "Math object is not an extendable object");
 	QUnit.ok(!isExtendable({}), "Object instance is not an extendable object");
 	QUnit.ok(!isExtendable([]), "Array instance is not an extendable object");
-	QUnit.ok(!isExtendable(new function() {
-	}), "new instance of object is not an extendable object");
+	QUnit.ok(!isExtendable(new fn()), "new instance of object is not an extendable object");
 	(function() {
 		QUnit.ok(!isExtendable(arguments), "Arguments instance is not an extendable object");
 	})();
@@ -118,13 +126,13 @@ QUnit.test("basic requirements", function() {
 	QUnit.equal(indexOf([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ], 5), 4, "Found array element at proper index.");
 
 	// test storing a original function into a new function
-	var fn = function() {
+	var fn_zero = function() {
 		return 0;
 	}, fn_base = function() {
 		return 1;
 	};
-	QUnit.equal(store(fn, fn_base), fn, "store returned the original function reference");
-	QUnit.equal(fn.__original_, fn_base, "original function reference stored correctly");
+	QUnit.equal(store(fn_zero, fn_base), fn_zero, "store returned the original function reference");
+	QUnit.equal(fn_zero.__original_, fn_base, "original function reference stored correctly");
 
 	// iteration functionality
 	test = [ 1 ];
@@ -155,7 +163,7 @@ QUnit.test("basic requirements", function() {
 		QUnit.equal(iteration_index++, 0, "each iterator stops when false is returned from callback for arrays.");
 		return false;
 	});
-	var iteration_index = 0;
+	iteration_index = 0;
 	each({
 		a : 1,
 		b : 2,

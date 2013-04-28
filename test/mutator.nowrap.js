@@ -1,3 +1,4 @@
+/* global create */
 QUnit.module("mutator.nowrap");
 
 QUnit.test("non wrapped properties", function() {

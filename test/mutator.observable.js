@@ -1,3 +1,5 @@
+/* global create */
+/* global Observer */
 QUnit.module("mutator.observable");
 
 QUnit.test("instantiating observer as part of object initialization", function() {

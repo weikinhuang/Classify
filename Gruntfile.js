@@ -47,12 +47,20 @@ module.exports = function(grunt) {
 							predef : []
 						}
 					},
-					/*
-					 * test : { src : [ "test/*.js" ], options : { latedef :
-					 * true, noempty : true, undef : true, strict : true, node :
-					 * true, browser : true, quotmark : "double", maxcomplexity :
-					 * 7, predef : [ "QUnit" ] } },
-					 */
+					test : {
+						src : [ "test/*.js" ],
+						options : {
+							latedef : true,
+							noempty : true,
+							undef : true,
+							strict : false,
+							node : true,
+							browser : true,
+							quotmark : "double",
+							maxcomplexity : 7,
+							predef : [ "QUnit", "Classify" ]
+						}
+					},
 					build : {
 						src : [ "Gruntfile.js", "test/bridge/qunit-node-bridge.js" ],
 						options : {
@@ -214,18 +222,24 @@ module.exports = function(grunt) {
 							outdir : "docs/yuidoc/"
 						}
 					}
+				},
+
+				watch : {
+					files : [ "src/*.js", "test/*.js", "test/*.html" ],
+					tasks : "dev"
 				}
 			});
 
 	grunt.loadNpmTasks("grunt-compare-size");
 	grunt.loadNpmTasks("grunt-contrib-concat");
-	grunt.loadNpmTasks("grunt-contrib-jshint");
-	grunt.loadNpmTasks("grunt-contrib-uglify");
-	grunt.loadNpmTasks("grunt-contrib-qunit");
 	grunt.loadNpmTasks("grunt-contrib-connect");
+	grunt.loadNpmTasks("grunt-contrib-jshint");
+	grunt.loadNpmTasks("grunt-contrib-qunit");
+	grunt.loadNpmTasks("grunt-contrib-uglify");
+	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-contrib-yuidoc");
-	grunt.loadNpmTasks("grunt-saucelabs");
 	grunt.loadNpmTasks("grunt-qunit-cov");
+	grunt.loadNpmTasks("grunt-saucelabs");
 
 	grunt.registerMultiTask("qunit-node", "Run QUnit unit tests in node sandbox.", function() {
 		// Nodejs libs.
@@ -361,4 +375,5 @@ module.exports = function(grunt) {
 	grunt.registerTask("test", [ "connect", "qunit", "qunit-node", "saucelabs-qunit" ]);
 	grunt.registerTask("doc", [ "yuidoc" ]);
 	grunt.registerTask("coverage", [ "qunit", "qunit-cov" ]);
+	grunt.registerTask("dev", [ "connect", "lint", "qunit" ]);
 };

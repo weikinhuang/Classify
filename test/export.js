@@ -1,3 +1,12 @@
+/* global create */
+/* global Namespace */
+/* global getNamespace */
+/* global destroyNamespace */
+/* global testNamespace */
+/* global getGlobalNamespace */
+/* global Observer */
+/* global addMutator */
+/* global removeMutator */
 QUnit.module("export");
 
 QUnit.test("check globally accessable Classify object", function() {

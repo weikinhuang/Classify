@@ -1,3 +1,7 @@
+/* global base */
+/* global create */
+/* global addMutator */
+/* global removeMutator */
 QUnit.module("create");
 
 QUnit.test("simple class creation", function() {
@@ -247,7 +251,7 @@ QUnit.test("extending classes using inheritance", function() {
 		b : 2,
 		c : []
 	});
-	var subclass_a = create(test_a, {
+	subclass_a = create(test_a, {
 		b : 3,
 		d : {}
 	});
@@ -282,9 +286,9 @@ QUnit.test("extending classes using inheritance", function() {
 	QUnit.ok(new subsubclass_b() instanceof subsubclass_a, "Class created with class.extend inherts from parent class.");
 
 	// testing using the parent invoke method
-	var double, triple, single = create({
+	var doubles, triple, single = create({
 		invoke : function() {
-			QUnit.equal(this, double, "parent invoke method called from child context");
+			QUnit.equal(this, doubles, "parent invoke method called from child context");
 			if (!this.instance) {
 				this.instance = this.applicate(arguments);
 			}
@@ -296,8 +300,8 @@ QUnit.test("extending classes using inheritance", function() {
 			}
 		}
 	});
-	double = create(single, {});
-	double();
+	doubles = create(single, {});
+	doubles();
 	triple = create(single, {
 		invoke : function() {
 			QUnit.equal(this, triple, "child invoke method called from child context");
@@ -760,7 +764,7 @@ QUnit.test("adding and removing mutators to the on initialize hook", function() 
 
 	addMutator("test", {
 		onInit : function(instance, klass) {
-			if (klass.count == null) {
+			if (klass.count === undefined) {
 				klass.count = 0;
 			}
 			instance.a = 1;

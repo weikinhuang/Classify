@@ -1,3 +1,4 @@
+/* global create */
 QUnit.module("mutator.static");
 
 QUnit.test("static properties", function() {
@@ -159,16 +160,6 @@ QUnit.test("removing existing static properties", function() {
 	// remove a static value
 	test.removeStaticProperty("y");
 	QUnit.equal(test.y, undefined, "static property removed from class.");
-
-	var test2 = create({
-		x : 1,
-		a : function() {
-			return 1;
-		},
-		b : function() {
-			return 2;
-		}
-	});
 
 	// attempt to remove special properties fail
 	var test2 = create(test, {});

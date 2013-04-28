@@ -1,3 +1,4 @@
+/* global create */
 QUnit.module("mutator.bind");
 
 QUnit.test("bound properties", function() {

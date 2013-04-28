@@ -1,3 +1,9 @@
+/* global base */
+/* global Namespace */
+/* global getNamespace */
+/* global destroyNamespace */
+/* global getGlobalNamespace */
+/* global testNamespace */
 QUnit.module("namespace");
 
 QUnit.test("retrieval and creation", function() {

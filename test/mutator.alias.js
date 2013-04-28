@@ -1,10 +1,11 @@
+/* global create */
 QUnit.module("mutator.alias");
 
 QUnit.test("alias properties", function() {
 	QUnit.expect(8);
 	// testing basic alias methods
 	var test = create({
-		__alias_z : 'a',
+		__alias_z : "a",
 		x : 0,
 		y : 0,
 		a : function() {
@@ -53,7 +54,7 @@ QUnit.test("alias properties", function() {
 	// test aliases working against inheritance
 	var test2 = create({
 		__alias_ : {
-			z : 'a'
+			z : "a"
 		},
 		x : 0,
 		a : function() {

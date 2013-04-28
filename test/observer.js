@@ -1,3 +1,6 @@
+/* global Observer */
+/* global create */
+/* global isArray */
 QUnit.module("observer");
 
 QUnit.test("basic observer creation", function() {
@@ -424,9 +427,9 @@ QUnit.test("removing bound event listeners from observer", function() {
 	observer.set(val);
 
 	// get the list of event listeners
-	var listeners = observer.listeners();
-	QUnit.ok(isArray(listeners), "observers listeners method returned an array of bound listeners.");
-	QUnit.equal(listeners.length, 0, "observers listeners method returned an array or proper number of events after removal of all listeners.");
+	var listeners1 = observer.listeners();
+	QUnit.ok(isArray(listeners1), "observers listeners method returned an array of bound listeners.");
+	QUnit.equal(listeners1.length, 0, "observers listeners method returned an array or proper number of events after removal of all listeners.");
 });
 
 QUnit.test("observer with bound setter event listeners and the delay flag set to true", function() {

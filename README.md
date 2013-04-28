@@ -211,17 +211,32 @@ require({
 Building the Source
 --------------------------------------
 
-After installing NodeJs, just run:
+Classify uses the [grunt](https://github.com/cowboy/grunt) build system. Building Classify requires node.js and a command line gzip program.
 
-`./make.js`
+Install grunt.
 
-Running the unit tests: `./make.js unit`
+`npm install -g grunt-cli`
 
-Running JsHint tests: `./make.js lint`
+Clone the Classify git repo.
 
-Running JsPerf tests: `./make.js perf`
+`git clone git://github.com/weikinhuang/Classify.git`
 
-Other options include: `clean`, `lint`, `unit`, `concat`, `min`, `size`, `perf`, `doc`
+`cd Classify`
+
+`git submodule update --init`
+
+Install node modules.
+
+`npm install`
+
+Run grunt.
+
+`grunt`
+
+There are many other tasks that can be run through grunt. For a list of all tasks:
+
+`grunt --help`
+
 
 Changelog
 --------------------------------------
@@ -336,6 +351,7 @@ About
 Classify copyright 2011-2012 by [Wei Kin Huang](http://closedinterval.com/).
 
 Build Tools: 
+[Grunt](https://github.com/cowboy/grunt),
 [QUnit](https://github.com/jquery/qunit),
 [Benchmark.js](https://github.com/bestiejs/benchmark.js),
 [UglifyJS](https://github.com/mishoo/UglifyJS),
