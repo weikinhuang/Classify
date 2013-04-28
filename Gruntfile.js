@@ -128,7 +128,8 @@ module.exports = function(grunt) {
 						// username: "",
 						// key: "",
 						urls : [ "http://127.0.0.1:8080/test/index.html" ],
-						tunnelTimeout : 5,
+						tunnelTimeout : 120,
+						testTimeout : 300000,
 						build : process.env.TRAVIS_JOB_ID,
 						concurrency : 3,
 						browsers : [ {
