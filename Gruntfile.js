@@ -306,7 +306,12 @@ module.exports = function(grunt) {
 
 	// Other tasks
 	grunt.registerTask("all", [ "connect", "concat", "jshint", "qunit", "qunit-node", "saucelabs-qunit", "uglify", "compare_size" ]);
-	grunt.registerTask("travis", [ "connect", "concat", "jshint", "qunit", "qunit-node", "saucelabs-qunit", "uglify" ]);
+	// only the latest version of travis should do saucelabs testings
+	if (process.env.CI && !/^v0\.10\.\d+$/.test(process.version)) {
+		grunt.registerTask("travis", [ "connect", "concat", "jshint", "qunit", "qunit-node", "uglify" ]);
+	} else {
+		grunt.registerTask("travis", [ "connect", "concat", "jshint", "qunit", "qunit-node", "saucelabs-qunit", "uglify" ]);
+	}
 	grunt.registerTask("lint", [ "concat", "jshint" ]);
 	grunt.registerTask("test:local", [ "connect", "qunit", "qunit-node" ]);
 	grunt.registerTask("test", [ "connect", "qunit", "qunit-node", "saucelabs-qunit" ]);
