@@ -1,3 +1,4 @@
+"use strict";
 // include the fs module
 var fs = require("fs"),
 // sandboxing module
