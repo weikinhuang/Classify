@@ -8,7 +8,14 @@ module.exports = function(grunt) {
 				pkg : grunt.file.readJSON("package.json"),
 
 				compare_size : {
-					files : [ "dist/classify.js", "dist/classify.min.map", "dist/classify.min.js" ]
+					files : [ "dist/classify.js", "dist/classify.min.map", "dist/classify.min.js" ],
+					options : {
+						compress : {
+							gz : function(file_contents) {
+								return require("gzip-js").zip(file_contents, {}).length;
+							}
+						}
+					}
 				},
 
 				concat : {
