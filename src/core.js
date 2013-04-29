@@ -1,7 +1,5 @@
 // shortcut for minification compaction
-var prototype = "prototype",
-// export variables into the Classify namespace
-exportNames = {},
+var exportNames = {},
 // For IE, check if looping through objects works with toString & valueOf
 isEnumerationBuggy = !({
 	toString : null

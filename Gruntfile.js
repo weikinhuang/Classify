@@ -39,6 +39,7 @@ module.exports = function(grunt) {
 							latedef : true,
 							noempty : true,
 							undef : true,
+							unused : true,
 							strict : true,
 							node : true,
 							browser : true,
@@ -67,6 +68,7 @@ module.exports = function(grunt) {
 							latedef : true,
 							noempty : true,
 							undef : true,
+							unused : true,
 							strict : true,
 							node : true,
 							browser : true,
@@ -294,63 +296,63 @@ module.exports = function(grunt) {
 		child.on("message", function(message) {
 			var data = message.data || {};
 			switch (message.event) {
-			case "assertionDone":
-				if (data.result === false) {
-					failedAssertions.push({
-						actual : data.actual,
-						expected : data.expected,
-						message : data.message,
-						source : data.source,
-						testName : (data.module ? data.module + " - " : "") + data.name
-					});
-				}
-				break;
-			case "testStart":
-				grunt.verbose.write((data.module ? data.module + " - " : "") + data.name + "...");
-				break;
-			case "testDone":
-				// Log errors if necessary, otherwise success.
-				if (data.failed > 0) {
-					// list assertions
-					if (grunt.option("verbose")) {
-						grunt.log.error();
-						logFailedAssertions();
-					} else {
-						grunt.log.write("F".red);
+				case "assertionDone":
+					if (data.result === false) {
+						failedAssertions.push({
+							actual : data.actual,
+							expected : data.expected,
+							message : data.message,
+							source : data.source,
+							testName : (data.module ? data.module + " - " : "") + data.name
+						});
 					}
-				} else {
-					grunt.verbose.ok().or.write(".");
-				}
-				break;
-			case "moduleStart":
-				break;
-			case "moduleDone":
-				break;
-			case "done":
-				status.failed += data.failed;
-				status.passed += data.passed;
-				status.total += data.total;
-				status.duration += data.runtime;
-				// Print assertion errors here, if verbose mode is disabled.
-				if (!grunt.option("verbose")) {
+					break;
+				case "testStart":
+					grunt.verbose.write((data.module ? data.module + " - " : "") + data.name + "...");
+					break;
+				case "testDone":
+					// Log errors if necessary, otherwise success.
 					if (data.failed > 0) {
-						grunt.log.writeln();
-						logFailedAssertions();
+						// list assertions
+						if (grunt.option("verbose")) {
+							grunt.log.error();
+							logFailedAssertions();
+						} else {
+							grunt.log.write("F".red);
+						}
 					} else {
-						grunt.log.ok();
+						grunt.verbose.ok().or.write(".");
 					}
-				}
-				// Log results.
-				if (status.failed > 0) {
-					grunt.warn(status.failed + "/" + status.total + " assertions failed (" + status.duration + "ms)");
-					done(false);
-				} else if (status.total === 0) {
-					grunt.warn("0/0 assertions ran (" + status.duration + "ms)");
-				} else {
-					grunt.verbose.writeln();
-					grunt.log.ok(status.total + " assertions passed (" + status.duration + "ms)");
-				}
-				break;
+					break;
+				case "moduleStart":
+					break;
+				case "moduleDone":
+					break;
+				case "done":
+					status.failed += data.failed;
+					status.passed += data.passed;
+					status.total += data.total;
+					status.duration += data.runtime;
+					// Print assertion errors here, if verbose mode is disabled.
+					if (!grunt.option("verbose")) {
+						if (data.failed > 0) {
+							grunt.log.writeln();
+							logFailedAssertions();
+						} else {
+							grunt.log.ok();
+						}
+					}
+					// Log results.
+					if (status.failed > 0) {
+						grunt.warn(status.failed + "/" + status.total + " assertions failed (" + status.duration + "ms)");
+						done(false);
+					} else if (status.total === 0) {
+						grunt.warn("0/0 assertions ran (" + status.duration + "ms)");
+					} else {
+						grunt.verbose.writeln();
+						grunt.log.ok(status.total + " assertions passed (" + status.duration + "ms)");
+					}
+					break;
 			}
 			if (message.event === "done") {
 				child.kill();
