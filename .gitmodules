@@ -1,3 +1,6 @@
-[submodule "test/qunit"]
-	path = test/qunit
+[submodule "vendor/qunit"]
+	path = vendor/qunit
 	url = https://github.com/jquery/qunit.git
+[submodule "vendor/benchmark.js"]
+	path = vendor/benchmark.js
+	url = https://github.com/bestiejs/benchmark.js.git

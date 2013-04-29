@@ -38,6 +38,9 @@ module.exports = function(grunt) {
 						options : {
 							latedef : true,
 							noempty : true,
+							curly : true,
+							noarg : true,
+							trailing : false,
 							undef : true,
 							unused : true,
 							strict : true,
@@ -53,6 +56,8 @@ module.exports = function(grunt) {
 						options : {
 							latedef : true,
 							noempty : true,
+							curly : true,
+							trailing : false,
 							undef : true,
 							strict : false,
 							node : true,
@@ -67,6 +72,8 @@ module.exports = function(grunt) {
 						options : {
 							latedef : true,
 							noempty : true,
+							curly : true,
+							trailing : false,
 							undef : true,
 							unused : true,
 							strict : true,
@@ -227,7 +234,7 @@ module.exports = function(grunt) {
 				},
 
 				watch : {
-					files : [ "src/*.js", "test/*.js", "test/*.html" ],
+					files : [ "src/*.js", "test/*.js", "test/*.html", "Gruntfile.js" ],
 					tasks : "dev"
 				}
 			});

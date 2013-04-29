@@ -52,7 +52,7 @@ function load(src) {
 }
 
 // load up qunit
-load("test/qunit/qunit/qunit.js");
+load("vendor/qunit/qunit/qunit.js");
 
 // have a global reference to QUnit within the sandbox
 context.QUnit = context.exports;

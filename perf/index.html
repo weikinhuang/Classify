@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<title>Classify Performance Suite</title>
+	<!-- Includes -->
+
+	<link rel="stylesheet" media="screen" href="perf/perf.css" />
+	<script type="text/javascript" src="../vendor/benchmark.js/vendor/lodash/lodash.js"></script>
+	<script type="text/javascript" src="../vendor/benchmark.js/benchmark.js"></script>
+	<script type="text/javascript">
+	var ___benchmarks = new Benchmark.Suite();
+	</script>
+	
+	<script>
+		var root = this;
+	</script>
+</head>
+
+<body id="body">
+<h1 id="perf-header">Classify Performance Suite</h1>
+	<table id="perf-container">
+	<thead>
+		<tr class="perf-header">
+			<th colspan="3" id="perf-status">Initializing...</th>
+		</tr>
+		<tr class="perf-sub-header">
+			<th>Name</th>
+			<th>Ops/sec</th>
+			<th>Test</th>
+		</tr>
+	</thead>
+	<tbody id="perf-tests"></tbody>
+</table>
+<script type="text/javascript" src="perf/perf.js"></script>
+
+<script src="../src/core.js"></script>
+<script src="../src/create.js"></script>
+<script src="../src/mutator.static.js"></script>
+<script src="../src/mutator.nowrap.js"></script>
+<script src="../src/mutator.alias.js"></script>
+<script src="../src/mutator.bind.js"></script>
+<script src="../src/observer.js"></script>
+<script src="../src/mutator.observable.js"></script>
+<script src="../src/namespace.js"></script>
+<script src="../src/export.js"></script>
+
+<script src="create.js"></script>
+
+<script type="text/javascript">
+___benchmarks.run({
+	async : true,
+	queued: true
+});
+</script>
+</body>
+</html>
