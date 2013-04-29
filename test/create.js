@@ -1,4 +1,4 @@
-/* global base */
+/* global Base */
 /* global create */
 /* global addMutator */
 /* global removeMutator */
@@ -161,11 +161,11 @@ QUnit.test("known properties", function() {
 	QUnit.equal((new test()).constructor, test, "assert that we have a internal reference to the constructor via 'constructor'");
 	QUnit.equal((new test()).self, test, "assert that we have a internal reference to the constructor via 'self'");
 	QUnit.equal(typeof test.superclass, "function", "assert that there is an internal reference to the parent class");
-	QUnit.equal(test.superclass, base, "assert that the reference to the superclass is the parent");
+	QUnit.equal(test.superclass, Base, "assert that the reference to the superclass is the parent");
 	QUnit.equal(typeof test.subclass, "object", "assert that an array is created holding child classes");
 	QUnit.equal(test.subclass.length, 0, "assert that there are no child classes extending this object");
 	QUnit.ok(new test() instanceof test, "assert that a new object of this class is an instance of it's constructor");
-	QUnit.ok(new test() instanceof base, "assert that a new object of this class is an instance of it's parent");
+	QUnit.ok(new test() instanceof Base, "assert that a new object of this class is an instance of it's parent");
 });
 
 QUnit.test("extending classes using inheritance", function() {

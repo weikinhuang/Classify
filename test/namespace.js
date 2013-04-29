@@ -1,4 +1,4 @@
-/* global base */
+/* global Base */
 /* global Namespace */
 /* global getNamespace */
 /* global destroyNamespace */
@@ -37,7 +37,7 @@ QUnit.test("class creation", function() {
 		}
 	});
 	QUnit.ok(!!c.__isclass_, "class created is a class object");
-	QUnit.ok(new c() instanceof base, "class creation created by extending the base class");
+	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
 	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
 	QUnit.equal(c.getNamespace(), ns, "namespaced class has a getter for the current namespace");
@@ -54,7 +54,7 @@ QUnit.test("class creation", function() {
 		}
 	});
 	QUnit.equal(typeof ns.B, "object", "an intermediate container object is created by the namespace");
-	QUnit.ok(new d() instanceof base, "class creation created by extending the base class");
+	QUnit.ok(new d() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.B.C, d, "class reference is stored directly within namespace object (nested)");
 	QUnit.equal(ns.B.C(), "invoke", "class reference within namespace object can still be invoked");
 	QUnit.equal(ns.get("B.C"), d, "class reference is stored in internal reference array (nested)");

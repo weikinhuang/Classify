@@ -7,22 +7,13 @@ var keywordRegexp = /^(?:superclass|subclass|implement|observable|bindings|exten
 mutatorNameTest = /^__/,
 // reference to existing mutators
 mutators = {},
-// array of mutators that will get called when a class is created
-createMutator = [],
-// array of mutators that will get called when a property is added to the class
-propAddMutator = [],
-// array of mutators that will get called when a property is removed from the class
-propRemoveMutator = [],
-// array of mutators that will get called when a class is instantiated
-initMutator = [],
-// quick reference to the mutator arrays
-refMutator = [ createMutator, propAddMutator, propRemoveMutator, initMutator ],
-// Array of mutator methods that correspond to the mutator quick reference
-refMutatorOrder = [ "onCreate", "onPropAdd", "onPropRemove", "onInit" ],
+// list of all mutators in the order of definition
+globalMutators = [],
 // Use native object.create whenever possible
 objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto) {
 //#JSCOVERAGE_IF !Object.create
-	// This method allows for the constructor to not be called when making a new subclass
+	// This method allows for the constructor to not be called when making a new
+	// subclass
 	var SubClass = function() {
 	};
 	SubClass.prototype = proto;
@@ -34,12 +25,14 @@ objectDefineProperty = function(obj, prop, descriptor) {
 	obj[prop] = descriptor;
 },
 // create the base object that everything extends from
-base = (function() {
+Base = (function() {
 	var fn = function() {
 	};
 	// Make sure we always have a constructor
 	/**
-	 * True constructor method for this object, will be called when object is called with the "new" keyword
+	 * True constructor method for this object, will be called when object is
+	 * called with the "new" keyword
+	 *
 	 * @for Classify.Class
 	 * @method init
 	 * @return {Class}
@@ -49,8 +42,8 @@ base = (function() {
 	fn.superclass = null;
 	fn.subclass = [];
 	fn.implement = [];
-	fn.prototype.constructor = base;
-	fn.prototype.self = base;
+	fn.prototype.constructor = Base;
+	fn.prototype.self = Base;
 	fn.__isclass_ = true;
 	return fn;
 })(),
@@ -58,8 +51,9 @@ base = (function() {
 wrapParentProperty = function(parentPrototype, property) {
 	return store(function() {
 		/**
-		 * Internal reference property for methods that override a parent method,
-		 * allow for access to the parent version of the function.
+		 * Internal reference property for methods that override a parent
+		 * method, allow for access to the parent version of the function.
+		 *
 		 * @for Classify.Class
 		 * @method parent
 		 * @return {Object}
@@ -76,13 +70,21 @@ wrapParentProperty = function(parentPrototype, property) {
 	}, property);
 },
 /**
- * Adds a global class mutator that modifies the defined classes at different points with hooks
+ * Adds a global class mutator that modifies the defined classes at different
+ * points with hooks
+ *
  * @param {String} name The name of the mutator reference to add
  * @param {Object} mutator The mutator definition with optional hooks
- * @param {Function} [mutator.onCreate] The hook to be called when a class is defined
- * @param {Function} [mutator.onPropAdd] The hook to be called when a property with the __name_ prefix is added
- * @param {Function} [mutator.onPropRemove] The hook to be called when a property with the __name_ prefix is removed
- * @param {Function} [mutator.onInit] The hook to be called during each object's initialization
+ * @param {Function} [mutator.onCreate] The hook to be called when a class is
+ *            defined before any properties are added
+ * @param {Function} [mutator.onDefine] The hook to be called when a class is
+ *            defined after all properties are added
+ * @param {Function} [mutator.onPropAdd] The hook to be called when a property
+ *            with the __name_ prefix is added
+ * @param {Function} [mutator.onPropRemove] The hook to be called when a
+ *            property with the __name_ prefix is removed
+ * @param {Function} [mutator.onInit] The hook to be called during each object's
+ *            initialization
  * @throws Error
  * @static
  * @for Classify
@@ -96,14 +98,12 @@ addMutator = function(name, mutator) {
 	mutator.name = name;
 	mutator.propTest = new RegExp("^__" + name + "_");
 	mutator.propPrefix = "__" + name + "_";
-	each(refMutatorOrder, function(v, i) {
-		if (mutator[v]) {
-			refMutator[i].push(mutator);
-		}
-	});
+	globalMutators.push(mutator);
 },
 /**
- * Removes a global class mutator that modifies the defined classes at different points
+ * Removes a global class mutator that modifies the defined classes at different
+ * points
+ *
  * @param {String} name The name of the mutator to be removed
  * @throws Error
  * @static
@@ -115,15 +115,10 @@ removeMutator = function(name) {
 	if (!mutator) {
 		throw new Error("Removing unknown mutator.");
 	}
-	each(refMutatorOrder, function(v, i) {
-		if (mutator[v]) {
-			// remove the event listener if it exists
-			var idx = indexOf(refMutator[i], mutator);
-			if (idx > -1) {
-				refMutator[i].splice(idx, 1);
-			}
-		}
-	});
+	var idx = indexOf(globalMutators, mutator);
+	if (idx > -1) {
+		globalMutators.splice(idx, 1);
+	}
 	mutators[name] = null;
 	try {
 		delete mutators[name];
@@ -131,7 +126,7 @@ removeMutator = function(name) {
 	}
 },
 // adds a property to an existing class taking into account parent
-addProperty = function(klass, parent, name, property) {
+addProperty = function(klass, parent, name, property, mutators) {
 	var foundMutator, parent_prototype, self_prototype;
 	// we don't want to re-add the core javascript properties, it's redundant
 	if (property === objectPrototype[name]) {
@@ -141,8 +136,8 @@ addProperty = function(klass, parent, name, property) {
 	// check to see if the property needs to be mutated
 	if (mutatorNameTest.test(name)) {
 		foundMutator = false;
-		each(propAddMutator, function(mutator) {
-			if (mutator.propTest.test(name)) {
+		each(mutators, function(mutator) {
+			if (mutator.onPropAdd && mutator.propTest.test(name)) {
 				if (name === mutator.propPrefix) {
 					each(property, function(prop, key) {
 						mutator.onPropAdd.call(mutator, klass, parent, key, prop);
@@ -162,7 +157,8 @@ addProperty = function(klass, parent, name, property) {
 	// quick references
 	parent_prototype = parent.prototype[name];
 	self_prototype = klass.prototype;
-	// else this is not a prefixed static property, so we're assigning it to the prototype
+	// else this is not a prefixed static property, so we're assigning it to the
+	// prototype
 	objectDefineProperty(self_prototype, name, (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property);
 
 	// wrap all child implementation with the parent wrapper
@@ -176,11 +172,11 @@ addProperty = function(klass, parent, name, property) {
 	}
 },
 // removes a property from the chain
-removeProperty = function(klass, name) {
+removeProperty = function(klass, name, mutators) {
 	var foundMutator = false;
 	if (mutatorNameTest.test(name)) {
-		each(propRemoveMutator, function(mutator) {
-			if (mutator.propTest.test(name)) {
+		each(mutators, function(mutator) {
+			if (mutator.onPropRemove && mutator.propTest.test(name)) {
 				mutator.onPropRemove.call(mutator, klass, name.replace(mutator.propTest, ""));
 				foundMutator = true;
 				return false;
@@ -191,7 +187,8 @@ removeProperty = function(klass, name) {
 		}
 	}
 
-	// if we are not removing a function from the prototype chain, then just delete it
+	// if we are not removing a function from the prototype chain, then just
+	// delete it
 	if (!isFunction(klass.prototype[name])) {
 		klass.prototype[name] = null;
 		try {
@@ -200,7 +197,8 @@ removeProperty = function(klass, name) {
 		}
 		return;
 	}
-	// we need to delete the observable property from all children as well as the current class
+	// we need to delete the observable property from all children as well as
+	// the current class
 	each(klass.subclass, function(k) {
 		// remove the parent function wrapper for child classes
 		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].__original_)) {
@@ -217,8 +215,11 @@ removeProperty = function(klass, name) {
 // Master inheritance based class system creation
 /**
  * Creates a new Classify class
- * @param {Class} [parent] Optional first parameter defines what object to inherit from
- * @param {Object[]} [implement] Optional second parameter defines where to implement traits from
+ *
+ * @param {Class} [parent] Optional first parameter defines what object to
+ *            inherit from
+ * @param {Object[]} [implement] Optional second parameter defines where to
+ *            implement traits from
  * @param {Object} definition The description of the class to be created
  * @static
  * @for Classify
@@ -226,10 +227,11 @@ removeProperty = function(klass, name) {
  * @return {Class}
  */
 var create = function() {
-	var parent = base,
+	var parent = Base,
 	// a hash of methods and properties to be inserted into the new class
 	methods = {},
-	// array of objects/classes that this class will implement the functions of, but will not be an instance of
+	// array of objects/classes that this class will implement the functions of,
+	// but will not be an instance of
 	implement = [],
 	// quick reference to the arguments array and it's length
 	args = arguments, argLength = args.length,
@@ -258,44 +260,57 @@ var create = function() {
 	if (!parent.__isclass_ && !methods.init) {
 		methods.init = parent;
 	}
+
 	/**
 	 * Placeholder for class descriptors created with the create method
+	 *
 	 * @constructor
 	 * @for Classify
 	 * @type Object
 	 */
 	klass = function() {
 		var tmp, i, l;
-		// We're not creating a instantiated object so we want to force a instantiation or call the invoke function
+		// We're not creating a instantiated object so we want to force a
+		// instantiation or call the invoke function
 		// we need to test for !this when in "use strict" mode
-		// we need to test for !this.init for quick check if this is a instance or a definition
-		// we need to test for !(this instanceof klass) when the class is a property of a instance class (ie. namespace)
+		// we need to test for !this.init for quick check if this is a instance
+		// or a definition
+		// we need to test for !(this instanceof klass) when the class is a
+		// property of a instance class (ie. namespace)
 		if (!this || !this.init || !(this instanceof klass)) {
 			return klass.invoke.apply(klass, arguments);
 		}
 		// loop through all the mutators for the onInit hook
-		for (i = 0, l = initMutator.length; i < l; i++) {
-			// if the onInit hook returns anything, then it will override the "new" keyword
-			tmp = initMutator[i].onInit.call(initMutator[i], this, klass);
+		for (i = 0, l = globalMutators.length; i < l; i++) {
+			if (!globalMutators[i].onInit) {
+				continue;
+			}
+			// if the onInit hook returns anything, then it will override the
+			// "new" keyword
+			tmp = globalMutators[i].onInit.call(globalMutators[i], this, klass);
 			if (tmp !== undefined) {
-				// however this method can only return objects and not scalar values
+				// however this method can only return objects and not scalar
+				// values
 				if (isScalar(tmp)) {
 					throw new Error("Return values during onInit hook can only be objects.");
 				}
 				return tmp;
 			}
 		}
-		// just in case we want to do anything special like "new" keyword override (usually don't return anything)
+		// just in case we want to do anything special like "new" keyword
+		// override (usually don't return anything)
 		tmp = this.init.apply(this, arguments);
 		if (tmp !== undefined) {
-			// we can only return objects because the new keyword forces it to be an object
+			// we can only return objects because the new keyword forces it to
+			// be an object
 			if (isScalar(tmp)) {
 				throw new Error("Return values for the constructor can only be objects.");
 			}
 			return tmp;
 		}
 	};
-	// ability to create a new instance using an array of arguments, cannot be overriden
+	// ability to create a new instance using an array of arguments, cannot be
+	// overriden
 	delete methods.applicate;
 	/**
 	 * Create a new instance of the class using arguments passed in as an array
@@ -314,8 +329,9 @@ var create = function() {
 		return new TempClass();
 	};
 	/**
-	 * Default invocation function when the defined class is called without the "new" keyword.
-	 * The default behavior is to return a new instance of itself
+	 * Default invocation function when the defined class is called without the
+	 * "new" keyword. The default behavior is to return a new instance of itself
+	 *
 	 * @static
 	 * @for Classify.Class
 	 * @method invoke
@@ -329,6 +345,7 @@ var create = function() {
 	// Keep a list of the inheritance chain
 	/**
 	 * Reference to the parent that this object extends from
+	 *
 	 * @static
 	 * @for Classify.Class
 	 * @property superclass
@@ -336,7 +353,9 @@ var create = function() {
 	 */
 	klass.superclass = parent;
 	/**
-	 * Array containing a reference to all the children that inherit from this object
+	 * Array containing a reference to all the children that inherit from this
+	 * object
+	 *
 	 * @static
 	 * @for Classify.Class
 	 * @property subclass
@@ -344,7 +363,9 @@ var create = function() {
 	 */
 	klass.subclass = [];
 	/**
-	 * Array containing all the objects and classes that this object implements methods and properties from
+	 * Array containing all the objects and classes that this object implements
+	 * methods and properties from
+	 *
 	 * @static
 	 * @for Classify.Class
 	 * @property implement
@@ -352,13 +373,16 @@ var create = function() {
 	 */
 	klass.implement = (isArray(parent.implement) ? parent.implement : []).concat(implement);
 
-	// assign child prototype to be that of the parent's by default (inheritance)
+	// assign child prototype to be that of the parent's by default
+	// (inheritance)
 	proto = klass.prototype = objectCreate(parent.prototype);
 
 	// Give this class the ability to create sub classes
 	/**
 	 * Creates a new class that is a child of the current class
-	 * @param {Object[]} [implement] Optional parameter defines where to implement traits from
+	 *
+	 * @param {Object[]} [implement] Optional parameter defines where to
+	 *            implement traits from
 	 * @param {Object} definition The description of the class to be created
 	 * @static
 	 * @for Classify.Class
@@ -368,7 +392,8 @@ var create = function() {
 	/**
 	 * Creates a new class that is a child of the current class
 	 *
-	 * @param {Object[]} [implement] Optional parameter defines where to implement traits from
+	 * @param {Object[]} [implement] Optional parameter defines where to
+	 *            implement traits from
 	 * @param {Object} definition The description of the class to be created
 	 * @for Classify.Class
 	 * @method extend
@@ -385,6 +410,7 @@ var create = function() {
 	// Create a magic method that can invoke any of the parent methods
 	/**
 	 * Magic method that can invoke any of the parent methods
+	 *
 	 * @param {Object} name The name of the parent method to invoke
 	 * @param {Array} args The arguments to pass through to invoke
 	 * @for Classify.Class
@@ -403,7 +429,9 @@ var create = function() {
 	};
 	/**
 	 * Adds a new property to the object's prototype of base
-	 * @param {String|Object} name The property name to add or if object is passed in then it will iterate through it to add properties
+	 *
+	 * @param {String|Object} name The property name to add or if object is
+	 *            passed in then it will iterate through it to add properties
 	 * @param {Object} [property] The property to add to the class
 	 * @param {String} [prefix=""] Prefix of the property name if any
 	 * @static
@@ -416,15 +444,16 @@ var create = function() {
 		prefix = prefix || "";
 		if (property === undefined && typeof name !== "string") {
 			each(keys(name), function(n) {
-				addProperty(klass, parent, prefix + n, name[n]);
+				addProperty(klass, parent, prefix + n, name[n], globalMutators);
 			});
 		} else {
-			addProperty(klass, parent, prefix + name, property);
+			addProperty(klass, parent, prefix + name, property, globalMutators);
 		}
 		return klass;
 	};
 	/**
 	 * Removes a property from the object's prototype or base
+	 *
 	 * @param {String} name The name of the property to remove
 	 * @static
 	 * @for Classify.Class
@@ -432,7 +461,7 @@ var create = function() {
 	 * @return {Class}
 	 */
 	klass.removeProperty = function(name) {
-		removeProperty(klass, name);
+		removeProperty(klass, name, globalMutators);
 		return klass;
 	};
 
@@ -442,7 +471,8 @@ var create = function() {
 			var props = impl.__isclass_ ? impl.prototype : impl;
 			each(keys(props), function(name) {
 				if (!hasOwn.call(proto, name) && !hasOwn.call(methods, name)) {
-					// copy all the implemented properties to the methods definition object
+					// copy all the implemented properties to the methods
+					// definition object
 					methods[name] = props[name];
 				}
 			});
@@ -450,7 +480,10 @@ var create = function() {
 	}
 
 	// call each of the onCreate mutators to modify this class
-	each(createMutator, function(mutator) {
+	each(globalMutators, function(mutator) {
+		if (!mutator.onCreate) {
+			return;
+		}
 		mutator.onCreate.call(mutator, klass, parent);
 	});
 
@@ -458,6 +491,7 @@ var create = function() {
 	klass.addProperty(methods);
 	/**
 	 * Reference to the constructor function of this object
+	 *
 	 * @for Classify.Class
 	 * @property constructor
 	 * @type {Class}
@@ -465,6 +499,7 @@ var create = function() {
 	proto.constructor = klass;
 	/**
 	 * Reference to the constructor function of this object
+	 *
 	 * @for Classify.Class
 	 * @property self
 	 * @type {Class}
@@ -472,6 +507,7 @@ var create = function() {
 	proto.self = klass;
 	/**
 	 * Flag to determine if this object is created by Classify.create
+	 *
 	 * @static
 	 * @for Classify.Class
 	 * @property __isclass_
@@ -479,5 +515,14 @@ var create = function() {
 	 * @type {Boolean}
 	 */
 	klass.__isclass_ = true;
+
+	// call each of the onDefine mutators to modify this class
+	each(globalMutators, function(mutator) {
+		if (!mutator.onDefine) {
+			return;
+		}
+		mutator.onDefine.call(mutator, klass);
+	});
+
 	return klass;
 };

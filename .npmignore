@@ -1,26 +1,18 @@
-.gitattributes
-.gitignore
-.npmignore
-config.js
-make.js
-.travis.yml
-.settings
+/.*
+/.*/*
 *~
 *.diff
 *.patch
 /*.html
-.svn
-*/.svn
-.DS_Store
-.externalToolBuilders
-.buildpath
-.project
 
+Gruntfile.js
+README.md
 README.md
 
-build/*
 coverage/*
 docs/*
 perf/*
 src/*
+srcwrap/*
 test/*
+vendor/*

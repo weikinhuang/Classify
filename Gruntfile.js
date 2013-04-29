@@ -47,7 +47,7 @@ module.exports = function(grunt) {
 							node : true,
 							browser : true,
 							quotmark : "double",
-							maxcomplexity : 7,
+							maxcomplexity : 8,
 							predef : []
 						}
 					},
@@ -382,11 +382,12 @@ module.exports = function(grunt) {
 
 	// Other tasks
 	grunt.registerTask("all", [ "concat", "jshint" ].concat(unit_test_all_tasks).concat([ "uglify", "compare_size" ]));
+	grunt.registerTask("all:local", [ "concat", "jshint" ].concat(unit_test_tasks).concat([ "uglify", "compare_size" ]));
 	grunt.registerTask("travis", [ "concat", "jshint" ].concat(unit_test_all_tasks).concat([ "uglify" ]));
 	grunt.registerTask("lint", [ "concat", "jshint" ]);
 	grunt.registerTask("test:local", unit_test_tasks);
 	grunt.registerTask("test", unit_test_all_tasks);
 	grunt.registerTask("doc", [ "yuidoc" ]);
 	grunt.registerTask("coverage", [ "connect", "qunit", "qunit-cov" ]);
-	grunt.registerTask("dev", [ "lint" ].concat(unit_test_tasks));
+	grunt.registerTask("dev", [ "lint" ].concat(unit_test_tasks).concat([ "uglify", "compare_size" ]));
 };
