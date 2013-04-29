@@ -213,44 +213,46 @@ Building the Source
 
 Classify uses the [grunt](https://github.com/cowboy/grunt) build system. Building Classify requires node.js and a command line gzip program.
 
-Install grunt.
+```bash
+# Install grunt.
+$ npm install -g grunt-cli
 
-`npm install -g grunt-cli`
+# Clone the Classify git repo.
+$ git clone git://github.com/weikinhuang/Classify.git
+$ cd Classify
+$ git submodule update --init
 
-Clone the Classify git repo.
+# Install node modules.
+$ npm install
 
-`git clone git://github.com/weikinhuang/Classify.git`
-
-`cd Classify`
-
-`git submodule update --init`
-
-Install node modules.
-
-`npm install`
-
-Run grunt.
-
-`grunt`
+# Run grunt.
+$ grunt
+```
 
 Running the tests:
 
-`grunt test`
+```bash
+$ grunt test
+```
 
 For saucelabs users, test can be run from the test task with:
 
 ```bash
-export SAUCE_USERNAME=[saucelabs username]
-export SAUCE_ACCESS_KEY=[saucelabs access token]
+$ export SAUCE_USERNAME=[saucelabs username]
+$ export SAUCE_ACCESS_KEY=[saucelabs access token]
 ```
 
 To skip the saucelabs tests
 
-`grunt test:local`
+```bash
+$ grunt test:local
+```
 
 There are many other tasks that can be run through grunt. For a list of all tasks:
 
-`grunt --help`
+```bash
+$ grunt --help
+```
 
 
 Changelog
