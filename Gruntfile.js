@@ -3,6 +3,8 @@ var fs = require("fs");
 module.exports = function(grunt) {
 	"use strict";
 
+	var gzip = require("gzip-js");
+
 	grunt
 			.initConfig({
 				pkg : grunt.file.readJSON("package.json"),
@@ -12,7 +14,7 @@ module.exports = function(grunt) {
 					options : {
 						compress : {
 							gz : function(file_contents) {
-								return require("gzip-js").zip(file_contents, {}).length;
+								return gzip.zip(file_contents, {}).length;
 							}
 						}
 					}
