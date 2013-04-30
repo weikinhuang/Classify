@@ -74,11 +74,6 @@ extend(Classify, exportNames, {
 	 */
 	version : "@VERSION",
 
-	// direct access functions
-	create : create,
-	addMutator : addMutator,
-	removeMutator : removeMutator,
-
 	/**
 	 * Utility function to provide functionality to quickly add properties to objects
 	 * @param {Object} base The base object to copy properties into
