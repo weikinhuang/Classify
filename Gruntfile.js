@@ -135,6 +135,7 @@ module.exports = function(grunt) {
 								"src/export.js" ],
 						tests : [ "test/core.js",
 								"test/create.js",
+								"test/mutator.js",
 								"test/mutator.static.js",
 								"test/mutator.nowrap.js",
 								"test/mutator.alias.js",
