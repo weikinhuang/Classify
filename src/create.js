@@ -11,14 +11,14 @@ namedGlobalMutators = {},
 globalMutators = [],
 // Use native object.create whenever possible
 objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto) {
-	// #JSCOVERAGE_IF !Object.create
+//#JSCOVERAGE_IF !Object.create
 	// This method allows for the constructor to not be called when making a new
 	// subclass
 	var SubClass = function() {
 	};
 	SubClass.prototype = proto;
 	return new SubClass();
-	// #JSCOVERAGE_ENDIF
+//#JSCOVERAGE_ENDIF
 },
 // Hook to use Object.defineProperty if needed
 objectDefineProperty = function(obj, prop, descriptor) {
@@ -265,31 +265,28 @@ var create = function() {
 	// array of mutators to be
 	mutators = [],
 	// quick reference to the arguments array and it's length
-	args = argsToArray(arguments), argLength = args.length,
+	args = argsToArray(arguments).slice(0, 4), argLength = args.length,
 	// other variables
-	klass, proto;
+	klass, proto, tmp;
 	// Parse out the arguments to grab the parent and methods
 	// 1 argument: class definition
 	// 2 argument: parent|implements|mutators, class definition
 	// 3 argument: class definition, [implements, parent]|[implements,
 	// mutators]|[parent, mutators], class definition
-	// 4 argument: implements, parent, mutators, class definition
+	// 4 argument: parent, implements, mutators, class definition
 	if (argLength > 0) {
 		// the definition is always the last argument
 		methods = args.pop();
-		// test the rest...
-		if (argLength > 1) {
-			if (argLength === 2) {
-				if (!args[0].__isclass_ && !isExtendable(args[0])) {
-					implement = toArray(args[0]);
+		while (--argLength > 0) {
+			tmp = args.shift();
+			if (!tmp.__isclass_ && !isExtendable(tmp)) {
+				if (tmp instanceof Mutator || isArray(tmp) && tmp[0] instanceof Mutator) {
+					mutators = toArray(tmp);
 				} else {
-					parent = args[0];
+					implement = toArray(tmp);
 				}
-				methods = args[1];
 			} else {
-				parent = args[0];
-				implement = toArray(args[1]);
-				methods = args[2];
+				parent = tmp;
 			}
 		}
 	}

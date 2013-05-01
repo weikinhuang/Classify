@@ -216,8 +216,7 @@ QUnit.test("adding class level mutators to the on create hook", function() {
 		}
 	});
 
-	var test = create({
-		__mutators : [ mutator ],
+	var test = create([ mutator ], {
 		xyz : function() {
 		}
 	});
