@@ -11,14 +11,14 @@ namedGlobalMutators = {},
 globalMutators = [],
 // Use native object.create whenever possible
 objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto) {
-//#JSCOVERAGE_IF !Object.create
+	// #JSCOVERAGE_IF !Object.create
 	// This method allows for the constructor to not be called when making a new
 	// subclass
 	var SubClass = function() {
 	};
 	SubClass.prototype = proto;
 	return new SubClass();
-//#JSCOVERAGE_ENDIF
+	// #JSCOVERAGE_ENDIF
 },
 // Hook to use Object.defineProperty if needed
 objectDefineProperty = function(obj, prop, descriptor) {
@@ -93,6 +93,8 @@ wrapParentProperty = function(parentPrototype, property) {
  *
  * @param {String} name The name of the mutator reference to add
  * @param {Object} mutator The mutator definition with optional hooks
+ * @param {Function} [mutator._onPredefine] Internal hook to be called as soon as
+ *            the constructor is defined
  * @param {Function} [mutator.onCreate] The hook to be called when a class is
  *            defined before any properties are added
  * @param {Function} [mutator.onDefine] The hook to be called when a class is
@@ -145,6 +147,10 @@ removeMutator = function(name) {
 getMutators = function(klass) {
 	var i, l, mutators = globalMutators.slice(0);
 	arrayPush.apply(mutators, klass.mutators);
+	// hook for namespaces!
+	if (klass.getMutators) {
+		arrayPush.apply(mutators, klass.getMutators() || []);
+	}
 	for (i = 0, l = mutators; i < l; i++) {
 		if (!(mutators[i] instanceof Mutator)) {
 			throw new Error("Mutator objects can only be instances of \"Mutator\", please use createMutator.");
@@ -422,6 +428,14 @@ var create = function() {
 	 * @type {Array}
 	 */
 	klass.mutators = mutators;
+
+	// call each of the _onPredefine mutators to modify this class
+	each(getMutators(klass), function(mutator) {
+		if (!mutator._onPredefine) {
+			return;
+		}
+		mutator._onPredefine.call(mutator, klass);
+	});
 
 	// assign child prototype to be that of the parent's by default
 	// (inheritance)

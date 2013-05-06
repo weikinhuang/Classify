@@ -57,6 +57,24 @@ var Namespace = create({
 	 */
 	ref : null,
 	/**
+	 * Hashtable containing references to all the defined mutators
+	 *
+	 * @private
+	 * @for Classify.Namespace
+	 * @property namedMutators
+	 * @type {Object}
+	 */
+	namedMutators : null,
+	/**
+	 * Array of all mutators in the namespace
+	 *
+	 * @private
+	 * @for Classify.Namespace
+	 * @property mutators
+	 * @type {Array}
+	 */
+	mutators : null,
+	/**
 	 * Namespace container that hold a tree of classes
 	 *
 	 * @constructor
@@ -68,6 +86,8 @@ var Namespace = create({
 	init : function(name) {
 		this.name = name;
 		this.ref = {};
+		this.namedMutators = {};
+		this.mutators = [];
 	},
 	/**
 	 * Creates a new class within this namespace
@@ -100,27 +120,30 @@ var Namespace = create({
 		ref = provide(namespace, self),
 		// the namespace mutator
 		nsMutator = new Mutator("namespace", {
-			onCreate : function(klass){
+			_onPredefine : function(klass) {
 				// Assign the magic properties of the class's name and namespace
 				klass._name_ = name;
 				klass._namespace_ = fullname;
-				// give classes the ability to always store the namespace for chaining
+				// give classes the ability to always store the namespace for
+				// chaining
 				klass.getNamespace = function() {
 					return self;
 				};
 				klass.toString = function() {
 					return "[object " + fullname + "]";
 				};
+				klass.getMutators = function() {
+					return self.mutators;
+				};
 			}
-		}),
-		mappedArgs = map(args, function(v) {
+		}), mappedArgs = map(args, function(v) {
 			return dereference(self, v);
 		}),
 		// other vars
 		foundMutatorArg = false, c, tmp;
 
 		// look for the mutators argument
-		mappedArgs = each(mappedArgs, function(v) {
+		mappedArgs = map(mappedArgs, function(v) {
 			// we found some mutators!
 			if (!v.__isclass_ && !isExtendable(v) && (v instanceof Mutator || (isArray(v) && v[0] instanceof Mutator))) {
 				foundMutatorArg = true;
@@ -131,8 +154,7 @@ var Namespace = create({
 		});
 		if (foundMutatorArg === false) {
 			tmp = mappedArgs.pop();
-			mappedArgs.push(nsMutator);
-			mappedArgs.push(tmp);
+			arrayPush.call(mappedArgs, nsMutator, tmp);
 		}
 
 		// fix the arguments & create the class
@@ -279,6 +301,60 @@ var Namespace = create({
 	 */
 	getName : function() {
 		return this.name;
+	},
+	/**
+	 * Adds a namespace level class mutator that modifies the defined classes at
+	 * different points with hooks
+	 *
+	 * @param {String} name The name of the mutator reference to add
+	 * @param {Object} mutator The mutator definition with optional hooks
+	 * @param {Function} [mutator._onPredefine] Internal hook to be called as
+	 *            soon as the constructor is defined
+	 * @param {Function} [mutator.onCreate] The hook to be called when a class
+	 *            is defined before any properties are added
+	 * @param {Function} [mutator.onDefine] The hook to be called when a class
+	 *            is defined after all properties are added
+	 * @param {Function} [mutator.onPropAdd] The hook to be called when a
+	 *            property with the __name_ prefix is added
+	 * @param {Function} [mutator.onPropRemove] The hook to be called when a
+	 *            property with the __name_ prefix is removed
+	 * @param {Function} [mutator.onInit] The hook to be called during each
+	 *            object's initialization
+	 * @throws Error
+	 * @for Classify.Namespace
+	 * @method addMutator
+	 */
+	addMutator : function(name, mutator) {
+		if (this.namedMutators[name] || namedGlobalMutators[name]) {
+			throw new Error("Adding duplicate mutator \"" + name + "\" in namespace " + this.name + ".");
+		}
+		var mutatorInstance = new Mutator(name, mutator);
+		this.namedMutators[name] = mutatorInstance;
+		this.mutators.push(mutatorInstance);
+	},
+	/**
+	 * Removes a namespace level class mutator that modifies the defined classes
+	 * at different points
+	 *
+	 * @param {String} name The name of the mutator to be removed
+	 * @throws Error
+	 * @for Classify.Namespace
+	 * @method removeMutator
+	 */
+	removeMutator : function(name) {
+		var mutator = this.namedMutators[name];
+		if (!mutator) {
+			throw new Error("Removing unknown mutator from namespace " + this.name + ".");
+		}
+		var idx = indexOf(this.mutators, mutator);
+		if (idx > -1) {
+			this.mutators.splice(idx, 1);
+		}
+		this.namedMutators[name] = null;
+		try {
+			delete this.namedMutators[name];
+		} catch (e) {
+		}
 	},
 	/**
 	 * Gets the translated toString name of this object "[namespace Name]"

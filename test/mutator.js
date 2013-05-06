@@ -20,6 +20,30 @@ QUnit.test("adding and removing global mutators", function() {
 	}, Error, "Attempts to remove an non existing mutator throws a error.");
 });
 
+QUnit.test("adding and removing global mutators to the internal on predefine hook", function() {
+	QUnit.expect(4);
+
+	addMutator("test", {
+		_onPredefine : function(klass) {
+			klass.a = 1;
+			QUnit.ok(true, "onPredefine in mutator was called when the class is created");
+			QUnit.ok(!Object.prototype.hasOwnProperty.call(klass.prototype, "init"), "onPredefine in mutator was called before constructor 'init' have been added");
+		}
+	});
+
+	var test = create({
+		xyz : function() {
+		}
+	});
+	QUnit.equal(test.a, 1, "onPredefine mutator modified the class during creation");
+
+	removeMutator("test");
+
+	// after removal, hooks are no longer called
+	var test2 = create({});
+	QUnit.ok(!test2.hasOwnProperty("a"), "removed onPredefine mutator is no longer called during creation");
+});
+
 QUnit.test("adding and removing global mutators to the on create hook", function() {
 	QUnit.expect(4);
 
@@ -203,6 +227,24 @@ QUnit.test("adding and removing global mutators to the on initialize hook", func
 	}, Error, "onInit mutator override new keyword during instantiation with scalar value throws a error.");
 
 	removeMutator("test4");
+});
+
+QUnit.test("adding class level mutators to the internal on predefine hook", function() {
+	QUnit.expect(3);
+
+	var mutator = Mutator("test", {
+		_onPredefine : function(klass, parent) {
+			klass.a = 1;
+			QUnit.ok(true, "onPredefine in mutator was called when the class is created");
+			QUnit.ok(!Object.prototype.hasOwnProperty.call(klass.prototype, "init"), "onPredefine in mutator was called before constructor 'init' have been added");
+		}
+	});
+
+	var test = create([ mutator ], {
+		xyz : function() {
+		}
+	});
+	QUnit.equal(test.a, 1, "onPredefine mutator modified the class during creation");
 });
 
 QUnit.test("adding class level mutators to the on create hook", function() {

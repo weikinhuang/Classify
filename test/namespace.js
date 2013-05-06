@@ -1,6 +1,8 @@
 /* global Base */
 /* global create */
 /* global Mutator */
+/* global addMutator */
+/* global removeMutator */
 /* global Namespace */
 /* global getNamespace */
 /* global destroyNamespace */
@@ -458,6 +460,56 @@ QUnit.test("class autoloading", function() {
 	QUnit.raises(function() {
 		ns.setAutoloader([]);
 	}, Error, "attempt to set non function autoloader throws an error");
+});
+
+QUnit.test("adding and removing namespace mutators", function() {
+	QUnit.expect(3);
+	var ns = getNamespace("Namespace6B");
+
+	ns.addMutator("test", {});
+
+	// adding duplicate mutators will throw an error
+	QUnit.raises(function() {
+		ns.addMutator("test", {});
+	}, Error, "Attempts to add an existing mutator throws a error.");
+
+	// add global mutator
+	addMutator("testa", {});
+	// adding duplicate global mutators will throw an error
+	QUnit.raises(function() {
+		ns.addMutator("testa", {});
+	}, Error, "Attempts to add an existing global mutator on namespace throws a error.");
+	removeMutator("testa");
+
+	ns.removeMutator("test");
+	QUnit.raises(function() {
+		ns.removeMutator("test");
+	}, Error, "Attempts to remove an non existing mutator throws a error.");
+});
+
+QUnit.test("adding and removing namespace mutators to the on create hook", function() {
+	QUnit.expect(4);
+	var ns = getNamespace("Namespace6C");
+
+	ns.addMutator("test", {
+		onCreate : function(klass, parent) {
+			klass.a = 1;
+			QUnit.ok(true, "onCreate in mutator was called when the class is created");
+			QUnit.ok(!Object.prototype.hasOwnProperty.call(klass.prototype, "xyz"), "onCreate in mutator was called before properties have been added");
+		}
+	});
+
+	var test = ns.create("A", {
+		xyz : function() {
+		}
+	});
+	QUnit.equal(test.a, 1, "onCreate mutator modified the class during creation");
+
+	ns.removeMutator("test");
+
+	// after removal, hooks are no longer called
+	var test2 = ns.create("B", {});
+	QUnit.ok(!test2.hasOwnProperty("a"), "removed onCreate mutator is no longer called during creation");
 });
 
 QUnit.test("global namespace inheritance", function() {
