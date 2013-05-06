@@ -12,8 +12,10 @@ enumerationLength = enumeratedKeys.length,
 objectPrototype = Object.prototype,
 // quick reference to the toString prototype
 toString = objectPrototype.toString,
-// quick reference to the toString prototype
+// quick reference to the hasOwnProperty prototype
 hasOwn = objectPrototype.hasOwnProperty,
+// quick reference to the Array push prototype
+arrayPush = Array.prototype.push,
 // regex to test for scalar value
 scalarRegExp = /^(?:boolean|number|string|undefined)$/,
 // test if a value is scalar in nature

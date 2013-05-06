@@ -3,6 +3,8 @@ var fs = require("fs");
 module.exports = function(grunt) {
 	"use strict";
 
+	var gzip = require("gzip-js");
+
 	grunt
 			.initConfig({
 				pkg : grunt.file.readJSON("package.json"),
@@ -12,7 +14,7 @@ module.exports = function(grunt) {
 					options : {
 						compress : {
 							gz : function(file_contents) {
-								return require("gzip-js").zip(file_contents, {}).length;
+								return gzip.zip(file_contents, {}).length;
 							}
 						}
 					}
@@ -133,6 +135,7 @@ module.exports = function(grunt) {
 								"src/export.js" ],
 						tests : [ "test/core.js",
 								"test/create.js",
+								"test/mutator.js",
 								"test/mutator.static.js",
 								"test/mutator.nowrap.js",
 								"test/mutator.alias.js",
@@ -167,7 +170,7 @@ module.exports = function(grunt) {
 						}, {
 							browserName : "chrome",
 							platform : "Windows 7",
-							version : "24"
+							version : "26"
 						}, {
 							browserName : "chrome",
 							platform : "Linux",

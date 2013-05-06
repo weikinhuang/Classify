@@ -6,7 +6,7 @@ var keywordRegexp = /^(?:superclass|subclass|implement|observable|bindings|exten
 // regex to test for a mutator name to avoid a loop
 mutatorNameTest = /^__/,
 // reference to existing mutators
-mutators = {},
+namedGlobalMutators = {},
 // list of all mutators in the order of definition
 globalMutators = [],
 // Use native object.create whenever possible
@@ -47,6 +47,24 @@ Base = (function() {
 	fn.__isclass_ = true;
 	return fn;
 })(),
+/**
+ * Internal "Mutator" class that handles hooks for class object manipulation
+ *
+ * @constructor
+ * @for Classify.Mutator
+ * @param {String} name The name of the mutator
+ * @param {Object} props hash of properties to merge into the prototype
+ * @method Mutator
+ */
+Mutator = function(name, props) {
+	if (!(this instanceof Mutator)) {
+		return new Mutator(name, props);
+	}
+	extend(this, props);
+	this.name = name;
+	this.propTest = new RegExp("^__" + name + "_");
+	this.propPrefix = "__" + name + "_";
+},
 // wraps a function so that the "this.parent" is bound to the function
 wrapParentProperty = function(parentPrototype, property) {
 	return store(function() {
@@ -75,6 +93,8 @@ wrapParentProperty = function(parentPrototype, property) {
  *
  * @param {String} name The name of the mutator reference to add
  * @param {Object} mutator The mutator definition with optional hooks
+ * @param {Function} [mutator._onPredefine] Internal hook to be called as soon as
+ *            the constructor is defined
  * @param {Function} [mutator.onCreate] The hook to be called when a class is
  *            defined before any properties are added
  * @param {Function} [mutator.onDefine] The hook to be called when a class is
@@ -91,14 +111,12 @@ wrapParentProperty = function(parentPrototype, property) {
  * @method addMutator
  */
 addMutator = function(name, mutator) {
-	if (mutators[name]) {
+	if (namedGlobalMutators[name]) {
 		throw new Error("Adding duplicate mutator \"" + name + "\".");
 	}
-	mutators[name] = mutator;
-	mutator.name = name;
-	mutator.propTest = new RegExp("^__" + name + "_");
-	mutator.propPrefix = "__" + name + "_";
-	globalMutators.push(mutator);
+	var mutatorInstance = new Mutator(name, mutator);
+	namedGlobalMutators[name] = mutatorInstance;
+	globalMutators.push(mutatorInstance);
 },
 /**
  * Removes a global class mutator that modifies the defined classes at different
@@ -111,7 +129,7 @@ addMutator = function(name, mutator) {
  * @method removeMutator
  */
 removeMutator = function(name) {
-	var mutator = mutators[name];
+	var mutator = namedGlobalMutators[name];
 	if (!mutator) {
 		throw new Error("Removing unknown mutator.");
 	}
@@ -119,11 +137,26 @@ removeMutator = function(name) {
 	if (idx > -1) {
 		globalMutators.splice(idx, 1);
 	}
-	mutators[name] = null;
+	namedGlobalMutators[name] = null;
 	try {
-		delete mutators[name];
+		delete namedGlobalMutators[name];
 	} catch (e) {
 	}
+},
+// method to get all possible mutators
+getMutators = function(klass) {
+	var i, l, mutators = globalMutators.slice(0);
+	arrayPush.apply(mutators, klass.mutators);
+	// hook for namespaces!
+	if (klass.getMutators) {
+		arrayPush.apply(mutators, klass.getMutators() || []);
+	}
+	for (i = 0, l = mutators; i < l; i++) {
+		if (!(mutators[i] instanceof Mutator)) {
+			throw new Error("Mutator objects can only be instances of \"Mutator\", please use createMutator.");
+		}
+	}
+	return mutators;
 },
 // adds a property to an existing class taking into account parent
 addProperty = function(klass, parent, name, property, mutators) {
@@ -220,6 +253,8 @@ removeProperty = function(klass, name, mutators) {
  *            inherit from
  * @param {Object[]} [implement] Optional second parameter defines where to
  *            implement traits from
+ * @param {Classify.Mutator[]} [mutators] Optional third parameter defines
+ *            mutations for this class
  * @param {Object} definition The description of the class to be created
  * @static
  * @for Classify
@@ -233,24 +268,33 @@ var create = function() {
 	// array of objects/classes that this class will implement the functions of,
 	// but will not be an instance of
 	implement = [],
+	// array of mutators to be
+	mutators = [],
 	// quick reference to the arguments array and it's length
-	args = arguments, argLength = args.length,
+	args = argsToArray(arguments).slice(0, 4), argLength = args.length,
 	// other variables
-	klass, proto;
+	klass, proto, tmp;
 	// Parse out the arguments to grab the parent and methods
-	if (argLength === 1) {
-		methods = args[0];
-	} else if (argLength === 2) {
-		if (!args[0].__isclass_ && !isExtendable(args[0])) {
-			implement = toArray(args[0]);
-		} else {
-			parent = args[0];
+	// 1 argument: class definition
+	// 2 argument: parent|implements|mutators, class definition
+	// 3 argument: class definition, [implements, parent]|[implements,
+	// mutators]|[parent, mutators], class definition
+	// 4 argument: parent, implements, mutators, class definition
+	if (argLength > 0) {
+		// the definition is always the last argument
+		methods = args.pop();
+		while (--argLength > 0) {
+			tmp = args.shift();
+			if (!tmp.__isclass_ && !isExtendable(tmp)) {
+				if (tmp instanceof Mutator || isArray(tmp) && tmp[0] instanceof Mutator) {
+					mutators = toArray(tmp);
+				} else {
+					implement = toArray(tmp);
+				}
+			} else {
+				parent = tmp;
+			}
 		}
-		methods = args[1];
-	} else {
-		parent = args[0];
-		implement = toArray(args[1]);
-		methods = args[2];
 	}
 
 	// extend so that modifications won't affect the passed in object
@@ -269,7 +313,7 @@ var create = function() {
 	 * @type Object
 	 */
 	klass = function() {
-		var tmp, i, l;
+		var tmp, i, l, mutators;
 		// We're not creating a instantiated object so we want to force a
 		// instantiation or call the invoke function
 		// we need to test for !this when in "use strict" mode
@@ -280,14 +324,15 @@ var create = function() {
 		if (!this || !this.init || !(this instanceof klass)) {
 			return klass.invoke.apply(klass, arguments);
 		}
+		mutators = getMutators(klass);
 		// loop through all the mutators for the onInit hook
-		for (i = 0, l = globalMutators.length; i < l; i++) {
-			if (!globalMutators[i].onInit) {
+		for (i = 0, l = mutators.length; i < l; i++) {
+			if (!mutators[i].onInit) {
 				continue;
 			}
 			// if the onInit hook returns anything, then it will override the
 			// "new" keyword
-			tmp = globalMutators[i].onInit.call(globalMutators[i], this, klass);
+			tmp = mutators[i].onInit.call(mutators[i], this, klass);
 			if (tmp !== undefined) {
 				// however this method can only return objects and not scalar
 				// values
@@ -309,6 +354,7 @@ var create = function() {
 			return tmp;
 		}
 	};
+
 	// ability to create a new instance using an array of arguments, cannot be
 	// overriden
 	delete methods.applicate;
@@ -372,6 +418,24 @@ var create = function() {
 	 * @type {Array}
 	 */
 	klass.implement = (isArray(parent.implement) ? parent.implement : []).concat(implement);
+	/**
+	 * Array containing all the mutators that were defined with this class,
+	 * these mutators DO NOT get inherited
+	 *
+	 * @static
+	 * @for Classify.Class
+	 * @property mutators
+	 * @type {Array}
+	 */
+	klass.mutators = mutators;
+
+	// call each of the _onPredefine mutators to modify this class
+	each(getMutators(klass), function(mutator) {
+		if (!mutator._onPredefine) {
+			return;
+		}
+		mutator._onPredefine.call(mutator, klass);
+	});
 
 	// assign child prototype to be that of the parent's by default
 	// (inheritance)
@@ -440,14 +504,15 @@ var create = function() {
 	 * @return {Class}
 	 */
 	klass.addProperty = function(name, property, prefix) {
+		var mutators = getMutators(klass);
 		// the prefix parameter is for internal use only
 		prefix = prefix || "";
 		if (property === undefined && typeof name !== "string") {
 			each(keys(name), function(n) {
-				addProperty(klass, parent, prefix + n, name[n], globalMutators);
+				addProperty(klass, parent, prefix + n, name[n], mutators);
 			});
 		} else {
-			addProperty(klass, parent, prefix + name, property, globalMutators);
+			addProperty(klass, parent, prefix + name, property, mutators);
 		}
 		return klass;
 	};
@@ -461,7 +526,7 @@ var create = function() {
 	 * @return {Class}
 	 */
 	klass.removeProperty = function(name) {
-		removeProperty(klass, name, globalMutators);
+		removeProperty(klass, name, getMutators(klass));
 		return klass;
 	};
 
@@ -480,7 +545,7 @@ var create = function() {
 	}
 
 	// call each of the onCreate mutators to modify this class
-	each(globalMutators, function(mutator) {
+	each(getMutators(klass), function(mutator) {
 		if (!mutator.onCreate) {
 			return;
 		}
@@ -517,7 +582,7 @@ var create = function() {
 	klass.__isclass_ = true;
 
 	// call each of the onDefine mutators to modify this class
-	each(globalMutators, function(mutator) {
+	each(getMutators(klass), function(mutator) {
 		if (!mutator.onDefine) {
 			return;
 		}
@@ -526,3 +591,12 @@ var create = function() {
 
 	return klass;
 };
+
+// export methods to the main object
+extend(exportNames, {
+	// direct access functions
+	create : create,
+	Mutator : Mutator,
+	addMutator : addMutator,
+	removeMutator : removeMutator
+});
