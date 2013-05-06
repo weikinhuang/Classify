@@ -5,12 +5,13 @@
 /* global testNamespace */
 /* global getGlobalNamespace */
 /* global Observer */
+/* global Mutator */
 /* global addMutator */
 /* global removeMutator */
 QUnit.module("export");
 
 QUnit.test("check globally accessable Classify object", function() {
-	QUnit.expect(11);
+	QUnit.expect(12);
 	QUnit.ok(Classify.__isclass_, "Classify global object is a class");
 
 	QUnit.deepEqual(Classify.create, create, "Create functionality is bound to the static instance of the class");
@@ -21,6 +22,7 @@ QUnit.test("check globally accessable Classify object", function() {
 	QUnit.equal(Classify.getGlobalNamespace, getGlobalNamespace, "get global namespace functionality is bound to the static instance of the class");
 	QUnit.equal(Classify.global, getGlobalNamespace(), "Global namespace is bound to the global property");
 	QUnit.equal(Classify.Observer, Observer, "Observer class is bound to the static instance of the class");
+	QUnit.deepEqual(Classify.Mutator, Mutator, "Mutator class is bound to the static instance of the class");
 	QUnit.equal(Classify.addMutator, addMutator, "adding a mutator functionality bound to the static instance of the class");
 	QUnit.equal(Classify.removeMutator, removeMutator, "removing a mutator functionality bound to the static instance of the class");
 });
