@@ -348,6 +348,7 @@ var create = function() {
 			return tmp;
 		}
 	};
+
 	// ability to create a new instance using an array of arguments, cannot be
 	// overriden
 	delete methods.applicate;

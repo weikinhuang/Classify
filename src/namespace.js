@@ -39,6 +39,7 @@ dereference = function(ns, arg, ref) {
 var Namespace = create({
 	/**
 	 * The name of the namespace
+	 *
 	 * @private
 	 * @for Classify.Namespace
 	 * @property name
@@ -46,7 +47,9 @@ var Namespace = create({
 	 */
 	name : null,
 	/**
-	 * Hashtable containing references to all the classes created within this namespace
+	 * Hashtable containing references to all the classes created within this
+	 * namespace
+	 *
 	 * @private
 	 * @for Classify.Namespace
 	 * @property ref
@@ -70,8 +73,13 @@ var Namespace = create({
 	 * Creates a new class within this namespace
 	 *
 	 * @param {String} name The name of the created class within the namespace
-	 * @param {String|Class} [parent] Optional second parameter defines what object to inherit from, can be a string referencing a class within any namespace
-	 * @param {Object[]} [implement] Optional third parameter defines where to implement traits from
+	 * @param {String|Class} [parent] Optional second parameter defines what
+	 *            object to inherit from, can be a string referencing a class
+	 *            within any namespace
+	 * @param {Object[]} [implement] Optional third parameter defines where to
+	 *            implement traits from
+	 * @param {Classify.Mutator[]} [mutators] Optional third parameter defines
+	 *            mutations for this class
 	 * @param {Object} definition The description of the class to be created
 	 * @for Classify.Namespace
 	 * @method create
@@ -90,26 +98,50 @@ var Namespace = create({
 		self = this,
 		// Retrieve the namespaced container
 		ref = provide(namespace, self),
+		// the namespace mutator
+		nsMutator = new Mutator("namespace", {
+			onCreate : function(klass){
+				// Assign the magic properties of the class's name and namespace
+				klass._name_ = name;
+				klass._namespace_ = fullname;
+				// give classes the ability to always store the namespace for chaining
+				klass.getNamespace = function() {
+					return self;
+				};
+				klass.toString = function() {
+					return "[object " + fullname + "]";
+				};
+			}
+		}),
+		mappedArgs = map(args, function(v) {
+			return dereference(self, v);
+		}),
+		// other vars
+		foundMutatorArg = false, c, tmp;
+
+		// look for the mutators argument
+		mappedArgs = each(mappedArgs, function(v) {
+			// we found some mutators!
+			if (!v.__isclass_ && !isExtendable(v) && (v instanceof Mutator || (isArray(v) && v[0] instanceof Mutator))) {
+				foundMutatorArg = true;
+				v = toArray(v);
+				v.unshift(nsMutator);
+			}
+			return v;
+		});
+		if (foundMutatorArg === false) {
+			tmp = mappedArgs.pop();
+			mappedArgs.push(nsMutator);
+			mappedArgs.push(tmp);
+		}
 
 		// fix the arguments & create the class
-		c = create.apply(null, map(args, function(v) {
-			return dereference(self, v);
-		}));
-		// Assign the magic properties of the class's name and namespace
-		c._name_ = name;
-		c._namespace_ = fullname;
+		c = create.apply(null, mappedArgs);
 		// fix the issue with the extends function referencing string classes
 		c.extend = c.prototype.extend = function() {
 			return create.apply(null, [ c ].concat(map(arguments, function(v) {
 				return dereference(self, v);
 			})));
-		};
-		// give classes the ability to always store the namespace for chaining
-		c.getNamespace = function() {
-			return self;
-		};
-		c.toString = function() {
-			return "[object " + fullname + "]";
 		};
 		// Assign the classes to the namespaced references
 		ref[name] = c;
@@ -164,7 +196,8 @@ var Namespace = create({
 		if (c.superclass.subclass) {
 			c.superclass.subclass = filter(c.superclass.subclass, c);
 		}
-		// now we remove all non inherited classes, but fall under this namespace
+		// now we remove all non inherited classes, but fall under this
+		// namespace
 		each(deref, function(v, k) {
 			if (k !== classname && k.indexOf(classname) === 0) {
 				self.destroy(v._namespace_);
@@ -180,7 +213,8 @@ var Namespace = create({
 	/**
 	 * Checks if a class exists within this namespace
 	 *
-	 * @param {String} classname Name of class to check if it has already been defined
+	 * @param {String} classname Name of class to check if it has already been
+	 *            defined
 	 * @for Classify.Namespace
 	 * @method exists
 	 * @return {Boolean}
@@ -219,9 +253,11 @@ var Namespace = create({
 		return this.ref[name] || null;
 	},
 	/**
-	 * Sets the internal autoloader by overriding the Namespace.prototype.load method
+	 * Sets the internal autoloader by overriding the Namespace.prototype.load
+	 * method
 	 *
-	 * @param {Function} callback The function to call when a class that doesn't exist needs to be loaded
+	 * @param {Function} callback The function to call when a class that doesn't
+	 *            exist needs to be loaded
 	 * @for Classify.Namespace
 	 * @method setAutoloader
 	 * @return {Namespace}
@@ -258,6 +294,7 @@ var Namespace = create({
 
 /**
  * Retrieves a namespace and creates if it it doesn't already exist
+ *
  * @param {String} namespace Dot separated namespace string
  * @static
  * @for Classify
@@ -280,6 +317,7 @@ getNamespace = function(namespace) {
 
 /**
  * Destroy an existing namespace
+ *
  * @param {String} namespace Dot separated namespace string
  * @static
  * @for Classify
@@ -299,7 +337,9 @@ destroyNamespace = function(namespace) {
 };
 
 /**
- * Retrieves the first namespace that matches the namespace chain "Ns1.ns2.ns3.ns4"
+ * Retrieves the first namespace that matches the namespace chain
+ * "Ns1.ns2.ns3.ns4"
+ *
  * @param {String} namespace Dot separated namespace string
  * @static
  * @for Classify
@@ -318,6 +358,7 @@ testNamespace = function(namespace) {
 
 /**
  * Retieves the globally named namespace
+ *
  * @static
  * @for Classify
  * @method getGlobalNamespace
@@ -338,6 +379,7 @@ extend(exportNames, {
 
 	/**
 	 * The globally named namespace
+	 *
 	 * @static
 	 * @for Classify
 	 * @property global
