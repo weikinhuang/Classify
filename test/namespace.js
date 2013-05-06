@@ -531,6 +531,102 @@ QUnit.test("global namespace inheritance", function() {
 	QUnit.equal(ns.get("X"), x, "retrieval of named class in namespace cascades into the global namespace");
 });
 
+QUnit.test("creating namespaces from existing plain objects", function() {
+	QUnit.expect(7);
+
+	var ns = Namespace.from("Plain", {});
+
+	// creating a single class
+	var c = ns.create("A", {
+		invoke : function() {
+			return "invoke";
+		},
+		a : function() {
+			return this;
+		}
+	});
+	QUnit.ok(!!c.__isclass_, "class created is a class object");
+	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
+	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
+	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
+	QUnit.equal(c.getNamespace(), ns, "namespaced class has a getter for the current namespace");
+	QUnit.equal(c.getNamespace().getName(), "Plain", "namespace name is available");
+
+	QUnit.equal(c + "", "[object A]", "namespaced class has overriden toString method");
+});
+
+QUnit.test("creating namespaces from existing Classify classes", function() {
+	QUnit.expect(7);
+
+	var a = create({
+		a : 1,
+		b : function() {
+			return this.a;
+		}
+	});
+	var ns = Namespace.from("ClassObj", a);
+
+	// creating a single class
+	var c = ns.create("A", {
+		invoke : function() {
+			return "invoke";
+		},
+		a : function() {
+			return this;
+		}
+	});
+	QUnit.ok(!!c.__isclass_, "class created is a class object");
+	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
+	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
+	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
+	QUnit.equal(c.getNamespace(), ns, "namespaced class has a getter for the current namespace");
+	QUnit.equal(c.getNamespace().getName(), "ClassObj", "namespace name is available");
+
+	QUnit.equal(c + "", "[object A]", "namespaced class has overriden toString method");
+});
+
+QUnit.test("creating namespaces from existing Classify object instances", function() {
+	QUnit.expect(7);
+
+	var a = create({
+		a : 1,
+		b : function() {
+			return this.a;
+		}
+	});
+	var ns = Namespace.from("ClassInst", new a());
+
+	// creating a single class
+	var c = ns.create("A", {
+		invoke : function() {
+			return "invoke";
+		},
+		a : function() {
+			return this;
+		}
+	});
+	QUnit.ok(!!c.__isclass_, "class created is a class object");
+	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
+	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
+	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
+	QUnit.equal(c.getNamespace(), ns, "namespaced class has a getter for the current namespace");
+	QUnit.equal(c.getNamespace().getName(), "ClassInst", "namespace name is available");
+
+	QUnit.equal(c + "", "[object A]", "namespaced class has overriden toString method");
+});
+
+
+QUnit.test("creating namespaces from existing Classify object instances", function() {
+	QUnit.expect(1);
+
+	var ns = new Namespace("Somenamespace");
+
+	// adding duplicate global mutators will throw an error
+	QUnit.raises(function() {
+		Namespace.from("Plain", ns);
+	}, Error, "Attempts to create a namespace from an namespace throws a error.");
+});
+
 QUnit.test("testing namespaces", function() {
 	QUnit.expect(4);
 	var ns = getNamespace("Namespace8");

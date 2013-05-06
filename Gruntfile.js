@@ -170,7 +170,7 @@ module.exports = function(grunt) {
 						}, {
 							browserName : "chrome",
 							platform : "Windows 7",
-							version : "24"
+							version : "26"
 						}, {
 							browserName : "chrome",
 							platform : "Linux",

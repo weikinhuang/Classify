@@ -4,7 +4,7 @@
 // global container containing all the namespace references
 var namespaces = {},
 // name of the globally avaliable namespace
-global_namespace = "GLOBAL",
+globalNamespace = "GLOBAL",
 // early definition for namespacing function
 getNamespace, destroyNamespace, testNamespace, getGlobalNamespace,
 // create a function that create namespaces in an object
@@ -33,62 +33,9 @@ dereference = function(ns, arg, ref) {
 	return !isArray(arg) ? arg : map(arg, function(prop) {
 		return dereference(ns, prop);
 	});
-};
-
-// Namespacing class to create and handle namespaces
-var Namespace = create({
-	/**
-	 * The name of the namespace
-	 *
-	 * @private
-	 * @for Classify.Namespace
-	 * @property name
-	 * @type {String}
-	 */
-	name : null,
-	/**
-	 * Hashtable containing references to all the classes created within this
-	 * namespace
-	 *
-	 * @private
-	 * @for Classify.Namespace
-	 * @property ref
-	 * @type {Object}
-	 */
-	ref : null,
-	/**
-	 * Hashtable containing references to all the defined mutators
-	 *
-	 * @private
-	 * @for Classify.Namespace
-	 * @property namedMutators
-	 * @type {Object}
-	 */
-	namedMutators : null,
-	/**
-	 * Array of all mutators in the namespace
-	 *
-	 * @private
-	 * @for Classify.Namespace
-	 * @property mutators
-	 * @type {Array}
-	 */
-	mutators : null,
-	/**
-	 * Namespace container that hold a tree of classes
-	 *
-	 * @constructor
-	 * @for Classify.Namespace
-	 * @extends {Class}
-	 * @param {String} name The name of the namespace to construct with
-	 * @method Namespace
-	 */
-	init : function(name) {
-		this.name = name;
-		this.ref = {};
-		this.namedMutators = {};
-		this.mutators = [];
-	},
+},
+// properties to create a namespace from any object
+namespaceProperties = {
 	/**
 	 * Creates a new class within this namespace
 	 *
@@ -167,7 +114,7 @@ var Namespace = create({
 		};
 		// Assign the classes to the namespaced references
 		ref[name] = c;
-		self.ref[fullname] = c;
+		self.nsref[fullname] = c;
 		// Return the new class
 		return c;
 	},
@@ -189,7 +136,7 @@ var Namespace = create({
 		// create a quick reference to this
 		self = this, ref = this,
 		// Create a reference to the master classes array
-		deref = this.ref;
+		deref = this.nsref;
 
 		// remove it from this namespace
 		each(namespace, function(ns) {
@@ -242,7 +189,7 @@ var Namespace = create({
 	 * @return {Boolean}
 	 */
 	exists : function(classname) {
-		return !!this.ref[classname];
+		return !!this.nsref[classname];
 	},
 	/**
 	 * Attempt to retrieve a class within this namespace or the global one
@@ -255,8 +202,8 @@ var Namespace = create({
 	get : function(name) {
 		var tmp;
 		// already defined, return it
-		if (this.ref[name]) {
-			return this.ref[name];
+		if (this.nsref[name]) {
+			return this.nsref[name];
 		}
 		// use the autoloader if defined
 		tmp = this.load(name);
@@ -265,14 +212,14 @@ var Namespace = create({
 			return tmp;
 		}
 		// reach into the global namespace
-		if (this.name !== global_namespace) {
+		if (this.nsname !== globalNamespace) {
 			return getGlobalNamespace().get(name);
 		}
 		// no class found
 		return null;
 	},
 	load : function(name) {
-		return this.ref[name] || null;
+		return this.nsref[name] || null;
 	},
 	/**
 	 * Sets the internal autoloader by overriding the Namespace.prototype.load
@@ -300,7 +247,7 @@ var Namespace = create({
 	 * @return {String}
 	 */
 	getName : function() {
-		return this.name;
+		return this.nsname;
 	},
 	/**
 	 * Adds a namespace level class mutator that modifies the defined classes at
@@ -326,7 +273,7 @@ var Namespace = create({
 	 */
 	addMutator : function(name, mutator) {
 		if (this.namedMutators[name] || namedGlobalMutators[name]) {
-			throw new Error("Adding duplicate mutator \"" + name + "\" in namespace " + this.name + ".");
+			throw new Error("Adding duplicate mutator \"" + name + "\" in namespace " + this.nsname + ".");
 		}
 		var mutatorInstance = new Mutator(name, mutator);
 		this.namedMutators[name] = mutatorInstance;
@@ -344,7 +291,7 @@ var Namespace = create({
 	removeMutator : function(name) {
 		var mutator = this.namedMutators[name];
 		if (!mutator) {
-			throw new Error("Removing unknown mutator from namespace " + this.name + ".");
+			throw new Error("Removing unknown mutator from namespace " + this.nsname + ".");
 		}
 		var idx = indexOf(this.mutators, mutator);
 		if (idx > -1) {
@@ -355,6 +302,62 @@ var Namespace = create({
 			delete this.namedMutators[name];
 		} catch (e) {
 		}
+	}
+};
+
+// Namespacing class to create and handle namespaces
+var Namespace = create(extend({}, namespaceProperties, {
+	/**
+	 * The name of the namespace
+	 *
+	 * @private
+	 * @for Classify.Namespace
+	 * @property nsname
+	 * @type {String}
+	 */
+	nsname : null,
+	/**
+	 * Hashtable containing references to all the classes created within this
+	 * namespace
+	 *
+	 * @private
+	 * @for Classify.Namespace
+	 * @property nsref
+	 * @type {Object}
+	 */
+	nsref : null,
+	/**
+	 * Hashtable containing references to all the defined mutators
+	 *
+	 * @private
+	 * @for Classify.Namespace
+	 * @property namedMutators
+	 * @type {Object}
+	 */
+	namedMutators : null,
+	/**
+	 * Array of all mutators in the namespace
+	 *
+	 * @private
+	 * @for Classify.Namespace
+	 * @property mutators
+	 * @type {Array}
+	 */
+	mutators : null,
+	/**
+	 * Namespace container that hold a tree of classes
+	 *
+	 * @constructor
+	 * @for Classify.Namespace
+	 * @extends {Class}
+	 * @param {String} name The name of the namespace to construct with
+	 * @method Namespace
+	 */
+	init : function(name) {
+		this.nsname = name;
+		this.nsref = {};
+		this.namedMutators = {};
+		this.mutators = [];
 	},
 	/**
 	 * Gets the translated toString name of this object "[namespace Name]"
@@ -364,9 +367,37 @@ var Namespace = create({
 	 * @return {String}
 	 */
 	toString : function() {
-		return "[namespace " + this.name + "]";
+		return "[namespace " + this.nsname + "]";
 	}
-});
+}));
+
+/**
+ * Transforms a object to a {Classify.Namespace} capable object
+ *
+ * @param {String} name The name of the namespace to construct with
+ * @param {Object} obj The target object to extend with Namespace abilities
+ * @for Classify.Namespace
+ * @method from
+ * @static
+ * @return {Object}
+ */
+Namespace.from = function(name, obj) {
+	if (obj instanceof Namespace) {
+		throw new Error("Attempting to create a namespace from an existing namespace.");
+	}
+	var namespaceProps = {};
+	each(namespaceProperties, function(prop, key) {
+		namespaceProps[key] = function() {
+			return prop.apply(obj, arguments);
+		};
+	});
+	return extend(obj, namespaceProps, {
+		nsname : name,
+		nsref : {},
+		namedMutators : {},
+		mutators : []
+	});
+};
 
 /**
  * Retrieves a namespace and creates if it it doesn't already exist
@@ -383,7 +414,7 @@ getNamespace = function(namespace) {
 		return namespace;
 	}
 	// if we passed in nothing then we want the global namespace
-	namespace = namespace || global_namespace;
+	namespace = namespace || globalNamespace;
 	// if the namespace doesn't exist, just create it
 	if (!namespaces[namespace]) {
 		namespaces[namespace] = new Namespace(namespace);
@@ -402,10 +433,10 @@ getNamespace = function(namespace) {
 destroyNamespace = function(namespace) {
 	// if namespace passed in, get the name out of it
 	if (namespace instanceof Namespace) {
-		namespace = namespace.name;
+		namespace = namespace.nsname;
 	}
 	// can't destroy the global namespace
-	if (namespace === global_namespace) {
+	if (namespace === globalNamespace) {
 		return;
 	}
 	// TODO: more advanced cleanup
@@ -441,7 +472,7 @@ testNamespace = function(namespace) {
  * @return {Namespace}
  */
 getGlobalNamespace = function() {
-	return getNamespace(global_namespace);
+	return getNamespace(globalNamespace);
 };
 
 // export methods to the main object
