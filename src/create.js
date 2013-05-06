@@ -11,14 +11,14 @@ namedGlobalMutators = {},
 globalMutators = [],
 // Use native object.create whenever possible
 objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto) {
-	// #JSCOVERAGE_IF !Object.create
+//#JSCOVERAGE_IF !Object.create
 	// This method allows for the constructor to not be called when making a new
 	// subclass
 	var SubClass = function() {
 	};
 	SubClass.prototype = proto;
 	return new SubClass();
-	// #JSCOVERAGE_ENDIF
+//#JSCOVERAGE_ENDIF
 },
 // Hook to use Object.defineProperty if needed
 objectDefineProperty = function(obj, prop, descriptor) {
