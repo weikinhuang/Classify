@@ -153,62 +153,64 @@ module.exports = function(grunt) {
 
 				"saucelabs-qunit" : {
 					all : {
-						// username: "",
-						// key: "",
-						urls : [ "http://127.0.0.1:8080/test/index.html" ],
-						tunnelTimeout : 120,
-						testTimeout : 300000,
-						build : process.env.TRAVIS_JOB_ID,
-						concurrency : 3,
-						browsers : [ {
-							browserName : "firefox",
-							platform : "Windows 7",
-							version : "21"
-						}, {
-							browserName : "firefox",
-							platform : "Windows XP",
-							version : "4"
-						}, {
-							browserName : "chrome",
-							platform : "Windows 7",
-							version : "26"
-						}, {
-							browserName : "chrome",
-							platform : "Linux",
-							version : "25"
-						}, {
-							browserName : "internet explorer",
-							platform : "Windows 8",
-							version : "10"
-						}, {
-							browserName : "internet explorer",
-							platform : "Windows 7",
-							version : "9"
-						}, {
-							browserName : "internet explorer",
-							platform : "Windows XP",
-							version : "8"
-						}, {
-							browserName : "internet explorer",
-							platform : "Windows XP",
-							version : "7"
-						}, {
-							browserName : "opera",
-							platform : "Windows 7",
-							version : "12"
-						}, {
-							browserName : "opera",
-							platform : "Windows 7",
-							version : "11"
-						}, {
-							platform : "OS X 10.6",
-							browserName : "safari",
-							version : "5"
-						}, {
-							platform : "OS X 10.8",
-							browserName : "safari",
-							version : "6"
-						} ]
+						options : {
+							// username: "",
+							// key: "",
+							urls : [ "http://127.0.0.1:8080/test/index.html" ],
+							tunnelTimeout : 120,
+							testTimeout : 300000,
+							build : process.env.TRAVIS_JOB_ID,
+							concurrency : 3,
+							browsers : [ {
+								browserName : "firefox",
+								platform : "Windows 7",
+								version : "21"
+							}, {
+								browserName : "firefox",
+								platform : "Windows XP",
+								version : "4"
+							}, {
+								browserName : "chrome",
+								platform : "Windows 7",
+								version : "26"
+							}, {
+								browserName : "chrome",
+								platform : "Linux",
+								version : "25"
+							}, {
+								browserName : "internet explorer",
+								platform : "Windows 8",
+								version : "10"
+							}, {
+								browserName : "internet explorer",
+								platform : "Windows 7",
+								version : "9"
+							}, {
+								browserName : "internet explorer",
+								platform : "Windows XP",
+								version : "8"
+							}, {
+								browserName : "internet explorer",
+								platform : "Windows XP",
+								version : "7"
+							}, {
+								browserName : "opera",
+								platform : "Windows 7",
+								version : "12"
+							}, {
+								browserName : "opera",
+								platform : "Windows 7",
+								version : "11"
+							}, {
+								platform : "OS X 10.6",
+								browserName : "safari",
+								version : "5"
+							}, {
+								platform : "OS X 10.8",
+								browserName : "safari",
+								version : "6"
+							} ]
+						}
 					}
 				},
 

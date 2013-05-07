@@ -43,7 +43,7 @@
         "grunt-contrib-yuidoc": ">=0.4.0",
         "grunt-contrib-watch": ">=0.3.1",
         "grunt-qunit-cov": ">=0.3.2",
-        "grunt-saucelabs": ">=3.0.8",
+        "grunt-saucelabs": ">=4.0.0",
         "gzip-js": "*"
     },
     "scripts": {
