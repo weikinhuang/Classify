@@ -72,7 +72,7 @@ extend(Classify, exportNames, {
 	 * @type {String}
 	 * @property version
 	 */
-	version : "@VERSION",
+	version : "<%= pkg.version %>",
 
 	/**
 	 * Utility function to provide functionality to quickly add properties to objects

@@ -1,3 +1,8 @@
+#### v0.10.3
+	Allow for mutators to be defined on a per class/namespace level
+	Ability to create mutators out of any object
+	Convert to grunt build system
+
 #### v0.10.2
 	Fix requirejs and amd definitions, remove async autoloader to support it
 

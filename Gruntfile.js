@@ -37,7 +37,8 @@ module.exports = function(grunt) {
 						dest : "dist/classify.js"
 					},
 					options : {
-						banner : fs.readFileSync("srcwrap/copyright.js", "utf8")
+						banner : fs.readFileSync("srcwrap/copyright.js", "utf8"),
+						process : true
 					}
 				},
 
