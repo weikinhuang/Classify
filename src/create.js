@@ -313,7 +313,7 @@ var create = function() {
 	 * @type Object
 	 */
 	klass = function() {
-		var tmp, i, l, mutators;
+		var tmp, i, l, mutators, args;
 		// We're not creating a instantiated object so we want to force a
 		// instantiation or call the invoke function
 		// we need to test for !this when in "use strict" mode
@@ -325,6 +325,7 @@ var create = function() {
 			return klass.invoke.apply(klass, arguments);
 		}
 		mutators = getMutators(klass);
+		args = argsToArray(arguments);
 		// loop through all the mutators for the onInit hook
 		for (i = 0, l = mutators.length; i < l; i++) {
 			if (!mutators[i].onInit) {
@@ -332,7 +333,7 @@ var create = function() {
 			}
 			// if the onInit hook returns anything, then it will override the
 			// "new" keyword
-			tmp = mutators[i].onInit.call(mutators[i], this, klass);
+			tmp = mutators[i].onInit.call(mutators[i], this, klass, args);
 			if (tmp !== undefined) {
 				// however this method can only return objects and not scalar
 				// values
@@ -344,7 +345,7 @@ var create = function() {
 		}
 		// just in case we want to do anything special like "new" keyword
 		// override (usually don't return anything)
-		tmp = this.init.apply(this, arguments);
+		tmp = this.init.apply(this, args);
 		if (tmp !== undefined) {
 			// we can only return objects because the new keyword forces it to
 			// be an object
