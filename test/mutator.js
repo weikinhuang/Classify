@@ -158,10 +158,10 @@ QUnit.test("adding and removing global mutators to the on property remove hook",
 });
 
 QUnit.test("adding and removing global mutators to the on initialize hook", function() {
-	QUnit.expect(9);
+	QUnit.expect(12);
 
 	addMutator("test", {
-		onInit : function(instance, klass) {
+		onInit : function(instance, klass, args) {
 			if (klass.count === undefined) {
 				klass.count = 0;
 			}
@@ -227,6 +227,31 @@ QUnit.test("adding and removing global mutators to the on initialize hook", func
 	}, Error, "onInit mutator override new keyword during instantiation with scalar value throws a error.");
 
 	removeMutator("test4");
+
+	// test mutator access to instance constructor arguments
+	addMutator("test", {
+		onInit : function(instance, klass, args) {
+			QUnit.deepEqual(args, ["a", "b"], "onInit in mutator is passed the instance constructor arguments");
+		}
+	});
+	var test6 = create({});
+	(new test6("a", "b"));
+	removeMutator("test");
+
+	// test mutator modification of instance constructor arguments
+	addMutator("test", {
+		onInit : function(instance, klass, args) {
+			args[0] = "x";
+		}
+	});
+	var test7 = create({
+		init : function(a, b) {
+			QUnit.equal(a, "x", "a parameter can modified by a mutator onInit");
+			QUnit.equal(b, "b", "a parameter can modified by a mutator onInit");
+		}
+	});
+	(new test7("a", "b"));
+	removeMutator("test");
 });
 
 QUnit.test("adding class level mutators to the internal on predefine hook", function() {
