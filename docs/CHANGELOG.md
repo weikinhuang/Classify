@@ -1,3 +1,6 @@
+#### v0.10.4
+	Pass arguments to onInit mutators
+	
 #### v0.10.3
 	Allow for mutators to be defined on a per class/namespace level
 	Ability to create mutators out of any object
