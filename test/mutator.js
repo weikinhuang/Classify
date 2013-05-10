@@ -247,7 +247,7 @@ QUnit.test("adding and removing global mutators to the on initialize hook", func
 	var test7 = create({
 		init : function(a, b) {
 			QUnit.equal(a, "x", "a parameter can modified by a mutator onInit");
-			QUnit.equal(b, "b", "a parameter can modified by a mutator onInit");
+			QUnit.equal(b, "b", "a parameter unmodified by a mutator onInit is left unchanged");
 		}
 	});
 	(new test7("a", "b"));
