@@ -2,7 +2,7 @@
  * @module create
  */
 // regex for keyword properties
-var keywordRegexp = /^(?:superclass|subclass|implement|observable|bindings|extend|prototype|applicate|(?:add|remove)(?:Static|Observable|Aliased|Bound)Property)$/,
+var keywordRegexp = /^(?:superclass|subclass|implement|bindings|extend|prototype|applicate|(?:add|remove)(?:Static|Aliased|Bound)Property)$/,
 // regex to test for a mutator name to avoid a loop
 mutatorNameTest = /^__/,
 // reference to existing mutators
@@ -230,7 +230,7 @@ removeProperty = function(klass, name, mutators) {
 		}
 		return;
 	}
-	// we need to delete the observable property from all children as well as
+	// we need to delete the property from all children as well as
 	// the current class
 	each(klass.subclass, function(k) {
 		// remove the parent function wrapper for child classes
