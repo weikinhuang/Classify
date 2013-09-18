@@ -153,20 +153,17 @@ module.exports = function(grunt) {
 				concurrency : 3,
 				browsers : [ {
 					browserName : "firefox",
-					platform : "Windows 7",
-					version : "21"
+					platform : "Windows 7"
 				}, {
 					browserName : "firefox",
 					platform : "Windows XP",
 					version : "4"
 				}, {
 					browserName : "chrome",
-					platform : "Windows 7",
-					version : "26"
+					platform : "Windows 7"
 				}, {
 					browserName : "chrome",
-					platform : "Linux",
-					version : "25"
+					platform : "Linux"
 				}, {
 					browserName : "internet explorer",
 					platform : "Windows 8",
