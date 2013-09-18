@@ -5,252 +5,243 @@ module.exports = function(grunt) {
 
 	var gzip = require("gzip-js");
 
-	grunt
-			.initConfig({
-				pkg : grunt.file.readJSON("package.json"),
+	var gruntConfig = {};
+	gruntConfig.pkg = grunt.file.readJSON("package.json");
 
-				compare_size : {
-					files : [ "dist/classify.js", "dist/classify.min.js" ],
-					options : {
-						compress : {
-							gz : function(file_contents) {
-								return gzip.zip(file_contents, {}).length;
-							}
-						}
-					}
-				},
-
-				concat : {
-					dist : {
-						src : [ "srcwrap/intro.js",
-								"src/core.js",
-								"src/create.js",
-								"src/mutator.static.js",
-								"src/mutator.nowrap.js",
-								"src/mutator.alias.js",
-								"src/mutator.bind.js",
-								"src/observer.js",
-								"src/mutator.observable.js",
-								"src/namespace.js",
-								"src/export.js",
-								"srcwrap/outro.js" ],
-						dest : "dist/classify.js"
-					},
-					options : {
-						banner : fs.readFileSync("srcwrap/copyright.js", "utf8"),
-						process : true
-					}
-				},
-
-				jshint : {
-					dist : {
-						src : [ "dist/classify.js" ],
-						options : {
-							latedef : true,
-							noempty : true,
-							curly : true,
-							noarg : true,
-							trailing : false,
-							undef : true,
-							unused : true,
-							strict : true,
-							node : true,
-							browser : true,
-							quotmark : "double",
-							maxcomplexity : 8,
-							predef : []
-						}
-					},
-					test : {
-						src : [ "test/*.js" ],
-						options : {
-							latedef : true,
-							noempty : true,
-							curly : true,
-							trailing : false,
-							undef : true,
-							strict : false,
-							node : true,
-							browser : true,
-							quotmark : "double",
-							maxcomplexity : 7,
-							predef : [ "QUnit", "Classify" ]
-						}
-					},
-					build : {
-						src : [ "Gruntfile.js", "test/bridge/qunit-node-bridge.js" ],
-						options : {
-							latedef : true,
-							noempty : true,
-							curly : true,
-							trailing : false,
-							undef : true,
-							unused : true,
-							strict : true,
-							node : true,
-							browser : true,
-							quotmark : "double",
-							maxcomplexity : 15,
-							predef : []
-						}
-					}
-				},
-
-				uglify : {
-					all : {
-						files : {
-							"dist/classify.min.js" : [ "dist/classify.js" ]
-						},
-						options : {
-							banner : "/*! ClassifyJs v<%= pkg.version %> | (c) 2011-<%= grunt.template.today(\"yyyy\") %>, Wei Kin Huang | <%= pkg.homepage %> | MIT license | <%= grunt.template.today(\"yyyy-mm-dd\") %> */;",
-							sourceMap : "dist/classify.min.map",
-							sourceMappingURL : "classify.min.map",
-							sourceMapPrefix : 1,
-							beautify : {
-								ascii_only : true
-							},
-							mangle : true
-						}
-					}
-				},
-
-				qunit : {
-					all : {
-						options : {
-							urls : [ "http://localhost:8080/test/index.html" ]
-						}
-					}
-				},
-
-				"qunit-node" : {
-					all : {
-						code : [ "src/core.js",
-								"src/create.js",
-								"src/mutator.static.js",
-								"src/mutator.nowrap.js",
-								"src/mutator.alias.js",
-								"src/mutator.bind.js",
-								"src/observer.js",
-								"src/mutator.observable.js",
-								"src/namespace.js",
-								"src/export.js" ],
-						tests : [ "test/core.js",
-								"test/create.js",
-								"test/mutator.js",
-								"test/mutator.static.js",
-								"test/mutator.nowrap.js",
-								"test/mutator.alias.js",
-								"test/mutator.bind.js",
-								"test/observer.js",
-								"test/mutator.observable.js",
-								"test/namespace.js",
-								"test/export.js" ],
-						setUp : function() {
-							this.root = this;
-						}
-					}
-				},
-
-				"saucelabs-qunit" : {
-					all : {
-						options : {
-							// username: "",
-							// key: "",
-							urls : [ "http://127.0.0.1:8080/test/index.html" ],
-							tunnelTimeout : 120,
-							testTimeout : 300000,
-							build : process.env.TRAVIS_JOB_ID,
-							concurrency : 3,
-							browsers : [ {
-								browserName : "firefox",
-								platform : "Windows 7",
-								version : "21"
-							}, {
-								browserName : "firefox",
-								platform : "Windows XP",
-								version : "4"
-							}, {
-								browserName : "chrome",
-								platform : "Windows 7",
-								version : "26"
-							}, {
-								browserName : "chrome",
-								platform : "Linux",
-								version : "25"
-							}, {
-								browserName : "internet explorer",
-								platform : "Windows 8",
-								version : "10"
-							}, {
-								browserName : "internet explorer",
-								platform : "Windows 7",
-								version : "9"
-							}, {
-								browserName : "internet explorer",
-								platform : "Windows XP",
-								version : "8"
-							}, {
-								browserName : "internet explorer",
-								platform : "Windows XP",
-								version : "7"
-							}, {
-								browserName : "opera",
-								platform : "Windows 7",
-								version : "12"
-							}, {
-								browserName : "opera",
-								platform : "Windows 7",
-								version : "11"
-							}, {
-								platform : "OS X 10.6",
-								browserName : "safari",
-								version : "5"
-							}, {
-								platform : "OS X 10.8",
-								browserName : "safari",
-								version : "6"
-							} ]
-						}
-					}
-				},
-
-				connect : {
-					server : {
-						options : {
-							base : ".",
-							port : 8080
-						}
-					}
-				},
-
-				"qunit-cov" : {
-					test : {
-						minimum : 0.95,
-						srcDir : "src",
-						depDirs : [ "test" ],
-						outDir : "coverage",
-						testFiles : [ "test/*.html" ]
-					}
-				},
-
-				yuidoc : {
-					compile : {
-						name : "<%= pkg.name %>",
-						description : "<%= pkg.description %>",
-						version : "<%= pkg.version %>",
-						url : "<%= pkg.homepage %>",
-						options : {
-							paths : "src/",
-							outdir : "docs/yuidoc/"
-						}
-					}
-				},
-
-				watch : {
-					files : [ "src/*.js", "test/*.js", "test/*.html", "Gruntfile.js" ],
-					tasks : "dev"
+	gruntConfig.compare_size = {
+		files : [ "dist/classify.js", "dist/classify.min.js" ],
+		options : {
+			compress : {
+				gz : function(file_contents) {
+					return gzip.zip(file_contents, {}).length;
 				}
-			});
+			}
+		}
+	};
+
+	gruntConfig.concat = {
+		dist : {
+			src : [ "srcwrap/intro.js",
+					"src/core.js",
+					"src/create.js",
+					"src/mutator.static.js",
+					"src/mutator.nowrap.js",
+					"src/mutator.alias.js",
+					"src/mutator.bind.js",
+					"src/observer.js",
+					"src/mutator.observable.js",
+					"src/namespace.js",
+					"src/export.js",
+					"srcwrap/outro.js" ],
+			dest : "dist/classify.js"
+		},
+		options : {
+			banner : fs.readFileSync("srcwrap/copyright.js", "utf8"),
+			process : true
+		}
+	};
+
+	gruntConfig.jshint = {
+		dist : {
+			src : [ "dist/classify.js" ],
+			options : {
+				latedef : true,
+				noempty : true,
+				curly : true,
+				noarg : true,
+				trailing : false,
+				undef : true,
+				unused : true,
+				strict : true,
+				node : true,
+				browser : true,
+				quotmark : "double",
+				maxcomplexity : 13,
+				predef : []
+			}
+		},
+		test : {
+			src : [ "test/*.js" ],
+			options : {
+				latedef : true,
+				noempty : true,
+				curly : true,
+				trailing : false,
+				undef : true,
+				strict : false,
+				node : true,
+				browser : true,
+				quotmark : "double",
+				maxcomplexity : 7,
+				predef : [ "QUnit", "Classify" ]
+			}
+		},
+		build : {
+			src : [ "Gruntfile.js", "test/bridge/qunit-node-bridge.js" ],
+			options : {
+				latedef : true,
+				noempty : true,
+				curly : true,
+				trailing : false,
+				undef : true,
+				unused : true,
+				strict : true,
+				node : true,
+				browser : true,
+				quotmark : "double",
+				maxcomplexity : 18,
+				predef : []
+			}
+		}
+	};
+
+	gruntConfig.uglify = {
+		all : {
+			files : {
+				"dist/classify.min.js" : [ "dist/classify.js" ]
+			},
+			options : {
+				banner : "/*! ClassifyJs v<%= pkg.version %> | (c) 2011-<%= grunt.template.today(\"yyyy\") %>, Wei Kin Huang | <%= pkg.homepage %> | MIT license | <%= grunt.template.today(\"yyyy-mm-dd\") %> */;",
+				sourceMap : "dist/classify.min.map",
+				sourceMappingURL : "classify.min.map",
+				sourceMapPrefix : 1,
+				beautify : {
+					ascii_only : true
+				},
+				mangle : true
+			}
+		}
+	};
+
+	gruntConfig.qunit = {
+		all : {
+			options : {
+				urls : [ "http://localhost:8080/test/index.html" ]
+			}
+		}
+	};
+
+	gruntConfig["qunit-node"] = {
+		all : {
+			code : [ "src/core.js", "src/create.js", "src/mutator.static.js", "src/mutator.nowrap.js", "src/mutator.alias.js", "src/mutator.bind.js", "src/observer.js", "src/mutator.observable.js", "src/namespace.js", "src/export.js" ],
+			tests : [ "test/core.js",
+					"test/create.js",
+					"test/mutator.js",
+					"test/mutator.static.js",
+					"test/mutator.nowrap.js",
+					"test/mutator.alias.js",
+					"test/mutator.bind.js",
+					"test/observer.js",
+					"test/mutator.observable.js",
+					"test/namespace.js",
+					"test/export.js" ],
+			setUp : function() {
+				this.root = this;
+			}
+		}
+	};
+
+	gruntConfig["saucelabs-qunit"] = {
+		all : {
+			options : {
+				// username: "",
+				// key: "",
+				urls : [ "http://127.0.0.1:8080/test/index.html" ],
+				tunnelTimeout : 120,
+				testTimeout : 300000,
+				build : process.env.TRAVIS_JOB_ID,
+				concurrency : 3,
+				browsers : [ {
+					browserName : "firefox",
+					platform : "Windows 7",
+					version : "21"
+				}, {
+					browserName : "firefox",
+					platform : "Windows XP",
+					version : "4"
+				}, {
+					browserName : "chrome",
+					platform : "Windows 7",
+					version : "26"
+				}, {
+					browserName : "chrome",
+					platform : "Linux",
+					version : "25"
+				}, {
+					browserName : "internet explorer",
+					platform : "Windows 8",
+					version : "10"
+				}, {
+					browserName : "internet explorer",
+					platform : "Windows 7",
+					version : "9"
+				}, {
+					browserName : "internet explorer",
+					platform : "Windows XP",
+					version : "8"
+				}, {
+					browserName : "internet explorer",
+					platform : "Windows XP",
+					version : "7"
+				}, {
+					browserName : "opera",
+					platform : "Windows 7",
+					version : "12"
+				}, {
+					browserName : "opera",
+					platform : "Windows 7",
+					version : "11"
+				}, {
+					platform : "OS X 10.6",
+					browserName : "safari",
+					version : "5"
+				}, {
+					platform : "OS X 10.8",
+					browserName : "safari",
+					version : "6"
+				} ]
+			}
+		}
+	};
+
+	gruntConfig.connect = {
+		server : {
+			options : {
+				base : ".",
+				port : 8080
+			}
+		}
+	};
+
+	gruntConfig["qunit-cov"] = {
+		test : {
+			minimum : 0.95,
+			srcDir : "src",
+			depDirs : [ "test" ],
+			outDir : "coverage",
+			testFiles : [ "test/*.html" ]
+		}
+	};
+
+	gruntConfig.yuidoc = {
+		compile : {
+			name : "<%= pkg.name %>",
+			description : "<%= pkg.description %>",
+			version : "<%= pkg.version %>",
+			url : "<%= pkg.homepage %>",
+			options : {
+				paths : "src/",
+				outdir : "docs/yuidoc/"
+			}
+		}
+	};
+
+	gruntConfig.watch = {
+		files : [ "src/*.js", "test/*.js", "test/*.html", "Gruntfile.js" ],
+		tasks : "dev"
+	};
+
+	grunt.initConfig(gruntConfig);
 
 	grunt.loadNpmTasks("grunt-compare-size");
 	grunt.loadNpmTasks("grunt-contrib-concat");
