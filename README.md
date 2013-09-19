@@ -376,7 +376,7 @@ Changelog
 About
 --------------------------------------
 
-Classify copyright 2011-2012 by [Wei Kin Huang](http://closedinterval.com/).
+Classify copyright 2011-2013 by [Wei Kin Huang](http://closedinterval.com/).
 
 Build Tools: 
 [Grunt](https://github.com/cowboy/grunt),
