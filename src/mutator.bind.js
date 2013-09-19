@@ -68,7 +68,7 @@ addMutator("bind", {
 	},
 	onInit : function(instance, klass) {
 		var bindings = klass.bindings || null;
-		// if there are no observable properties, just continue
+		// if there are no bound properties, just continue
 		if (bindings === null || bindings.length === 0) {
 			return;
 		}
