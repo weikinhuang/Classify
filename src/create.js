@@ -169,10 +169,10 @@ addProperty = function(klass, parent, name, property, mutators) {
 	// check to see if the property needs to be mutated
 	if (mutatorNameTest.test(name)) {
 		foundMutator = false;
-		each(mutators, function(mutator) {
+		each(mutators, function mutatorIterator(mutator) {
 			if (mutator.onPropAdd && mutator.propTest.test(name)) {
 				if (name === mutator.propPrefix) {
-					each(property, function(prop, key) {
+					each(property, function addPropertyMutatorIterator(prop, key) {
 						mutator.onPropAdd.call(mutator, klass, parent, key, prop);
 					});
 				} else {
@@ -196,7 +196,7 @@ addProperty = function(klass, parent, name, property, mutators) {
 
 	// wrap all child implementation with the parent wrapper
 	if (isFunction(property)) {
-		each(klass.subclass, function(k) {
+		each(klass.subclass, function addSubclassPropertyIterator(k) {
 			// add only if it's not already wrapped
 			if (isFunction(k.prototype[name]) && !k.prototype[name].__original_) {
 				objectDefineProperty(k.prototype, name, wrapParentProperty(self_prototype[name], k.prototype[name]));
@@ -208,7 +208,7 @@ addProperty = function(klass, parent, name, property, mutators) {
 removeProperty = function(klass, name, mutators) {
 	var foundMutator = false;
 	if (mutatorNameTest.test(name)) {
-		each(mutators, function(mutator) {
+		each(mutators, function removePropertyMutatorIterator(mutator) {
 			if (mutator.onPropRemove && mutator.propTest.test(name)) {
 				mutator.onPropRemove.call(mutator, klass, name.replace(mutator.propTest, ""));
 				foundMutator = true;
@@ -232,7 +232,7 @@ removeProperty = function(klass, name, mutators) {
 	}
 	// we need to delete the property from all children as well as
 	// the current class
-	each(klass.subclass, function(k) {
+	each(klass.subclass, function removeSubclassPropertyIterator(k) {
 		// remove the parent function wrapper for child classes
 		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].__original_)) {
 			objectDefineProperty(k.prototype, name, k.prototype[name].__original_);
@@ -431,7 +431,7 @@ var create = function() {
 	klass.mutators = mutators;
 
 	// call each of the _onPredefine mutators to modify this class
-	each(getMutators(klass), function(mutator) {
+	each(getMutators(klass), function classMutatorIterator(mutator) {
 		if (!mutator._onPredefine) {
 			return;
 		}
@@ -509,7 +509,7 @@ var create = function() {
 		// the prefix parameter is for internal use only
 		prefix = prefix || "";
 		if (property === undefined && typeof name !== "string") {
-			each(keys(name), function(n) {
+			each(keys(name), function addPropertyMutatorIterator(n) {
 				addProperty(klass, parent, prefix + n, name[n], mutators);
 			});
 		} else {
@@ -535,7 +535,7 @@ var create = function() {
 	if (implement.length !== 0) {
 		each(implement, function(impl) {
 			var props = impl.__isclass_ ? impl.prototype : impl;
-			each(keys(props), function(name) {
+			each(keys(props), function implementIterator(name) {
 				if (!hasOwn.call(proto, name) && !hasOwn.call(methods, name)) {
 					// copy all the implemented properties to the methods
 					// definition object
@@ -546,7 +546,7 @@ var create = function() {
 	}
 
 	// call each of the onCreate mutators to modify this class
-	each(getMutators(klass), function(mutator) {
+	each(getMutators(klass), function createMutatorIterator(mutator) {
 		if (!mutator.onCreate) {
 			return;
 		}
@@ -583,7 +583,7 @@ var create = function() {
 	klass.__isclass_ = true;
 
 	// call each of the onDefine mutators to modify this class
-	each(getMutators(klass), function(mutator) {
+	each(getMutators(klass), function defineMutatorIterator(mutator) {
 		if (!mutator.onDefine) {
 			return;
 		}

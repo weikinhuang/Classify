@@ -58,7 +58,7 @@ addMutator("bind", {
 		klass.bindings.splice(i, 1);
 
 		// we need to delete the bound property from all children as well as the current class
-		each(klass.subclass, function(k) {
+		each(klass.subclass, function bindPropRemoveIterator(k) {
 			if (indexOf(k.bindings, name) > -1 && !hasOwn.call(k.prototype, name)) {
 				k.removeBoundProperty(name);
 			}
@@ -73,7 +73,7 @@ addMutator("bind", {
 			return;
 		}
 		// wrap all prototypes that needs to be bound to the instance
-		each(bindings, function(prop) {
+		each(bindings, function bindingsIterator(prop) {
 			objectDefineProperty(instance, prop, function() {
 				// convert the arguments to an array
 				var args = argsToArray(arguments);

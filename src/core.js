@@ -117,7 +117,7 @@ each = function(o, iterator, context) {
 // simple mapping function
 map = function(o, iterator) {
 	var temp = [];
-	each(o, function(v, i) {
+	each(o, function mapIterator(v, i) {
 		temp[temp.length] = iterator(v, i, o);
 	});
 	return temp;
@@ -125,7 +125,7 @@ map = function(o, iterator) {
 // simple filter function
 filter = function(arr, item) {
 	var out = [];
-	each(arr, function(v) {
+	each(arr, function filterIterator(v) {
 		if (v !== item) {
 			out[out.length] = v;
 		}
@@ -135,8 +135,8 @@ filter = function(arr, item) {
 // simple extension function that takes into account the enumerated keys
 extend = function() {
 	var args = argsToArray(arguments), base = args.shift();
-	each(args, function(extens) {
-		each(keys(extens), function(k) {
+	each(args, function extendArgIterator(extens) {
+		each(keys(extens), function extendKeyIterator(k) {
 			base[k] = extens[k];
 		});
 	});

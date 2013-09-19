@@ -10,7 +10,7 @@ getNamespace, destroyNamespace, testNamespace, getGlobalNamespace,
 // create a function that create namespaces in an object
 provide = function(namespace, base) {
 	// Drill down the namespace array
-	each(namespace, function(ns) {
+	each(namespace, function provideIterator(ns) {
 		if (!base[ns]) {
 			base[ns] = {};
 		}
@@ -30,7 +30,7 @@ dereference = function(ns, arg, ref) {
 	}
 	// if we have an object, then that's what we want, otherwise arrays
 	// we need to loop through and convert them to the proper objects
-	return !isArray(arg) ? arg : map(arg, function(prop) {
+	return !isArray(arg) ? arg : map(arg, function dereferenceIterator(prop) {
 		return dereference(ns, prop);
 	});
 },
@@ -83,14 +83,14 @@ namespaceProperties = {
 					return self.mutators;
 				};
 			}
-		}), mappedArgs = map(args, function(v) {
+		}), mappedArgs = map(args, function mappedArgsDereferenceIterator(v) {
 			return dereference(self, v);
 		}),
 		// other vars
 		foundMutatorArg = false, c, tmp;
 
 		// look for the mutators argument
-		mappedArgs = map(mappedArgs, function(v) {
+		mappedArgs = map(mappedArgs, function mappedArgsIterator(v) {
 			// we found some mutators!
 			if (!v.__isclass_ && !isExtendable(v) && (v instanceof Mutator || (isArray(v) && v[0] instanceof Mutator))) {
 				foundMutatorArg = true;
@@ -108,7 +108,7 @@ namespaceProperties = {
 		c = create.apply(null, mappedArgs);
 		// fix the issue with the extends function referencing string classes
 		c.extend = c.prototype.extend = function() {
-			return create.apply(null, [ c ].concat(map(arguments, function(v) {
+			return create.apply(null, [ c ].concat(map(arguments, function extendIterator(v) {
 				return dereference(self, v);
 			})));
 		};
@@ -139,7 +139,7 @@ namespaceProperties = {
 		deref = this.nsref;
 
 		// remove it from this namespace
-		each(namespace, function(ns) {
+		each(namespace, function destroyIterator(ns) {
 			// if it doesn't go that far, then forget deleting it
 			if (!ref[ns]) {
 				ref = null;
@@ -158,7 +158,7 @@ namespaceProperties = {
 			return this;
 		}
 		// recursively remove all inherited classes
-		each(c.subclass, function(v) {
+		each(c.subclass, function destroyInheritedIterator(v) {
 			self.destroy(v._namespace_);
 		});
 		// we also need to delete the reference to this object from the parent!
@@ -167,7 +167,7 @@ namespaceProperties = {
 		}
 		// now we remove all non inherited classes, but fall under this
 		// namespace
-		each(deref, function(v, k) {
+		each(deref, function destroyClassIterator(v, k) {
 			if (k !== classname && k.indexOf(classname) === 0) {
 				self.destroy(v._namespace_);
 			}
@@ -386,7 +386,7 @@ Namespace.from = function(name, obj) {
 		throw new Error("Attempting to create a namespace from an existing namespace.");
 	}
 	var namespaceProps = {};
-	each(namespaceProperties, function(prop, key) {
+	each(namespaceProperties, function namespaceFromIterator(prop, key) {
 		namespaceProps[key] = function() {
 			return prop.apply(obj, arguments);
 		};

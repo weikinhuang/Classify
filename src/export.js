@@ -91,7 +91,7 @@ if (typeof define === "function" && define.amd) {
 	// Export Classify as an AMD module only if there is a AMD module loader,
 	// use lowercase classify, because AMD modules are usually loaded with filenames
 	// and Classify would usually be loaded with lowercase classify.js
-	define(function() {
+	define("classify", [], function() {
 		return Classify;
 	});
 }

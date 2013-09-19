@@ -1,5 +1,5 @@
 #### v0.11.0
-	Removing Observer and observable mutator from core. Now in Classify-Observable[https://github.com/weikinhuang/Classify-Observable]
+	Removing Observer and observable mutator from core. Now in Classify-Observable[https://github.com/weikinhuang/Classify-Observer]
 
 #### v0.10.4
 	Pass arguments to onInit mutators
