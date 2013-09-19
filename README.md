@@ -3,8 +3,8 @@
 
 Classify.js is a library that allows for cross platform and cross browser Object Oriented Javascript
 class definitions using classical inheritance and namespaces behind the prototype syntax in an easy to
-use interface function. Classify also provides "observable" properties that can be assigned getters and
-setters and onchange listeners to provide abstractions around `get` and `set` accessors.
+use interface function. Classify also provides "bound" properties that passes the calling context as
+the first argument, and "static" properties for static properties and methods on the object definition.
 
 Classify is tested in IE 6+, Firefox 2+, Safari 3+, Chrome 3+, and Opera 10+, NodeJs.
 

@@ -28,8 +28,6 @@ module.exports = function(grunt) {
 					"src/mutator.nowrap.js",
 					"src/mutator.alias.js",
 					"src/mutator.bind.js",
-					"src/observer.js",
-					"src/mutator.observable.js",
 					"src/namespace.js",
 					"src/export.js",
 					"srcwrap/outro.js" ],
@@ -123,7 +121,7 @@ module.exports = function(grunt) {
 
 	gruntConfig["qunit-node"] = {
 		all : {
-			code : [ "src/core.js", "src/create.js", "src/mutator.static.js", "src/mutator.nowrap.js", "src/mutator.alias.js", "src/mutator.bind.js", "src/observer.js", "src/mutator.observable.js", "src/namespace.js", "src/export.js" ],
+			code : [ "src/core.js", "src/create.js", "src/mutator.static.js", "src/mutator.nowrap.js", "src/mutator.alias.js", "src/mutator.bind.js", "src/namespace.js", "src/export.js" ],
 			tests : [ "test/core.js",
 					"test/create.js",
 					"test/mutator.js",
@@ -131,8 +129,6 @@ module.exports = function(grunt) {
 					"test/mutator.nowrap.js",
 					"test/mutator.alias.js",
 					"test/mutator.bind.js",
-					"test/observer.js",
-					"test/mutator.observable.js",
 					"test/namespace.js",
 					"test/export.js" ],
 			setUp : function() {
