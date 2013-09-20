@@ -44,7 +44,7 @@ Base = (function() {
 	fn.implement = [];
 	fn.prototype.constructor = Base;
 	fn.prototype.self = Base;
-	fn.__isclass_ = true;
+	fn.$$isclass = true;
 	return fn;
 })(),
 /**
@@ -133,10 +133,7 @@ removeMutator = function(name) {
 	if (!mutator) {
 		throw new Error("Removing unknown mutator.");
 	}
-	var idx = indexOf(globalMutators, mutator);
-	if (idx > -1) {
-		globalMutators.splice(idx, 1);
-	}
+	remove(globalMutators, mutator);
 	namedGlobalMutators[name] = null;
 	try {
 		delete namedGlobalMutators[name];
@@ -192,7 +189,7 @@ addProperty = function(klass, parent, name, property, mutators) {
 	self_prototype = klass.prototype;
 	// else this is not a prefixed static property, so we're assigning it to the
 	// prototype
-	objectDefineProperty(self_prototype, name, (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property);
+	objectDefineProperty(self_prototype, name, (isFunction(property) && !property.$$isclass && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property);
 
 	// wrap all child implementation with the parent wrapper
 	if (isFunction(property)) {
@@ -285,7 +282,7 @@ var create = function() {
 		methods = args.pop();
 		while (--argLength > 0) {
 			tmp = args.shift();
-			if (!tmp.__isclass_ && !isExtendable(tmp)) {
+			if (!tmp.$$isclass && !isExtendable(tmp)) {
 				if (tmp instanceof Mutator || isArray(tmp) && tmp[0] instanceof Mutator) {
 					mutators = toArray(tmp);
 				} else {
@@ -301,7 +298,7 @@ var create = function() {
 	methods = extend({}, methods);
 
 	// extending from an outside object and not passing in a constructor
-	if (!parent.__isclass_ && !methods.init) {
+	if (!parent.$$isclass && !methods.init) {
 		methods.init = parent;
 	}
 
@@ -534,7 +531,7 @@ var create = function() {
 	// Now implement each of the implemented objects before extending
 	if (implement.length !== 0) {
 		each(implement, function(impl) {
-			var props = impl.__isclass_ ? impl.prototype : impl;
+			var props = impl.$$isclass ? impl.prototype : impl;
 			each(keys(props), function implementIterator(name) {
 				if (!hasOwn.call(proto, name) && !hasOwn.call(methods, name)) {
 					// copy all the implemented properties to the methods
@@ -576,11 +573,11 @@ var create = function() {
 	 *
 	 * @static
 	 * @for Classify.Class
-	 * @property __isclass_
+	 * @property $$isclass
 	 * @private
 	 * @type {Boolean}
 	 */
-	klass.__isclass_ = true;
+	klass.$$isclass = true;
 
 	// call each of the onDefine mutators to modify this class
 	each(getMutators(klass), function defineMutatorIterator(mutator) {

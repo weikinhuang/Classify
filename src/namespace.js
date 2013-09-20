@@ -92,7 +92,7 @@ namespaceProperties = {
 		// look for the mutators argument
 		mappedArgs = map(mappedArgs, function mappedArgsIterator(v) {
 			// we found some mutators!
-			if (!v.__isclass_ && !isExtendable(v) && (v instanceof Mutator || (isArray(v) && v[0] instanceof Mutator))) {
+			if (!v.$$isclass && !isExtendable(v) && (v instanceof Mutator || (isArray(v) && v[0] instanceof Mutator))) {
 				foundMutatorArg = true;
 				v = toArray(v);
 				v.unshift(nsMutator);
@@ -163,7 +163,7 @@ namespaceProperties = {
 		});
 		// we also need to delete the reference to this object from the parent!
 		if (c.superclass.subclass) {
-			c.superclass.subclass = filter(c.superclass.subclass, c);
+			remove(c.superclass.subclass, c);
 		}
 		// now we remove all non inherited classes, but fall under this
 		// namespace
@@ -293,10 +293,7 @@ namespaceProperties = {
 		if (!mutator) {
 			throw new Error("Removing unknown mutator from namespace " + this.nsname + ".");
 		}
-		var idx = indexOf(this.mutators, mutator);
-		if (idx > -1) {
-			this.mutators.splice(idx, 1);
-		}
+		remove(this.mutators, mutator);
 		this.namedMutators[name] = null;
 		try {
 			delete this.namedMutators[name];

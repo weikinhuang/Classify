@@ -36,7 +36,7 @@ addMutator("static", {
 			return;
 		}
 		// See if we are defining an static property, if we are, assign it to the class
-		objectDefineProperty(klass, name, (isFunction(property) && !property.__isclass_) ? store(function() {
+		objectDefineProperty(klass, name, (isFunction(property) && !property.$$isclass) ? store(function() {
 			// Force "this" to be a reference to the class itself to simulate "self"
 			return property.apply(klass, arguments);
 		}, property) : property);

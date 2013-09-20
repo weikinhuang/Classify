@@ -42,7 +42,7 @@ addMutator("bind", {
 	onPropAdd : function(klass, parent, name, property) {
 		// add to the bindings array only if not already added and is not an definition of a class
 		var i = indexOf(klass.bindings, name);
-		if (i < 0 && isFunction(property) && !property.__isclass_) {
+		if (i < 0 && isFunction(property) && !property.$$isclass) {
 			// add the property name to the internal bindings array
 			klass.bindings.push(name);
 		}
@@ -51,11 +51,9 @@ addMutator("bind", {
 	},
 	onPropRemove : function(klass, name) {
 		// remove the bindings if it exists
-		var i = indexOf(klass.bindings, name);
-		if (i < 0) {
+		if (!remove(klass.bindings, name)) {
 			return;
 		}
-		klass.bindings.splice(i, 1);
 
 		// we need to delete the bound property from all children as well as the current class
 		each(klass.subclass, function bindPropRemoveIterator(k) {

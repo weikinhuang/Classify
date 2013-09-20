@@ -155,7 +155,7 @@ QUnit.test("known properties", function() {
 	// testing class for known properties in every defined class
 	var test = create({});
 
-	QUnit.equal(test.__isclass_, true, "flag indicating this object was created using the create method");
+	QUnit.equal(test.$$isclass, true, "flag indicating this object was created using the create method");
 	QUnit.equal((new test()).constructor, test, "assert that we have a internal reference to the constructor via 'constructor'");
 	QUnit.equal((new test()).self, test, "assert that we have a internal reference to the constructor via 'self'");
 	QUnit.equal(typeof test.superclass, "function", "assert that there is an internal reference to the parent class");

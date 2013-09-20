@@ -40,7 +40,7 @@ QUnit.test("class creation", function() {
 			return this;
 		}
 	});
-	QUnit.ok(!!c.__isclass_, "class created is a class object");
+	QUnit.ok(!!c.$$isclass, "class created is a class object");
 	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
 	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
@@ -545,7 +545,7 @@ QUnit.test("creating namespaces from existing plain objects", function() {
 			return this;
 		}
 	});
-	QUnit.ok(!!c.__isclass_, "class created is a class object");
+	QUnit.ok(!!c.$$isclass, "class created is a class object");
 	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
 	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
@@ -575,7 +575,7 @@ QUnit.test("creating namespaces from existing Classify classes", function() {
 			return this;
 		}
 	});
-	QUnit.ok(!!c.__isclass_, "class created is a class object");
+	QUnit.ok(!!c.$$isclass, "class created is a class object");
 	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
 	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
@@ -605,7 +605,7 @@ QUnit.test("creating namespaces from existing Classify object instances", functi
 			return this;
 		}
 	});
-	QUnit.ok(!!c.__isclass_, "class created is a class object");
+	QUnit.ok(!!c.$$isclass, "class created is a class object");
 	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
 	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");

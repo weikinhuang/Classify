@@ -54,7 +54,7 @@ Classify = create({
 		params = isArray(args[args.length - 1]) ? args.pop() : [];
 		tmp = Classify.invoke.apply(null, args);
 		// if we found a class, instantiate it
-		if (tmp.__isclass_) {
+		if (tmp.$$isclass) {
 			return tmp.applicate(params);
 		}
 		// otherwise, just return it

@@ -11,7 +11,7 @@ QUnit.module("export");
 
 QUnit.test("check globally accessable Classify object", function() {
 	QUnit.expect(11);
-	QUnit.ok(Classify.__isclass_, "Classify global object is a class");
+	QUnit.ok(Classify.$$isclass, "Classify global object is a class");
 
 	QUnit.deepEqual(Classify.create, create, "Create functionality is bound to the static instance of the class");
 	QUnit.equal(Classify.Namespace, Namespace, "Namespace class is bound to the static instance of the class");
@@ -95,12 +95,12 @@ QUnit.test("invoking global Classify object with object", function() {
 		a : 1
 	});
 	QUnit.equal(typeof test, "function", "object parameter creates a class");
-	QUnit.ok(test.__isclass_, "object parameter creates a class with create");
+	QUnit.ok(test.$$isclass, "object parameter creates a class with create");
 
 	// 2 object parameters creates class objects
 	var test2 = Classify(test, {});
 	QUnit.equal(typeof test2, "function", "2 object parameters creates a class");
-	QUnit.ok(test2.__isclass_, "2 object parameters creates a class with create");
+	QUnit.ok(test2.$$isclass, "2 object parameters creates a class with create");
 	QUnit.ok(new test2() instanceof test, "2 object parameters creates a class with inheritance");
 });
 

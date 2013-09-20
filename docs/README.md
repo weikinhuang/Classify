@@ -25,7 +25,7 @@
  * [`Classify.Class.implement`](#Classify.Class.implement)
  * [`Classify.Class.bindings`](#Classify.Class.bindings)
  * [`Classify.Class.observables`](#Classify.Class.observables)
- * [`Classify.Class.__isclass_`](#Classify.Class.__isclass_)
+ * [`Classify.Class.$$isclass`](#Classify.Class.$$isclass)
  * [`Classify.Class.invoke`](#Classify.Class.invoke)
  * [`Classify.Class.applicate`](#Classify.Class.applicate)
  * [`Classify.Class.extend`](#Classify.Class.extend)
@@ -354,7 +354,7 @@ Hashtable containing the definitions of all the observable properties that is im
 
 `Object`: Hashtable containing the definitions of all the observable properties that is implemented by this object
 
-### <a id="Classify.Class.__isclass_" href="#">`Classify.Class.__isclass_`</a>
+### <a id="Classify.Class.$$isclass" href="#">`Classify.Class.$$isclass`</a>
 Flag to determine if this object is created by Classify.create.
 [&#9650;](#)
 

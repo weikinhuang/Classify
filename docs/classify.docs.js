@@ -109,9 +109,9 @@ Classify.Class.observables = new Object();
  * @static
  * @memberOf Classify.Class
  * @type {Boolean}
- * @refexample Classify.Class.__isclass_
+ * @refexample Classify.Class.$$isclass
  */
-Classify.Class.__isclass_ = true;
+Classify.Class.$$isclass = true;
 /**
  * Default invocation function when the defined class is called without the "new" keyword. The default behavior is to return a new instance of itself
  *
