@@ -300,6 +300,16 @@ Classify.Class.prototype.$$parent = function() {
 	return new Object();
 };
 /**
+ * Allow access to the calling context when using a bound method
+ *
+ * @memberOf Classify.Class
+ * @for Classify.Class
+ * @property $$context
+ * @type {Object}
+ * @refexample Classify.Class.prototype.$$context
+ */
+Classify.Class.prototype.$$context = new Object();
+/**
  * Creates a new class that is a child of the current class
  *
  * @param {Object[]}

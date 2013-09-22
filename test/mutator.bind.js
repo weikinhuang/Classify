@@ -20,8 +20,8 @@ QUnit.test("bound properties", function() {
 			// the internal "this" reference should always point to the class definition
 			return this.a;
 		},
-		__bind_d : function(context, a) {
-			QUnit.strictEqual(context, temp, "Bound function's first argument is actual context of the caller");
+		__bind_d : function(a) {
+			QUnit.strictEqual(this.$$context, temp, "Bound function's first argument is actual context of the caller");
 			QUnit.equal(a, 1, "Bound function's passed in arguments are shifted by 1");
 		}
 	});

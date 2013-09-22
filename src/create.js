@@ -235,6 +235,49 @@ removeProperty = function(klass, name, mutators) {
 		delete klass.prototype[name];
 	} catch (e) {
 	}
+},
+// constructor body for all classes
+initializeKlass = function(instance, klass, args) {
+	var tmp, i, l, mutators;
+	// We're not creating a instantiated object so we want to force a
+	// instantiation or call the invoke function
+	// we need to test for !this when in "use strict" mode
+	// we need to test for !this.init for quick check if this is a instance
+	// or a definition
+	// we need to test for !(this instanceof klass) when the class is a
+	// property of a instance class (ie. namespace)
+	if (!instance || !instance.init || !(instance instanceof klass)) {
+		return klass.invoke.apply(klass, args);
+	}
+	mutators = getMutators(klass);
+	// loop through all the mutators for the onInit hook
+	for (i = 0, l = mutators.length; i < l; i++) {
+		if (!mutators[i].onInit) {
+			continue;
+		}
+		// if the onInit hook returns anything, then it will override the
+		// "new" keyword
+		tmp = mutators[i].onInit.call(mutators[i], instance, klass, args);
+		if (tmp !== undefined) {
+			// however this method can only return objects and not scalar
+			// values
+			if (isScalar(tmp)) {
+				throw new Error("Return values during onInit hook can only be objects.");
+			}
+			return tmp;
+		}
+	}
+	// just in case we want to do anything special like "new" keyword
+	// override (usually don't return anything)
+	tmp = instance.init.apply(instance, args);
+	if (tmp !== undefined) {
+		// we can only return objects because the new keyword forces it to
+		// be an object
+		if (isScalar(tmp)) {
+			throw new Error("Return values for the constructor can only be objects.");
+		}
+		return tmp;
+	}
 };
 
 // Master inheritance based class system creation
@@ -305,47 +348,7 @@ var create = function() {
 	 * @type Object
 	 */
 	klass = function() {
-		var tmp, i, l, mutators, args;
-		// We're not creating a instantiated object so we want to force a
-		// instantiation or call the invoke function
-		// we need to test for !this when in "use strict" mode
-		// we need to test for !this.init for quick check if this is a instance
-		// or a definition
-		// we need to test for !(this instanceof klass) when the class is a
-		// property of a instance class (ie. namespace)
-		if (!this || !this.init || !(this instanceof klass)) {
-			return klass.invoke.apply(klass, arguments);
-		}
-		mutators = getMutators(klass);
-		args = argsToArray(arguments);
-		// loop through all the mutators for the onInit hook
-		for (i = 0, l = mutators.length; i < l; i++) {
-			if (!mutators[i].onInit) {
-				continue;
-			}
-			// if the onInit hook returns anything, then it will override the
-			// "new" keyword
-			tmp = mutators[i].onInit.call(mutators[i], this, klass, args);
-			if (tmp !== undefined) {
-				// however this method can only return objects and not scalar
-				// values
-				if (isScalar(tmp)) {
-					throw new Error("Return values during onInit hook can only be objects.");
-				}
-				return tmp;
-			}
-		}
-		// just in case we want to do anything special like "new" keyword
-		// override (usually don't return anything)
-		tmp = this.init.apply(this, args);
-		if (tmp !== undefined) {
-			// we can only return objects because the new keyword forces it to
-			// be an object
-			if (isScalar(tmp)) {
-				throw new Error("Return values for the constructor can only be objects.");
-			}
-			return tmp;
-		}
+		return initializeKlass(this, klass, argsToArray(arguments));
 	};
 
 	// ability to create a new instance using an array of arguments, cannot be
