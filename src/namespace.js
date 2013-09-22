@@ -163,6 +163,7 @@ namespaceProperties = {
 		});
 		// we also need to delete the reference to this object from the parent!
 		if (c.superclass.subclass) {
+			c.superclass.subclass = c.superclass.subclass.slice(0);
 			remove(c.superclass.subclass, c);
 		}
 		// now we remove all non inherited classes, but fall under this
