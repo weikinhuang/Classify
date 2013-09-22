@@ -68,7 +68,7 @@ wrapParentProperty = function(parentPrototype, property) {
 		 * method, allow for access to the parent version of the function.
 		 *
 		 * @for Classify.Class
-		 * @method parent
+		 * @method $$parent
 		 * @return {Object}
 		 */
 		var tmp = this.$$parent, ret;
@@ -357,7 +357,7 @@ var create = function() {
 	 * @param {Array} args Array of arguments to construct the object with
 	 * @static
 	 * @for Classify.Class
-	 * @method applicate
+	 * @method $$apply
 	 * @return {Class}
 	 */
 	klass.$$apply = function(a) {
@@ -387,7 +387,7 @@ var create = function() {
 	 *
 	 * @static
 	 * @for Classify.Class
-	 * @property superclass
+	 * @property $$superclass
 	 * @type {Class}
 	 */
 	klass.$$superclass = parent;
@@ -397,7 +397,7 @@ var create = function() {
 	 *
 	 * @static
 	 * @for Classify.Class
-	 * @property subclass
+	 * @property $$subclass
 	 * @type {Array}
 	 */
 	klass.$$subclass = [];
@@ -407,7 +407,7 @@ var create = function() {
 	 *
 	 * @static
 	 * @for Classify.Class
-	 * @property implement
+	 * @property $$implement
 	 * @type {Array}
 	 */
 	klass.$$implement = (isArray(parent.$$implement) ? parent.$$implement : []).concat(implement);
@@ -417,7 +417,7 @@ var create = function() {
 	 *
 	 * @static
 	 * @for Classify.Class
-	 * @property mutators
+	 * @property $$mutator
 	 * @type {Array}
 	 */
 	klass.$$mutator = mutators;
