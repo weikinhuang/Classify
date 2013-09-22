@@ -170,14 +170,14 @@ QUnit.test("default toString method of constructor", function() {
 	QUnit.expect(2);
 
 	var test = create({});
-	QUnit.equal(test + "", "function () {\n}", "No constructor's toString returns empty function body.");
+	QUnit.equal((test + "").replace(/[\s\t\n]/g, ""), "function(){}", "No constructor's toString returns empty function body.");
 
 	var test2 = create({
 		init : function(arg) {
-			return arg;
+			return;
 		}
 	});
-	QUnit.equal((test2 + "").replace(/\t/g, ""), "function (arg) {\nreturn arg;\n}", "No constructor's toString returns empty function body.");
+	QUnit.equal((test2 + "").replace(/[\s\t\n]/g, ""), "function(arg){return;}", "No constructor's toString returns empty function body.");
 });
 
 QUnit.test("extending classes using inheritance", function() {
