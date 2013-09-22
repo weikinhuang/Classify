@@ -14,3 +14,4 @@ build/.*.json
 /.sizecache.json
 coverage/*
 node_modules
+sauce_connect*

@@ -9,7 +9,6 @@
 /* global store */
 /* global each */
 /* global map */
-/* global filter */
 /* global remove */
 QUnit.module("core");
 

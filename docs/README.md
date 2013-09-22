@@ -44,7 +44,7 @@
  * [`Classify.Class.prototype`](#Classify.Class.prototype)
  * [`Classify.Class#constructor`](#Classify.Class.prototype.constructor)
  * [`Classify.Class#init`](#Classify.Class.prototype.init)
- * [`Classify.Class#$parent`](#Classify.Class.prototype.$$parent)
+ * [`Classify.Class#$$parent`](#Classify.Class.prototype.$$parent)
  * [`Classify.Class#extend`](#Classify.Class.prototype.extend)
  * [`Classify.Class#invoke`](#Classify.Class.prototype.invoke)
 

@@ -4,9 +4,9 @@
 *.diff
 *.patch
 /*.html
+sauce_connect*
 
 Gruntfile.js
-README.md
 README.md
 
 coverage/*
