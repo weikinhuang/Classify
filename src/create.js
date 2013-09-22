@@ -24,6 +24,9 @@ objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto)
 objectDefineProperty = function(obj, prop, descriptor) {
 	obj[prop] = descriptor;
 },
+// create a noop function
+noop = function() {
+},
 // create the base object that everything extends from
 Base = (function() {
 	var fn = function() {
@@ -36,8 +39,7 @@ Base = (function() {
 	 * @method init
 	 * @return {Class}
 	 */
-	fn.prototype.init = function() {
-	};
+	fn.prototype.init = noop;
 	fn.prototype.constructor = fn;
 	fn.$$isclass = true;
 	return fn;
@@ -349,6 +351,12 @@ var create = function() {
 	 */
 	klass = function() {
 		return initializeKlass(this, klass, argsToArray(arguments));
+	};
+
+	// override klass.toString to return the body of the constructor method
+	// rather than the generalized constructor body
+	klass.toString = function() {
+		return (methods.init || noop).toString();
 	};
 
 	// ability to create a new instance using an array of arguments, cannot be

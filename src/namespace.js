@@ -80,7 +80,7 @@ namespaceProperties = {
 					return "[object " + fullname + "]";
 				};
 				klass.getMutators = function() {
-					return self.$$mutator;
+					return self.mutators;
 				};
 			}
 		}), mappedArgs = map(args, function mappedArgsDereferenceIterator(v) {
@@ -278,7 +278,7 @@ namespaceProperties = {
 		}
 		var mutatorInstance = new Mutator(name, mutator);
 		this.namedMutators[name] = mutatorInstance;
-		this.$$mutator.push(mutatorInstance);
+		this.mutators.push(mutatorInstance);
 	},
 	/**
 	 * Removes a namespace level class mutator that modifies the defined classes
@@ -294,7 +294,7 @@ namespaceProperties = {
 		if (!mutator) {
 			throw new Error("Removing unknown mutator from namespace " + this.nsname + ".");
 		}
-		remove(this.$$mutator, mutator);
+		remove(this.mutators, mutator);
 		this.namedMutators[name] = null;
 		try {
 			delete this.namedMutators[name];
@@ -355,7 +355,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 		this.nsname = name;
 		this.nsref = {};
 		this.namedMutators = {};
-		this.$$mutator = [];
+		this.mutators = [];
 	},
 	/**
 	 * Gets the translated toString name of this object "[namespace Name]"

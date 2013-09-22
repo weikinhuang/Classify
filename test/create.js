@@ -166,6 +166,20 @@ QUnit.test("known properties", function() {
 	QUnit.ok(new test() instanceof Base, "assert that a new object of this class is an instance of it's parent");
 });
 
+QUnit.test("default toString method of constructor", function() {
+	QUnit.expect(2);
+
+	var test = create({});
+	QUnit.equal(test + "", "function () {\n}", "No constructor's toString returns empty function body.");
+
+	var test2 = create({
+		init : function(arg) {
+			return arg;
+		}
+	});
+	QUnit.equal((test2 + "").replace(/\t/g, ""), "function (arg) {\nreturn arg;\n}", "No constructor's toString returns empty function body.");
+});
+
 QUnit.test("extending classes using inheritance", function() {
 	QUnit.expect(26);
 	// testing class for known properties in every defined class

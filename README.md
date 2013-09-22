@@ -36,7 +36,7 @@ var Dog = Classify(Pet, {
 });
 ```
 
-#### Interfaces
+#### Mixins/Multiple Inheritance
 ```javascript
 // Implementations will only be attached to the prototype
 var feline_traits = {
