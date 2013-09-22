@@ -152,7 +152,7 @@ getMutators = function(klass) {
 },
 // adds a property to an existing class taking into account parent
 addProperty = function(klass, parent, name, property, mutators) {
-	var foundMutator, parent_prototype, self_prototype;
+	var foundMutator, parentPrototype, selfPrototype;
 	// we don't want to re-add the core javascript properties, it's redundant
 	if (property === objectPrototype[name]) {
 		return;
@@ -180,18 +180,18 @@ addProperty = function(klass, parent, name, property, mutators) {
 	}
 
 	// quick references
-	parent_prototype = parent.prototype[name];
-	self_prototype = klass.prototype;
+	parentPrototype = parent.prototype[name];
+	selfPrototype = klass.prototype;
 	// else this is not a prefixed static property, so we're assigning it to the
 	// prototype
-	objectDefineProperty(self_prototype, name, (isFunction(property) && !property.$$isclass && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property);
+	objectDefineProperty(selfPrototype, name, (isFunction(property) && !property.$$isclass && isFunction(parentPrototype)) ? wrapParentProperty(parentPrototype, property) : property);
 
 	// wrap all child implementation with the parent wrapper
 	if (isFunction(property)) {
 		each(klass.$$subclass, function addSubclassPropertyIterator(k) {
 			// add only if it's not already wrapped
 			if (isFunction(k.prototype[name]) && !k.prototype[name].$$original) {
-				objectDefineProperty(k.prototype, name, wrapParentProperty(self_prototype[name], k.prototype[name]));
+				objectDefineProperty(k.prototype, name, wrapParentProperty(selfPrototype[name], k.prototype[name]));
 			}
 		});
 	}

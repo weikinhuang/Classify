@@ -69,8 +69,8 @@ namespaceProperties = {
 		nsMutator = new Mutator("namespace", {
 			_onPredefine : function(klass) {
 				// Assign the magic properties of the class's name and namespace
-				klass._name_ = name;
-				klass._namespace_ = fullname;
+				klass.$$name = name;
+				klass.$$namespace = fullname;
 				// give classes the ability to always store the namespace for
 				// chaining
 				klass.getNamespace = function() {
@@ -159,7 +159,7 @@ namespaceProperties = {
 		}
 		// recursively remove all inherited classes
 		each(c.$$subclass, function destroyInheritedIterator(v) {
-			self.destroy(v._namespace_);
+			self.destroy(v.$$namespace);
 		});
 		// we also need to delete the reference to this object from the parent!
 		if (c.$$superclass.$$subclass) {
@@ -170,7 +170,7 @@ namespaceProperties = {
 		// namespace
 		each(deref, function destroyClassIterator(v, k) {
 			if (k !== classname && k.indexOf(classname) === 0) {
-				self.destroy(v._namespace_);
+				self.destroy(v.$$namespace);
 			}
 		});
 		// let's remove it from this object!

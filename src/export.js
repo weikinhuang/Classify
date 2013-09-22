@@ -2,7 +2,7 @@
  * @module export
  */
 // quick reference to the seperator string
-var namespace_separator = "/",
+var namespaceSeparator = "/",
 // Create a wrapped reference to the Classify object.
 Classify = create({
 	invoke : function() {
@@ -15,7 +15,7 @@ Classify = create({
 		if (typeof args[0] === "string") {
 			// and there is only 1 arguments
 			if (length === 1) {
-				tmp = args[0].split(namespace_separator);
+				tmp = args[0].split(namespaceSeparator);
 				ns = getNamespace(tmp[0]);
 				// and it was separated with "/" then get the class
 				if (tmp[1]) {
@@ -29,7 +29,7 @@ Classify = create({
 				return getNamespace(args[0]).get(args[1]);
 			}
 			// otherwise we will assume the first parameter is the namespace
-			tmp = args.shift().split(namespace_separator);
+			tmp = args.shift().split(namespaceSeparator);
 			ns = getNamespace(tmp[0]);
 			// if the first parameter was a string, and separated with "/" then that is the class name
 			if (tmp[1]) {
@@ -109,7 +109,7 @@ if (typeof module !== "undefined" && module.exports) {
 	Classify.Classify = Classify;
 } else {
 	// store previous value of root.Classify
-	var root_value = root.Classify;
+	var rootValue = root.Classify;
 
 	// otherwise attempt to make a global reference
 	root.Classify = Classify;
@@ -128,10 +128,10 @@ if (typeof module !== "undefined" && module.exports) {
 	 *     })(Classify.noConflict());
 	 */
 	Classify.noConflict = function() {
-		if (root_value === undefined) {
+		if (rootValue === undefined) {
 			delete root.Classify;
 		} else {
-			root.Classify = root_value;
+			root.Classify = rootValue;
 		}
 		return Classify;
 	};
