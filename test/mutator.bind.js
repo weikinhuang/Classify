@@ -108,7 +108,7 @@ QUnit.test("bound properties that are instances of a class", function() {
 	var test = create({
 		__bind_b : prop,
 		__bind_d : function() {
-			return this.self;
+			return this.constructor;
 		}
 	});
 
@@ -136,7 +136,7 @@ QUnit.test("adding new bound properties after class definition", function() {
 	// adding a inherited bound property
 	var test2 = create(test, {});
 	test2.addBoundProperty("b", function() {
-		return this.parent();
+		return this.$$parent();
 	});
 	test2.addBoundProperty("c", function() {
 		return this;

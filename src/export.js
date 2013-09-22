@@ -55,7 +55,7 @@ Classify = create({
 		tmp = Classify.invoke.apply(null, args);
 		// if we found a class, instantiate it
 		if (tmp.$$isclass) {
-			return tmp.applicate(params);
+			return tmp.$$apply(params);
 		}
 		// otherwise, just return it
 		return tmp;

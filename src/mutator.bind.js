@@ -56,7 +56,7 @@ addMutator("bind", {
 		}
 
 		// we need to delete the bound property from all children as well as the current class
-		each(klass.subclass, function bindPropRemoveIterator(k) {
+		each(klass.$$subclass, function bindPropRemoveIterator(k) {
 			if (indexOf(k.bindings, name) > -1 && !hasOwn.call(k.prototype, name)) {
 				k.removeBoundProperty(name);
 			}

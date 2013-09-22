@@ -80,7 +80,7 @@ namespaceProperties = {
 					return "[object " + fullname + "]";
 				};
 				klass.getMutators = function() {
-					return self.mutators;
+					return self.$$mutator;
 				};
 			}
 		}), mappedArgs = map(args, function mappedArgsDereferenceIterator(v) {
@@ -158,13 +158,13 @@ namespaceProperties = {
 			return this;
 		}
 		// recursively remove all inherited classes
-		each(c.subclass, function destroyInheritedIterator(v) {
+		each(c.$$subclass, function destroyInheritedIterator(v) {
 			self.destroy(v._namespace_);
 		});
 		// we also need to delete the reference to this object from the parent!
-		if (c.superclass.subclass) {
-			c.superclass.subclass = c.superclass.subclass.slice(0);
-			remove(c.superclass.subclass, c);
+		if (c.$$superclass.$$subclass) {
+			c.$$superclass.$$subclass = c.$$superclass.$$subclass.slice(0);
+			remove(c.$$superclass.$$subclass, c);
 		}
 		// now we remove all non inherited classes, but fall under this
 		// namespace
@@ -278,7 +278,7 @@ namespaceProperties = {
 		}
 		var mutatorInstance = new Mutator(name, mutator);
 		this.namedMutators[name] = mutatorInstance;
-		this.mutators.push(mutatorInstance);
+		this.$$mutator.push(mutatorInstance);
 	},
 	/**
 	 * Removes a namespace level class mutator that modifies the defined classes
@@ -294,7 +294,7 @@ namespaceProperties = {
 		if (!mutator) {
 			throw new Error("Removing unknown mutator from namespace " + this.nsname + ".");
 		}
-		remove(this.mutators, mutator);
+		remove(this.$$mutator, mutator);
 		this.namedMutators[name] = null;
 		try {
 			delete this.namedMutators[name];
@@ -355,7 +355,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 		this.nsname = name;
 		this.nsref = {};
 		this.namedMutators = {};
-		this.mutators = [];
+		this.$$mutator = [];
 	},
 	/**
 	 * Gets the translated toString name of this object "[namespace Name]"

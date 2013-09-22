@@ -20,14 +20,13 @@
 
 ## `Classify.Class`
  * [`Classify.Class`](#Classify.Class)
- * [`Classify.Class.superclass`](#Classify.Class.superclass)
- * [`Classify.Class.subclass`](#Classify.Class.subclass)
- * [`Classify.Class.implement`](#Classify.Class.implement)
+ * [`Classify.Class.$$superclass`](#Classify.Class.$$superclass)
+ * [`Classify.Class.$$subclass`](#Classify.Class.$$subclass)
+ * [`Classify.Class.$$implement`](#Classify.Class.$$implement)
  * [`Classify.Class.bindings`](#Classify.Class.bindings)
- * [`Classify.Class.observables`](#Classify.Class.observables)
  * [`Classify.Class.$$isclass`](#Classify.Class.$$isclass)
  * [`Classify.Class.invoke`](#Classify.Class.invoke)
- * [`Classify.Class.applicate`](#Classify.Class.applicate)
+ * [`Classify.Class.$$apply`](#Classify.Class.$$apply)
  * [`Classify.Class.extend`](#Classify.Class.extend)
  * [`Classify.Class.addProperty`](#Classify.Class.addProperty)
  * [`Classify.Class.removeProperty`](#Classify.Class.removeProperty)
@@ -44,9 +43,8 @@
 ## `Classify.Class.prototype`
  * [`Classify.Class.prototype`](#Classify.Class.prototype)
  * [`Classify.Class#constructor`](#Classify.Class.prototype.constructor)
- * [`Classify.Class#self`](#Classify.Class.prototype.self)
  * [`Classify.Class#init`](#Classify.Class.prototype.init)
- * [`Classify.Class#parent`](#Classify.Class.prototype.parent)
+ * [`Classify.Class#$parent`](#Classify.Class.prototype.$$parent)
  * [`Classify.Class#extend`](#Classify.Class.prototype.extend)
  * [`Classify.Class#invoke`](#Classify.Class.prototype.invoke)
 
@@ -324,19 +322,19 @@ Placeholder for class descriptors created with the create method.
 
 ##### Constructor method
 
-### <a id="Classify.Class.superclass" href="#">`Classify.Class.superclass`</a>
+### <a id="Classify.Class.$$superclass" href="#">`Classify.Class.$$superclass`</a>
 Reference to the parent that this object extends from.
 [&#9650;](#)
 
 `Classify.Class`: Reference to the parent that this object extends from
 
-### <a id="Classify.Class.subclass" href="#">`Classify.Class.subclass`</a>
+### <a id="Classify.Class.$$subclass" href="#">`Classify.Class.$$subclass`</a>
 Array containing a reference to all the children that inherit from this object.
 [&#9650;](#)
 
 `Array`: Array containing a reference to all the children that inherit from this object
 
-### <a id="Classify.Class.implement" href="#">`Classify.Class.implement`</a>
+### <a id="Classify.Class.$$implement" href="#">`Classify.Class.$$implement`</a>
 Array containing all the objects and classes that this object implements methods and properties from.
 [&#9650;](#)
 
@@ -347,12 +345,6 @@ Array containing the list of all the bound properties that is wrapped during obj
 [&#9650;](#)
 
 `Array`: Array containing the list of all the bound properties that is wrapped during object initialization
-
-### <a id="Classify.Class.observables" href="#">`Classify.Class.observables`</a>
-Hashtable containing the definitions of all the observable properties that is implemented by this object.
-[&#9650;](#)
-
-`Object`: Hashtable containing the definitions of all the observable properties that is implemented by this object
 
 ### <a id="Classify.Class.$$isclass" href="#">`Classify.Class.$$isclass`</a>
 Flag to determine if this object is created by Classify.create.
@@ -368,7 +360,7 @@ Default invocation function when the defined class is called without the "new" k
 ##### Returns
 `Classify.Class`
 
-### <a id="Classify.Class.applicate" href="#">`Classify.Class.applicate(args)`</a>
+### <a id="Classify.Class.$$apply" href="#">`Classify.Class.$$apply(args)`</a>
 Create a new instance of the class using arguments passed in as an array.
 [&#9650;](#)
 
@@ -461,29 +453,6 @@ Removes a context bound property from the object's base.
 ##### Returns
 `Classify.Class`
 
-### <a id="Classify.Class.addObservableProperty" href="#">`Classify.Class.addObservableProperty(name, property)`</a>
-Adds a new observable property to the object's prototype.
-[&#9650;](#)
-
-
-##### Arguments
-1. `name` `{String}`: The name of the observable property to add
-2. `property` `{Object}`: The descriptor of the observable property
-
-##### Returns
-`Classify.Class`
-
-### <a id="Classify.Class.removeObservableProperty" href="#">`Classify.Class.removeObservableProperty(name)`</a>
-Removes a observable property to the object's prototype.
-[&#9650;](#)
-
-
-##### Arguments
-1. `name` `{String}`: The name of the observable property to remove
-
-##### Returns
-`Classify.Class`
-
 ### <a id="Classify.Class.addAliasedProperty" href="#">`Classify.Class.addAliasedProperty(name, property)`</a>
 Adds a aliased property to the object's prototype based on a existing prototype method.
 [&#9650;](#)
@@ -523,12 +492,6 @@ Reference to the constructor function of this object.
 
 `Classify.Class`: Reference to the constructor function of this object
 
-### <a id="Classify.Class.prototype.self" href="#">`Classify.Class.prototype.self`</a>
-Reference to the constructor function of this object.
-[&#9650;](#)
-
-`Classify.Class`: Reference to the constructor function of this object
-
 ### <a id="Classify.Class.prototype.init" href="#">`Classify.Class.prototype.init()`</a>
 True constructor method for this object, will be called when object is called with the "new" keyword.
 [&#9650;](#)
@@ -537,7 +500,7 @@ True constructor method for this object, will be called when object is called wi
 ##### Returns
 `Classify.Class`
 
-### <a id="Classify.Class.prototype.parent" href="#">`Classify.Class.prototype.parent()`</a>
+### <a id="Classify.Class.prototype.$$parent" href="#">`Classify.Class.prototype.$$parent()`</a>
 Internal reference property for methods that override a parent method, allow for access to the parent version of the function.
 [&#9650;](#)
 

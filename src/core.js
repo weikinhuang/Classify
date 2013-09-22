@@ -85,7 +85,7 @@ indexOf = Array.prototype.indexOf ? function(array, item) {
 },
 // ability to store the original definition into the new function definition
 store = function(fn, base) {
-	fn.__original_ = base;
+	fn.$$original = base;
 	return fn;
 },
 // simple iteration function

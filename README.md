@@ -30,7 +30,7 @@ var Pet = Classify({
 var Dog = Classify(Pet, {
 	breed : "",
 	init : function(breed) {
-		this.parent("dog");
+		this.$$parent("dog");
 		this.breed = breed;
 	}
 });
@@ -51,7 +51,7 @@ var feline_traits = {
 var Cat = Classify(Pet, [ feline_traits ], {
 	breed : "",
 	init : function(breed) {
-		this.parent("cat");
+		this.$$parent("cat");
 		this.breed = breed;
 	}
 });
@@ -78,7 +78,7 @@ var Reptile = namespace.get("Reptile");
 // extending classes within a namespace
 namespace.create("Tortoise", "Reptile", {
 	init : function() {
-		this.parent("tortoise");
+		this.$$parent("tortoise");
 	}
 });
 // retrieving classes within a namespace
@@ -87,7 +87,7 @@ var Tortoise = namespace.get("Tortoise");
 namespace.create("Tortoise.DesertTortoise", "Tortoise", {
 	age : null,
 	init : function() {
-		this.parent();
+		this.$$parent();
 		this.age = 0;
 	}
 });
@@ -132,7 +132,7 @@ var Reptile = Classify("Life/Reptile");
 // Classify("Life", "Tortoise", "Reptile", {
 Classify("Life/Tortoise", "Reptile", {
 	init : function() {
-		this.parent("tortoise");
+		this.$$parent("tortoise");
 	}
 });
 // retrieving classes within a namespace
@@ -141,7 +141,7 @@ var Tortoise = Classify("Life/Tortoise");
 Classify("Life/Tortoise.DesertTortoise", "Tortoise", {
 	age : null,
 	init : function() {
-		this.parent();
+		this.$$parent();
 		this.age = 0;
 	}
 });

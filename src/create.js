@@ -28,7 +28,6 @@ objectDefineProperty = function(obj, prop, descriptor) {
 Base = (function() {
 	var fn = function() {
 	};
-	// Make sure we always have a constructor
 	/**
 	 * True constructor method for this object, will be called when object is
 	 * called with the "new" keyword
@@ -39,11 +38,7 @@ Base = (function() {
 	 */
 	fn.prototype.init = function() {
 	};
-	fn.superclass = null;
-	fn.subclass = [];
-	fn.implement = [];
-	fn.prototype.constructor = Base;
-	fn.prototype.self = Base;
+	fn.prototype.constructor = fn;
 	fn.$$isclass = true;
 	return fn;
 })(),
@@ -65,7 +60,7 @@ Mutator = function(name, props) {
 	this.propTest = new RegExp("^__" + name + "_");
 	this.propPrefix = "__" + name + "_";
 },
-// wraps a function so that the "this.parent" is bound to the function
+// wraps a function so that the "this.$$parent" is bound to the function
 wrapParentProperty = function(parentPrototype, property) {
 	return store(function() {
 		/**
@@ -76,13 +71,13 @@ wrapParentProperty = function(parentPrototype, property) {
 		 * @method parent
 		 * @return {Object}
 		 */
-		var tmp = this.parent, ret;
-		this.parent = parentPrototype;
+		var tmp = this.$$parent, ret;
+		this.$$parent = parentPrototype;
 		ret = property.apply(this, arguments);
 		if (tmp === undefined) {
-			delete this.parent;
+			delete this.$$parent;
 		} else {
-			this.parent = tmp;
+			this.$$parent = tmp;
 		}
 		return ret;
 	}, property);
@@ -143,7 +138,7 @@ removeMutator = function(name) {
 // method to get all possible mutators
 getMutators = function(klass) {
 	var i, l, mutators = globalMutators.slice(0);
-	arrayPush.apply(mutators, klass.mutators);
+	arrayPush.apply(mutators, klass.$$mutator);
 	// hook for namespaces!
 	if (klass.getMutators) {
 		arrayPush.apply(mutators, klass.getMutators() || []);
@@ -193,9 +188,9 @@ addProperty = function(klass, parent, name, property, mutators) {
 
 	// wrap all child implementation with the parent wrapper
 	if (isFunction(property)) {
-		each(klass.subclass, function addSubclassPropertyIterator(k) {
+		each(klass.$$subclass, function addSubclassPropertyIterator(k) {
 			// add only if it's not already wrapped
-			if (isFunction(k.prototype[name]) && !k.prototype[name].__original_) {
+			if (isFunction(k.prototype[name]) && !k.prototype[name].$$original) {
 				objectDefineProperty(k.prototype, name, wrapParentProperty(self_prototype[name], k.prototype[name]));
 			}
 		});
@@ -229,10 +224,10 @@ removeProperty = function(klass, name, mutators) {
 	}
 	// we need to delete the property from all children as well as
 	// the current class
-	each(klass.subclass, function removeSubclassPropertyIterator(k) {
+	each(klass.$$subclass, function removeSubclassPropertyIterator(k) {
 		// remove the parent function wrapper for child classes
-		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].__original_)) {
-			objectDefineProperty(k.prototype, name, k.prototype[name].__original_);
+		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].$$original)) {
+			objectDefineProperty(k.prototype, name, k.prototype[name].$$original);
 		}
 	});
 	klass.prototype[name] = null;
@@ -355,7 +350,7 @@ var create = function() {
 
 	// ability to create a new instance using an array of arguments, cannot be
 	// overriden
-	delete methods.applicate;
+	delete methods.$$apply;
 	/**
 	 * Create a new instance of the class using arguments passed in as an array
 	 *
@@ -365,7 +360,7 @@ var create = function() {
 	 * @method applicate
 	 * @return {Class}
 	 */
-	klass.applicate = function(a) {
+	klass.$$apply = function(a) {
 		var TempClass = function() {
 			return klass.apply(this, a);
 		};
@@ -381,8 +376,8 @@ var create = function() {
 	 * @method invoke
 	 * @return {Class}
 	 */
-	klass.invoke = methods.invoke || (parent.invoke && isFunction(parent.invoke) && !parent.invoke.__original_ ? parent.invoke : null) || store(function() {
-		return klass.applicate(arguments);
+	klass.invoke = methods.invoke || (parent.invoke && isFunction(parent.invoke) && !parent.invoke.$$original ? parent.invoke : null) || store(function() {
+		return klass.$$apply(arguments);
 	}, true);
 	// Remove the invoke method from the prototype chain
 	delete methods.invoke;
@@ -395,7 +390,7 @@ var create = function() {
 	 * @property superclass
 	 * @type {Class}
 	 */
-	klass.superclass = parent;
+	klass.$$superclass = parent;
 	/**
 	 * Array containing a reference to all the children that inherit from this
 	 * object
@@ -405,7 +400,7 @@ var create = function() {
 	 * @property subclass
 	 * @type {Array}
 	 */
-	klass.subclass = [];
+	klass.$$subclass = [];
 	/**
 	 * Array containing all the objects and classes that this object implements
 	 * methods and properties from
@@ -415,7 +410,7 @@ var create = function() {
 	 * @property implement
 	 * @type {Array}
 	 */
-	klass.implement = (isArray(parent.implement) ? parent.implement : []).concat(implement);
+	klass.$$implement = (isArray(parent.$$implement) ? parent.$$implement : []).concat(implement);
 	/**
 	 * Array containing all the mutators that were defined with this class,
 	 * these mutators DO NOT get inherited
@@ -425,7 +420,7 @@ var create = function() {
 	 * @property mutators
 	 * @type {Array}
 	 */
-	klass.mutators = mutators;
+	klass.$$mutator = mutators;
 
 	// call each of the _onPredefine mutators to modify this class
 	each(getMutators(klass), function classMutatorIterator(mutator) {
@@ -466,8 +461,8 @@ var create = function() {
 	};
 
 	// Add this class to the list of subclasses of the parent
-	if (parent.subclass && isArray(parent.subclass)) {
-		parent.subclass.push(klass);
+	if (parent.$$subclass && isArray(parent.$$subclass)) {
+		parent.$$subclass.push(klass);
 	}
 	// Create a magic method that can invoke any of the parent methods
 	/**
@@ -560,14 +555,6 @@ var create = function() {
 	 * @type {Class}
 	 */
 	proto.constructor = klass;
-	/**
-	 * Reference to the constructor function of this object
-	 *
-	 * @for Classify.Class
-	 * @property self
-	 * @type {Class}
-	 */
-	proto.self = klass;
 	/**
 	 * Flag to determine if this object is created by Classify.create
 	 *

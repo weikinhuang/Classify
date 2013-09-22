@@ -110,8 +110,8 @@ QUnit.test("invocation and constructors", function() {
 			this.a = a;
 		}
 	});
-	QUnit.ok(test.applicate([ 2 ]) instanceof test, "assuring creating a new instance of a class by passing an array of parameters is of type class");
-	QUnit.equal(test.applicate([ 2 ]).a, 2, "creating a new instance of a class by passing an array of parameters");
+	QUnit.ok(test.$$apply([ 2 ]) instanceof test, "assuring creating a new instance of a class by passing an array of parameters is of type class");
+	QUnit.equal(test.$$apply([ 2 ]).a, 2, "creating a new instance of a class by passing an array of parameters");
 
 	// using "this" in invoke to create a instance
 	test = create({
@@ -137,7 +137,7 @@ QUnit.test("invocation and constructors", function() {
 		}
 	});
 	QUnit.ok(new test_sub() instanceof test, "overriding the 'new' keyword within a class constructor");
-	QUnit.ok(test_sub.applicate([ "a" ]) instanceof test, "overriding the 'new' keyword within a class constructor called with applicate");
+	QUnit.ok(test_sub.$$apply([ "a" ]) instanceof test, "overriding the 'new' keyword within a class constructor called with applicate");
 
 	// overriding init with scalar return
 	test = create({
@@ -157,11 +157,11 @@ QUnit.test("known properties", function() {
 
 	QUnit.equal(test.$$isclass, true, "flag indicating this object was created using the create method");
 	QUnit.equal((new test()).constructor, test, "assert that we have a internal reference to the constructor via 'constructor'");
-	QUnit.equal((new test()).self, test, "assert that we have a internal reference to the constructor via 'self'");
-	QUnit.equal(typeof test.superclass, "function", "assert that there is an internal reference to the parent class");
-	QUnit.equal(test.superclass, Base, "assert that the reference to the superclass is the parent");
-	QUnit.equal(typeof test.subclass, "object", "assert that an array is created holding child classes");
-	QUnit.equal(test.subclass.length, 0, "assert that there are no child classes extending this object");
+	QUnit.equal((new test()).constructor, test, "assert that we have a internal reference to the constructor via 'self'");
+	QUnit.equal(typeof test.$$superclass, "function", "assert that there is an internal reference to the parent class");
+	QUnit.equal(test.$$superclass, Base, "assert that the reference to the superclass is the parent");
+	QUnit.equal(typeof test.$$subclass, "object", "assert that an array is created holding child classes");
+	QUnit.equal(test.$$subclass.length, 0, "assert that there are no child classes extending this object");
 	QUnit.ok(new test() instanceof test, "assert that a new object of this class is an instance of it's constructor");
 	QUnit.ok(new test() instanceof Base, "assert that a new object of this class is an instance of it's parent");
 });
@@ -190,7 +190,7 @@ QUnit.test("extending classes using inheritance", function() {
 			return 3;
 		},
 		d : function() {
-			return this.parent();
+			return this.$$parent();
 		},
 		f : function() {
 			return this.constructor;
@@ -199,7 +199,7 @@ QUnit.test("extending classes using inheritance", function() {
 	var subclass_a = create(test, {
 		b : function() {
 			// invoking the parent version of this function
-			return this.parent() + 4;
+			return this.$$parent() + 4;
 		}
 	});
 	var subsubclass = create(subclass, {
@@ -207,10 +207,10 @@ QUnit.test("extending classes using inheritance", function() {
 			return 4;
 		},
 		d : function() {
-			return this.parent();
+			return this.$$parent();
 		},
 		e : function() {
-			return this.parent();
+			return this.$$parent();
 		}
 	});
 
@@ -235,9 +235,9 @@ QUnit.test("extending classes using inheritance", function() {
 	QUnit.equal((new subsubclass()).e(), subsubclass, "parent method's 'this' is still referencing proper object");
 
 	// calling apply on a class to generate an instance
-	QUnit.ok(subclass.applicate([ 2 ]) instanceof test, "assuring creating a new instance of a class by passing an array of parameters is of type parent class");
-	QUnit.ok(subclass.applicate([ 2 ]) instanceof subclass, "assuring creating a new instance of a class by passing an array of parameters is of type class");
-	QUnit.equal(subclass.applicate([ 2 ]).z, 2, "creating a new instance of a class by passing an array of parameters");
+	QUnit.ok(subclass.$$apply([ 2 ]) instanceof test, "assuring creating a new instance of a class by passing an array of parameters is of type parent class");
+	QUnit.ok(subclass.$$apply([ 2 ]) instanceof subclass, "assuring creating a new instance of a class by passing an array of parameters is of type class");
+	QUnit.equal(subclass.$$apply([ 2 ]).z, 2, "creating a new instance of a class by passing an array of parameters");
 
 	// calling invoke on a class to generate an instance
 	QUnit.ok(subclass(2) instanceof test, "assuring creating a new instance of a class using invocation is of type parent class");
@@ -267,12 +267,12 @@ QUnit.test("extending classes using inheritance", function() {
 	// testing parent calling functions in newly added methods
 	subsubclass.addProperty("f", function() {
 		// function with parent version
-		QUnit.equal(typeof this.parent, "function", "method with override has a parent method");
-		QUnit.equal(this.parent(), this.constructor, "parent method context is current class' context");
+		QUnit.equal(typeof this.$$parent, "function", "method with override has a parent method");
+		QUnit.equal(this.$$parent(), this.constructor, "parent method context is current class' context");
 	});
 	subsubclass.addProperty("g", function() {
 		// function without parent version
-		QUnit.equal(typeof this.parent, "undefined", "method with no override has no parent method");
+		QUnit.equal(typeof this.$$parent, "undefined", "method with no override has no parent method");
 	});
 	(new subsubclass()).f();
 	(new subsubclass()).g();
@@ -288,7 +288,7 @@ QUnit.test("extending classes using inheritance", function() {
 		invoke : function() {
 			QUnit.equal(this, doubles, "parent invoke method called from child context");
 			if (!this.instance) {
-				this.instance = this.applicate(arguments);
+				this.instance = this.$$apply(arguments);
 			}
 			return this.instance;
 		},
@@ -385,7 +385,7 @@ QUnit.test("adding new properties", function() {
 			return 3;
 		},
 		h : function() {
-			return this.parent();
+			return this.$$parent();
 		}
 	});
 
@@ -432,7 +432,7 @@ QUnit.test("removing existing properties", function() {
 	var subclass = create(test2, {
 		x : 2,
 		b : function() {
-			QUnit.equal(this.parent, undefined, "parent reference removed when parent function is removed");
+			QUnit.equal(this.$$parent, undefined, "parent reference removed when parent function is removed");
 		},
 		c : function() {
 			return 3;
@@ -532,7 +532,7 @@ QUnit.test("extending Javascript objects not bult using Classify using inheritan
 			return "ipsum lorem";
 		},
 		override : function() {
-			return "t" + this.parent();
+			return "t" + this.$$parent();
 		}
 	});
 
@@ -548,15 +548,15 @@ QUnit.test("extending Javascript objects not bult using Classify using inheritan
 	var override = function(value) {
 		this.value = value;
 	};
-	override.subclass = 1;
-	override.implement = 1;
+	override.$$subclass = 1;
+	override.$$implement = 1;
 	// extending the predefined object
 	var otest_obj = create(override, {
 		shuffle : function() {
 			return "ipsum lorem";
 		},
 		override : function() {
-			return "t" + this.parent();
+			return "t" + this.$$parent();
 		}
 	});
 
@@ -564,8 +564,8 @@ QUnit.test("extending Javascript objects not bult using Classify using inheritan
 	QUnit.ok(oinstance instanceof otest_obj, "Extended external object is an instance of itself.");
 	QUnit.ok(oinstance instanceof override, "Extended external object is an instance of external class.");
 	QUnit.equal(instance.value, "test", "External object's constructor function called.");
-	QUnit.equal(Object.prototype.toString.call(otest_obj.implement), "[object Array]", "Special properties (implement) are fixed during creation.");
-	QUnit.equal(Object.prototype.toString.call(otest_obj.subclass), "[object Array]", "Special properties (subclass) are fixed during creation.");
+	QUnit.equal(Object.prototype.toString.call(otest_obj.$$implement), "[object Array]", "Special properties (implement) are fixed during creation.");
+	QUnit.equal(Object.prototype.toString.call(otest_obj.$$subclass), "[object Array]", "Special properties (subclass) are fixed during creation.");
 });
 
 QUnit.test("implementing methods in classes from other objects", function() {
@@ -588,9 +588,9 @@ QUnit.test("implementing methods in classes from other objects", function() {
 	QUnit.equal(test.prototype.a, inf.a, "method implemented through a plain object into prototype of class");
 	var x = new test();
 	QUnit.equal(x.a(), x, "implemented reference to 'this' is the calling object");
-	QUnit.ok(typeof test.implement, "implemented objects reference is an array");
-	QUnit.equal(test.implement.length, 1, "implemented objects reference is stored");
-	QUnit.equal(test.implement[0], inf, "implemented objects reference is stored");
+	QUnit.ok(typeof test.$$implement, "implemented objects reference is an array");
+	QUnit.equal(test.$$implement.length, 1, "implemented objects reference is stored");
+	QUnit.equal(test.$$implement[0], inf, "implemented objects reference is stored");
 
 	// implementing class objects
 	var inf_class = create({
@@ -612,15 +612,15 @@ QUnit.test("implementing methods in classes from other objects", function() {
 	QUnit.equal(test_i.prototype.c, inf_class.prototype.c, "method implemented through a class object into prototype of class");
 	QUnit.equal((new test_i()).f(), 1, "method implemented through a class object can be called from main class");
 	QUnit.equal((new test_i()).c().constructor, test_i, "method implemented through a class object's 'this' reference is the calling object");
-	QUnit.equal(test_i.implement[0], inf_class, "implemented class' reference is stored");
+	QUnit.equal(test_i.$$implement[0], inf_class, "implemented class' reference is stored");
 
 	// implementing subclasses
 	var inf_subclass = create(inf_class, {
 		d : function() {
-			return this.parent();
+			return this.$$parent();
 		},
 		e : function() {
-			return this.parent();
+			return this.$$parent();
 		},
 		g : function() {
 			return this;
@@ -634,7 +634,7 @@ QUnit.test("implementing methods in classes from other objects", function() {
 	QUnit.equal(test_is.prototype.d, inf_subclass.prototype.d, "method implemented through a subclass object into prototype of class");
 	QUnit.equal((new test_is()).f(), 1, "method implemented through a subclass object can be called from main class");
 	QUnit.equal((new test_is()).c().constructor, test_is, "method implemented through a subclass object's 'this' reference is the calling object");
-	QUnit.equal(test_is.implement[0], inf_subclass, "implemented subclass' reference is stored");
+	QUnit.equal(test_is.$$implement[0], inf_subclass, "implemented subclass' reference is stored");
 
 	// implementing objects and inheriting subclass
 	var extens = create({
@@ -648,10 +648,10 @@ QUnit.test("implementing methods in classes from other objects", function() {
 		}
 	});
 	QUnit.equal(test_ei.prototype.d, inf_subclass.prototype.d, "method implemented through a subclass & extension object into prototype of class");
-	QUnit.equal(test_ei.prototype.e.__original_, inf_subclass.prototype.e, "method added through implementation takes priority over extension");
+	QUnit.equal(test_ei.prototype.e.$$original, inf_subclass.prototype.e, "method added through implementation takes priority over extension");
 	QUnit.equal((new test_ei()).e(), 2, "method implemented through a extended object can be called from main class");
 	QUnit.equal((new test_ei()).d(), 1, "method implemented through a subclass object can be called from main class and is able to call the parent function of the implemented class");
 	QUnit.equal((new test_ei()).g().constructor, test_ei, "method implemented through a subclass object's 'this' reference is the calling object");
-	QUnit.equal(test_ei.superclass, extens, "implemented subclass' reference is stored");
-	QUnit.equal(test_ei.implement[0], inf_subclass, "implemented subclass' reference is stored");
+	QUnit.equal(test_ei.$$superclass, extens, "implemented subclass' reference is stored");
+	QUnit.equal(test_ei.$$implement[0], inf_subclass, "implemented subclass' reference is stored");
 });

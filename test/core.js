@@ -133,7 +133,7 @@ QUnit.test("basic requirements", function() {
 		return 1;
 	};
 	QUnit.equal(store(fn_zero, fn_base), fn_zero, "store returned the original function reference");
-	QUnit.equal(fn_zero.__original_, fn_base, "original function reference stored correctly");
+	QUnit.equal(fn_zero.$$original, fn_base, "original function reference stored correctly");
 
 	// iteration functionality
 	test = [ 1 ];

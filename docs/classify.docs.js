@@ -63,9 +63,9 @@ Classify.Class.prototype = new Object();
  * @static
  * @memberOf Classify.Class
  * @type {Classify.Class}
- * @refexample Classify.Class.superclass
+ * @refexample Classify.Class.$$superclass
  */
-Classify.Class.superclass = Classify.Class;
+Classify.Class.$$superclass = Classify.Class;
 
 /**
  * Array containing a reference to all the children that inherit from this object
@@ -73,18 +73,18 @@ Classify.Class.superclass = Classify.Class;
  * @static
  * @memberOf Classify.Class
  * @type {Array}
- * @refexample Classify.Class.subclass
+ * @refexample Classify.Class.$$subclass
  */
-Classify.Class.subclass = new Array();
+Classify.Class.$$subclass = new Array();
 /**
  * Array containing all the objects and classes that this object implements methods and properties from
  *
  * @static
  * @memberOf Classify.Class
  * @type {Array}
- * @refexample Classify.Class.implement
+ * @refexample Classify.Class.$$implement
  */
-Classify.Class.implement = new Array();
+Classify.Class.$$implement = new Array();
 /**
  * Array containing the list of all the bound properties that is wrapped during object initialization
  *
@@ -94,15 +94,6 @@ Classify.Class.implement = new Array();
  * @refexample Classify.Class.bindings
  */
 Classify.Class.bindings = new Array();
-/**
- * Hashtable containing the definitions of all the observable properties that is implemented by this object
- *
- * @static
- * @memberOf Classify.Class
- * @type {Object}
- * @refexample Classify.Class.observables
- */
-Classify.Class.observables = new Object();
 /**
  * Flag to determine if this object is created by Classify.create
  *
@@ -133,9 +124,9 @@ Classify.Class.invoke = function() {
  * @memberOf Classify.Class
  * @returns {Classify.Class}
  * @type {Classify.Class}
- * @refexample Classify.Class.applicate
+ * @refexample Classify.Class.$$apply
  */
-Classify.Class.applicate = function(args) {
+Classify.Class.$$apply = function(args) {
 	return new Classify.Class();
 };
 /**
@@ -247,36 +238,6 @@ Classify.Class.removeBoundProperty = function(name) {
 	return Classify.Class;
 };
 /**
- * Adds a new observable property to the object's prototype
- *
- * @param {String}
- *            name The name of the observable property to add
- * @param {Object}
- *            property The descriptor of the observable property
- * @static
- * @memberOf Classify.Class
- * @returns {Classify.Class}
- * @type {Classify.Class}
- * @refexample Classify.Class.addObservableProperty
- */
-Classify.Class.addObservableProperty = function(name, property) {
-	return Classify.Class;
-};
-/**
- * Removes a observable property to the object's prototype
- *
- * @param {String}
- *            name The name of the observable property to remove
- * @static
- * @memberOf Classify.Class
- * @returns {Classify.Class}
- * @type {Classify.Class}
- * @refexample Classify.Class.removeObservableProperty
- */
-Classify.Class.removeObservableProperty = function(name) {
-	return Classify.Class;
-};
-/**
  * Adds a aliased property to the object's prototype based on a existing prototype method
  *
  * @param {String}
@@ -317,14 +278,6 @@ Classify.Class.addUnwrappedProperty = function(name, property) {
  */
 Classify.Class.prototype.constructor = Classify.Class;
 /**
- * Reference to the constructor function of this object
- *
- * @memberOf Classify.Class
- * @type {Classify.Class}
- * @refexample Classify.Class.prototype.self
- */
-Classify.Class.prototype.self = Classify.Class;
-/**
  * True constructor method for this object, will be called when object is called with the "new" keyword
  *
  * @memberOf Classify.Class
@@ -341,9 +294,9 @@ Classify.Class.prototype.init = function() {
  * @memberOf Classify.Class
  * @returns {Object}
  * @type {Object}
- * @refexample Classify.Class.prototype.parent
+ * @refexample Classify.Class.prototype.$$parent
  */
-Classify.Class.prototype.parent = function() {
+Classify.Class.prototype.$$parent = function() {
 	return new Object();
 };
 /**
