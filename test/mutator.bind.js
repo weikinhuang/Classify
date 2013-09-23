@@ -2,7 +2,7 @@
 QUnit.module("mutator.bind");
 
 QUnit.test("bound properties", function() {
-	QUnit.expect(11);
+	QUnit.expect(9);
 	// temp object for context testing
 	var temp = {
 		val : 1
@@ -19,10 +19,6 @@ QUnit.test("bound properties", function() {
 		__bind_c : function() {
 			// the internal "this" reference should always point to the class definition
 			return this.a;
-		},
-		__bind_d : function(context, a) {
-			QUnit.strictEqual(context, temp, "Bound function's first argument is actual context of the caller");
-			QUnit.equal(a, 1, "Bound function's passed in arguments are shifted by 1");
 		}
 	});
 
@@ -30,8 +26,6 @@ QUnit.test("bound properties", function() {
 	QUnit.equal(instance.b.call([]), instance, "Modified context is ignored for bound functions");
 	QUnit.equal(instance.c.call([]), 1, "Return value of bound functions is passed through");
 	QUnit.equal(instance.z, 1, "Non Function properties are not wrapped");
-	// test arguments
-	instance.d.call(temp, 1);
 
 	// testing class creation with bound properties
 	var test2 = create(test, {
@@ -49,6 +43,35 @@ QUnit.test("bound properties", function() {
 	QUnit.ok(instance2.b.call([]) instanceof test2, "Inherited bound function's reference to 'this' is of class");
 	QUnit.equal(instance2.c.call([]), 1, "Return value of overriden bound functions is passed through");
 	QUnit.equal(instance2.e.call([]), instance2, "Modified context is ignored for bound functions when inheriting");
+});
+
+QUnit.test("bound properties context passing", function() {
+	QUnit.expect(5);
+	// temp object for context testing
+	var temp = {
+		val : 1
+	};
+	// testing class creation with bound properties
+	var test = create({
+		a : 1,
+		__bind_b : function(a) {
+			QUnit.strictEqual(this.$$context, temp, "Bound function has special property $$context for caller");
+			QUnit.equal(a, 1, "Bound function's passed in arguments are unchanged");
+		},
+		__bind_c : function() {
+			QUnit.ok(this.$$context instanceof test, "Direct call of bound function passes $$context of calling object");
+		},
+		__bind_d : function() {
+			QUnit.strictEqual(this.$$context, temp, "Bound function has special property $$context for caller");
+			this.c();
+			QUnit.strictEqual(this.$$context, temp, "Bound function has special property $$context for caller after another bound call");
+		}
+	});
+
+	var instance = new test();
+	// test arguments
+	instance.b.call(temp, 1);
+	instance.d.call(temp, 1);
 });
 
 QUnit.test("bound properties defined in container", function() {
@@ -108,7 +131,7 @@ QUnit.test("bound properties that are instances of a class", function() {
 	var test = create({
 		__bind_b : prop,
 		__bind_d : function() {
-			return this.self;
+			return this.constructor;
 		}
 	});
 
@@ -136,7 +159,7 @@ QUnit.test("adding new bound properties after class definition", function() {
 	// adding a inherited bound property
 	var test2 = create(test, {});
 	test2.addBoundProperty("b", function() {
-		return this.parent();
+		return this.$$parent();
 	});
 	test2.addBoundProperty("c", function() {
 		return this;

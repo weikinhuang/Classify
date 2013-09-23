@@ -42,7 +42,7 @@ addMutator("bind", {
 	onPropAdd : function(klass, parent, name, property) {
 		// add to the bindings array only if not already added and is not an definition of a class
 		var i = indexOf(klass.bindings, name);
-		if (i < 0 && isFunction(property) && !property.__isclass_) {
+		if (i < 0 && isFunction(property) && !property.$$isclass) {
 			// add the property name to the internal bindings array
 			klass.bindings.push(name);
 		}
@@ -51,14 +51,12 @@ addMutator("bind", {
 	},
 	onPropRemove : function(klass, name) {
 		// remove the bindings if it exists
-		var i = indexOf(klass.bindings, name);
-		if (i < 0) {
+		if (!remove(klass.bindings, name)) {
 			return;
 		}
-		klass.bindings.splice(i, 1);
 
 		// we need to delete the bound property from all children as well as the current class
-		each(klass.subclass, function bindPropRemoveIterator(k) {
+		each(klass.$$subclass, function bindPropRemoveIterator(k) {
 			if (indexOf(k.bindings, name) > -1 && !hasOwn.call(k.prototype, name)) {
 				k.removeBoundProperty(name);
 			}
@@ -74,13 +72,25 @@ addMutator("bind", {
 		}
 		// wrap all prototypes that needs to be bound to the instance
 		each(bindings, function bindingsIterator(prop) {
+			var method = klass.prototype[prop];
 			objectDefineProperty(instance, prop, function() {
-				// convert the arguments to an array
-				var args = argsToArray(arguments);
-				// so we can push the context in as the first argument
-				args.unshift(this);
+				var tmp = instance.$$context, ret;
+				/**
+				 * Allow access to the calling context when using a bound method
+				 *
+				 * @for Classify.Class
+				 * @property $$context
+				 * @type {Object}
+				 */
+				instance.$$context = this;
 				// then call the original method with the proper context
-				return klass.prototype[prop].apply(instance, args);
+				ret = method.apply(instance, arguments);
+				if (tmp === undefined) {
+					delete instance.$$context;
+				} else {
+					instance.$$context = tmp;
+				}
+				return ret;
 			});
 		});
 	}

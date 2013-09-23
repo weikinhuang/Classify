@@ -9,11 +9,11 @@
 /* global store */
 /* global each */
 /* global map */
-/* global filter */
+/* global remove */
 QUnit.module("core");
 
 QUnit.test("basic requirements", function() {
-	QUnit.expect(70);
+	QUnit.expect(71);
 	var test, empty;
 	// test basic properties of the base Object
 	QUnit.ok(Object.prototype, "Object prototype exists");
@@ -132,7 +132,7 @@ QUnit.test("basic requirements", function() {
 		return 1;
 	};
 	QUnit.equal(store(fn_zero, fn_base), fn_zero, "store returned the original function reference");
-	QUnit.equal(fn_zero.__original_, fn_base, "original function reference stored correctly");
+	QUnit.equal(fn_zero.$$original, fn_base, "original function reference stored correctly");
 
 	// iteration functionality
 	test = [ 1 ];
@@ -191,9 +191,10 @@ QUnit.test("basic requirements", function() {
 		return v + i;
 	}), [ "0a", "1b", "2c" ], "mapping original array into new array");
 
-	// filter single object functionality
-	QUnit.deepEqual(filter([ 1, 2, 3, 4 ], 1), [ 2, 3, 4 ], "filter a single item out of an array");
-	QUnit.deepEqual(filter([ 1, 2, 1, 3, 1, 4 ], 1), [ 2, 3, 4 ], "filter multiple instances of an item out of an array");
-	test = {};
-	QUnit.deepEqual(filter([ 1, 2, test, 4 ], test), [ 1, 2, 4 ], "filter an object reference out of an array");
+	// array filtering
+	var temp_array = [1, 2, 3, 4, 3];
+	QUnit.ok(remove(temp_array, 3), "remove returns true when element is removed");
+	QUnit.deepEqual(temp_array, [1, 2, 4, 3], "remove a single item out of an array by reference");
+	QUnit.ok(!remove(temp_array, 5), "remove returns false when element is missing");
+	QUnit.deepEqual(temp_array, [1, 2, 4, 3], "remove missing item out of an array by reference, unchanged");
 });

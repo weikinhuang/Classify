@@ -15,8 +15,11 @@ Usage
 ```javascript
 var Pet = Classify({
 	type : "",
+	eaten : null,
 	init : function(type) { // constructor method
 		this.type = type;
+		// don't assign objects to the prototype, because it
+		// will be same reference in all instances
 		this.eaten = [];
 	},
 	eat : function(food) {
@@ -30,13 +33,13 @@ var Pet = Classify({
 var Dog = Classify(Pet, {
 	breed : "",
 	init : function(breed) {
-		this.parent("dog");
+		this.$$parent("dog");
 		this.breed = breed;
 	}
 });
 ```
 
-#### Interfaces
+#### Mixins/Multiple Inheritance
 ```javascript
 // Implementations will only be attached to the prototype
 var feline_traits = {
@@ -51,8 +54,79 @@ var feline_traits = {
 var Cat = Classify(Pet, [ feline_traits ], {
 	breed : "",
 	init : function(breed) {
-		this.parent("cat");
+		this.$$parent("cat");
 		this.breed = breed;
+	}
+});
+```
+
+#### Static Properties/Methods
+```javascript
+// Static properties can be defined with the "__static_" prefix
+// or defined in bulk with __static_ : {prop1:1, prop2:2}
+var Bird = Classify(Pet, {
+	breed : "",
+	init : function(breed) {
+		this.$$parent("bird");
+		this.breed = Bird.validateBreed(breed);
+	},
+	__static_BREEDS : {
+		parrot : "Parrot",
+		canary : "Canary"
+	},
+	__static_validateBreed : function(breed) {
+		return Bird.BREEDS[breed] || "Unknown";
+	}
+});
+```
+
+#### Autobinding
+```javascript
+// Auto bound properties can be defined with the "__bind_" prefix
+// or defined in bulk with __bind_ : {prop1:function(){}, prop2:function(){}}
+var Pig = Classify(Pet, {
+	init : function() {
+		this.$$parent("pig");
+	},
+	__bind_speak : function(event) {
+		// this can now be called within the class with this.speak()
+		// special property $$context added for the duration of this
+		// method to pass along the calling context, with "this" is
+		// still the instance
+		alert(this.$$context.href);
+	}
+});
+var p = new Pig();
+// <a href="#oink" id="some-link">Click me!</a>
+document.getElementById("some-link").addEventListener("click", p.speak);
+```
+
+#### Calling overridden parent methods
+```javascript
+var Dog = Classify(Pet, {
+	breed : "",
+	init : function(breed) {
+		// "this.$$parent" is the parent of the calling method
+		this.$$parent("dog");
+		this.breed = breed;
+	},
+	eat : function() {
+		// the dog can only eat fish...
+		this.$$parent("fish");
+	},
+	eatBiscuit : function() {
+		// using "this.$$apply" can call any method in the parent prototype
+		// with an array of arguments similar to "Function.apply()"
+		// this will call Pet.prototype.eat with the argument biscuit
+		// shortcut for Pet.prototype.eat.apply(this, [ "biscuit" ]);
+		this.$$apply("eat", [ "biscuit" ]);
+	},
+	eatDogFood : function() {
+		// using "this.$$call" can call any method in the parent prototype
+		// with a set of arguments similar to "Function.call()"
+		// this will call Pet.prototype.eat with the argument biscuit
+		// shortcut for Pet.prototype.eat.call(this, "biscuit");
+		this.$$call("eat", "biscuit");
 	}
 });
 ```
@@ -78,7 +152,7 @@ var Reptile = namespace.get("Reptile");
 // extending classes within a namespace
 namespace.create("Tortoise", "Reptile", {
 	init : function() {
-		this.parent("tortoise");
+		this.$$parent("tortoise");
 	}
 });
 // retrieving classes within a namespace
@@ -87,7 +161,7 @@ var Tortoise = namespace.get("Tortoise");
 namespace.create("Tortoise.DesertTortoise", "Tortoise", {
 	age : null,
 	init : function() {
-		this.parent();
+		this.$$parent();
 		this.age = 0;
 	}
 });
@@ -132,7 +206,7 @@ var Reptile = Classify("Life/Reptile");
 // Classify("Life", "Tortoise", "Reptile", {
 Classify("Life/Tortoise", "Reptile", {
 	init : function() {
-		this.parent("tortoise");
+		this.$$parent("tortoise");
 	}
 });
 // retrieving classes within a namespace
@@ -141,7 +215,7 @@ var Tortoise = Classify("Life/Tortoise");
 Classify("Life/Tortoise.DesertTortoise", "Tortoise", {
 	age : null,
 	init : function() {
-		this.parent();
+		this.$$parent();
 		this.age = 0;
 	}
 });

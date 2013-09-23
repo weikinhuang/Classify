@@ -34,7 +34,7 @@ QUnit.test("alias properties", function() {
 			return 3;
 		},
 		z : function() {
-			return this.parent();
+			return this.$$parent();
 		}
 	});
 
@@ -103,7 +103,7 @@ QUnit.test("adding new aliased properties after class definition", function() {
 			return 3;
 		},
 		h : function() {
-			return this.parent();
+			return this.$$parent();
 		}
 	});
 

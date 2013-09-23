@@ -69,8 +69,8 @@ namespaceProperties = {
 		nsMutator = new Mutator("namespace", {
 			_onPredefine : function(klass) {
 				// Assign the magic properties of the class's name and namespace
-				klass._name_ = name;
-				klass._namespace_ = fullname;
+				klass.$$name = name;
+				klass.$$namespace = fullname;
 				// give classes the ability to always store the namespace for
 				// chaining
 				klass.getNamespace = function() {
@@ -92,7 +92,7 @@ namespaceProperties = {
 		// look for the mutators argument
 		mappedArgs = map(mappedArgs, function mappedArgsIterator(v) {
 			// we found some mutators!
-			if (!v.__isclass_ && !isExtendable(v) && (v instanceof Mutator || (isArray(v) && v[0] instanceof Mutator))) {
+			if (!v.$$isclass && !isExtendable(v) && (v instanceof Mutator || (isArray(v) && v[0] instanceof Mutator))) {
 				foundMutatorArg = true;
 				v = toArray(v);
 				v.unshift(nsMutator);
@@ -158,18 +158,19 @@ namespaceProperties = {
 			return this;
 		}
 		// recursively remove all inherited classes
-		each(c.subclass, function destroyInheritedIterator(v) {
-			self.destroy(v._namespace_);
+		each(c.$$subclass, function destroyInheritedIterator(v) {
+			self.destroy(v.$$namespace);
 		});
 		// we also need to delete the reference to this object from the parent!
-		if (c.superclass.subclass) {
-			c.superclass.subclass = filter(c.superclass.subclass, c);
+		if (c.$$superclass.$$subclass) {
+			c.$$superclass.$$subclass = c.$$superclass.$$subclass.slice(0);
+			remove(c.$$superclass.$$subclass, c);
 		}
 		// now we remove all non inherited classes, but fall under this
 		// namespace
 		each(deref, function destroyClassIterator(v, k) {
 			if (k !== classname && k.indexOf(classname) === 0) {
-				self.destroy(v._namespace_);
+				self.destroy(v.$$namespace);
 			}
 		});
 		// let's remove it from this object!
@@ -293,10 +294,7 @@ namespaceProperties = {
 		if (!mutator) {
 			throw new Error("Removing unknown mutator from namespace " + this.nsname + ".");
 		}
-		var idx = indexOf(this.mutators, mutator);
-		if (idx > -1) {
-			this.mutators.splice(idx, 1);
-		}
+		remove(this.mutators, mutator);
 		this.namedMutators[name] = null;
 		try {
 			delete this.namedMutators[name];
