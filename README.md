@@ -332,6 +332,28 @@ $ grunt --help
 Changelog
 --------------------------------------
 
+#### v0.12.0
+	BREAKING CHANGE: Class.toString now returns the init method body
+	BREAKING CHANGE: Renaming internal properties and certain magic properties.
+	BREAKING CHANGE: Change behavior of the bind mutator to make context a property instead of a argument.
+```javascript
+	// calling parent method
+	this.parent => this.$$parent
+	this.invoke => this.$$apply
+	adding this.$$call
+	// internal variables
+	Class.superclass => Class.$$superclass
+	Class.subclass => Class.$$subclass
+	Class.implement => Class.$$implement
+	Class.mutators => Class.$$mutator
+	Class.applicate => Class.$$apply
+	Class.__isclass_ => Class.$$isclass
+	// bind mutator
+	function(context) {} => function() { this.$$context; }
+	// shortcuts
+	removed this.self, use Class.prototype.constructor/this.constructor instead
+```
+
 #### v0.11.0
 	Removing Observer and observable mutator from core. Now in Classify-Observable[https://github.com/weikinhuang/Classify-Observer]
 
