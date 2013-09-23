@@ -322,7 +322,7 @@ QUnit.test("extending classes using inheritance", function() {
 	triple();
 });
 
-QUnit.test("Calling parent methods with the invoke magic method", function() {
+QUnit.test("Calling parent methods with the $$call magic method", function() {
 	QUnit.expect(3);
 	// testing class for known properties in every defined class
 	var test = create({
@@ -330,8 +330,8 @@ QUnit.test("Calling parent methods with the invoke magic method", function() {
 		a : function() {
 			return 1;
 		},
-		b : function() {
-			return 2;
+		b : function(arg) {
+			return 2 + (arg || 0);
 		},
 		d : function() {
 			return 4;
@@ -345,16 +345,51 @@ QUnit.test("Calling parent methods with the invoke magic method", function() {
 			return 3;
 		},
 		d : function() {
-			return this.invoke("b");
+			return this.$$call("b", 1);
 		}
 	});
 
-	QUnit.equal((new subclass()).d(), 2, "Calling invoke from within class invokes parent method.");
-	QUnit.equal((new subclass()).invoke("b"), 2, "Calling invoke from outside class invokes parent method.");
+	QUnit.equal((new subclass()).d(), 3, "Calling $$call from within class invokes parent method.");
+	QUnit.equal((new subclass()).$$call("b"), 2, "Calling $$call from outside class invokes parent method.");
 
 	QUnit.raises(function() {
-		(new subclass()).invoke("z");
-	}, Error, "Attempts to invoke parent property that is not a function throws a error.");
+		(new subclass()).$$call("z");
+	}, Error, "Attempts to $$call parent property that is not a function throws a error.");
+});
+
+QUnit.test("Calling parent methods with the $$apply magic method", function() {
+	QUnit.expect(3);
+	// testing class for known properties in every defined class
+	var test = create({
+		z : 1,
+		a : function() {
+			return 1;
+		},
+		b : function(arg) {
+			return 2 + (arg || 0);
+		},
+		d : function() {
+			return 4;
+		}
+	});
+	var subclass = create(test, {
+		b : function() {
+			return 5;
+		},
+		c : function() {
+			return 3;
+		},
+		d : function() {
+			return this.$$apply("b", [ 1 ]);
+		}
+	});
+
+	QUnit.equal((new subclass()).d(), 3, "Calling $$apply from within class invokes parent method.");
+	QUnit.equal((new subclass()).$$apply("b"), 2, "Calling $$apply from outside class invokes parent method.");
+
+	QUnit.raises(function() {
+		(new subclass()).$$apply("z");
+	}, Error, "Attempts to $$apply parent property that is not a function throws a error.");
 });
 
 QUnit.test("adding new properties", function() {

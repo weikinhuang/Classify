@@ -46,7 +46,8 @@
  * [`Classify.Class#init`](#Classify.Class.prototype.init)
  * [`Classify.Class#$$parent`](#Classify.Class.prototype.$$parent)
  * [`Classify.Class#extend`](#Classify.Class.prototype.extend)
- * [`Classify.Class#invoke`](#Classify.Class.prototype.invoke)
+ * [`Classify.Class#$$apply`](#Classify.Class.prototype.$$apply)
+ * [`Classify.Class#$$call`](#Classify.Class.prototype.$$call)
 
 
 ## `Classify.Namespace`
@@ -520,14 +521,27 @@ Creates a new class that is a child of the current class.
 ##### Returns
 `Classify.Class`
 
-### <a id="Classify.Class.prototype.invoke" href="#">`Classify.Class.prototype.invoke(name, args)`</a>
-Magic method that can invoke any of the parent methods.
+### <a id="Classify.Class.prototype.$$apply" href="#">`Classify.Class.prototype.$$apply(name, args)`</a>
+Magic method that can invoke any of the parent methods with an array of arguments.
 [&#9650;](#)
 
 
 ##### Arguments
 1. `name` `{Object}`: The name of the parent method to invoke
 2. `args` `{Array}`: The arguments to pass through to invoke
+
+##### Returns
+`Object`
+
+### <a id="Classify.Class.prototype.$$call" href="#">`Classify.Class.prototype.$$call(name, [arg1, [arg2...]])`</a>
+Magic method that can invoke any of the parent methods with a series of arguments.
+[&#9650;](#)
+
+
+##### Arguments
+1. `name` `{Object}`: The name of the parent method to invoke
+2. `[arg1]` `{Object}`: Optional argument
+2. `[arg2]` `{Object}`: Optional argument
 
 ##### Returns
 `Object`

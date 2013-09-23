@@ -15,8 +15,11 @@ Usage
 ```javascript
 var Pet = Classify({
 	type : "",
+	eaten : null,
 	init : function(type) { // constructor method
 		this.type = type;
+		// don't assign objects to the prototype, because it
+		// will be same reference in all instances
 		this.eaten = [];
 	},
 	eat : function(food) {
@@ -96,6 +99,34 @@ var Pig = Classify(Pet, {
 var p = new Pig();
 // <a href="#oink" id="some-link">Click me!</a>
 document.getElementById("some-link").addEventListener("click", p.speak);
+```
+
+#### Calling overridden parent methods
+```javascript
+var Dog = Classify(Pet, {
+	breed : "",
+	init : function(breed) {
+		// "this.$$parent" is the parent of the calling method
+		this.$$parent("dog");
+		this.breed = breed;
+	},
+	eat : function() {
+		// the dog can only eat fish...
+		this.$$parent("fish");
+	},
+	eatBiscuit : function() {
+		// using "this.$$apply" can call any method in the parent prototype
+		// with an array of arguments similar to "Function.apply()"
+		// this will call Pet.prototype.eat with the argument biscuit
+		this.$$apply("eat", [ "biscuit" ]);
+	},
+	eatDogFood : function() {
+		// using "this.$$call" can call any method in the parent prototype
+		// with a set of arguments similar to "Function.call()"
+		// this will call Pet.prototype.eat with the argument biscuit
+		this.$$call("eat", "biscuit");
+	}
+});
 ```
 
 #### Namespaces

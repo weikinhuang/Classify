@@ -477,20 +477,48 @@ var create = function() {
 	}
 	// Create a magic method that can invoke any of the parent methods
 	/**
-	 * Magic method that can invoke any of the parent methods
+	 * Magic method that can invoke any of the parent methods with a array of arguments
 	 *
 	 * @param {Object} name The name of the parent method to invoke
 	 * @param {Array} args The arguments to pass through to invoke
 	 * @for Classify.Class
-	 * @method invoke
+	 * @method $$apply
 	 * @return {Object}
 	 */
-	methods.invoke = function(name, args) {
-		if (name in parent.prototype && name !== "invoke" && isFunction(parent.prototype[name])) {
-			var tmp = this.invoke, ret;
-			this.invoke = parent.prototype.invoke;
+	methods.$$apply = function(name, args) {
+		if (name !== "$$apply" && name !== "$$call" && name in parent.prototype && isFunction(parent.prototype[name])) {
+			var tmp = this.$$apply, ret;
+			this.$$apply = parent.prototype.$$apply;
 			ret = parent.prototype[name].apply(this, args || []);
-			this.invoke = tmp;
+			if (tmp === undefined) {
+				delete this.$$apply;
+			} else {
+				this.$$apply = tmp;
+			}
+			return ret;
+		}
+		throw new Error("Function \"" + name + "\" of parent class being invoked is undefined.");
+	};
+	/**
+	 * Magic method that can invoke any of the parent methods with any set of arguments
+	 *
+	 * @param {Object} name The name of the parent method to invoke
+	 * @param {Object} arg... Actual arguments to call the method with
+	 * @for Classify.Class
+	 * @method $$call
+	 * @return {Object}
+	 */
+	methods.$$call = function(name) {
+		if (name !== "$$apply" && name !== "$$call" && name in parent.prototype && isFunction(parent.prototype[name])) {
+			var tmp = this.$$call, args = argsToArray(arguments), ret;
+			args.shift();
+			this.$$call = parent.prototype.$$call;
+			ret = parent.prototype[name].apply(this, args || []);
+			if (tmp === undefined) {
+				delete this.$$call;
+			} else {
+				this.$$call = tmp;
+			}
 			return ret;
 		}
 		throw new Error("Function \"" + name + "\" of parent class being invoked is undefined.");
