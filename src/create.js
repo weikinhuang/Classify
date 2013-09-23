@@ -2,7 +2,7 @@
  * @module create
  */
 // regex for keyword properties
-var keywordRegexp = /^(?:superclass|subclass|implement|bindings|extend|prototype|applicate|(?:add|remove)(?:Static|Aliased|Bound)Property)$/,
+var keywordRegexp = /^(?:\$\$\w+|bindings|extend|prototype|(?:add|remove)(?:Static|Aliased|Bound)Property)$/,
 // regex to test for a mutator name to avoid a loop
 mutatorNameTest = /^__/,
 // reference to existing mutators
@@ -24,11 +24,13 @@ objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto)
 objectDefineProperty = function(obj, prop, descriptor) {
 	obj[prop] = descriptor;
 },
+// create a noop function
+noop = function() {
+},
 // create the base object that everything extends from
 Base = (function() {
 	var fn = function() {
 	};
-	// Make sure we always have a constructor
 	/**
 	 * True constructor method for this object, will be called when object is
 	 * called with the "new" keyword
@@ -37,14 +39,9 @@ Base = (function() {
 	 * @method init
 	 * @return {Class}
 	 */
-	fn.prototype.init = function() {
-	};
-	fn.superclass = null;
-	fn.subclass = [];
-	fn.implement = [];
-	fn.prototype.constructor = Base;
-	fn.prototype.self = Base;
-	fn.__isclass_ = true;
+	fn.prototype.init = noop;
+	fn.prototype.constructor = fn;
+	fn.$$isclass = true;
 	return fn;
 })(),
 /**
@@ -65,7 +62,7 @@ Mutator = function(name, props) {
 	this.propTest = new RegExp("^__" + name + "_");
 	this.propPrefix = "__" + name + "_";
 },
-// wraps a function so that the "this.parent" is bound to the function
+// wraps a function so that the "this.$$parent" is bound to the function
 wrapParentProperty = function(parentPrototype, property) {
 	return store(function() {
 		/**
@@ -73,16 +70,16 @@ wrapParentProperty = function(parentPrototype, property) {
 		 * method, allow for access to the parent version of the function.
 		 *
 		 * @for Classify.Class
-		 * @method parent
+		 * @method $$parent
 		 * @return {Object}
 		 */
-		var tmp = this.parent, ret;
-		this.parent = parentPrototype;
+		var tmp = this.$$parent, ret;
+		this.$$parent = parentPrototype;
 		ret = property.apply(this, arguments);
 		if (tmp === undefined) {
-			delete this.parent;
+			delete this.$$parent;
 		} else {
-			this.parent = tmp;
+			this.$$parent = tmp;
 		}
 		return ret;
 	}, property);
@@ -133,10 +130,7 @@ removeMutator = function(name) {
 	if (!mutator) {
 		throw new Error("Removing unknown mutator.");
 	}
-	var idx = indexOf(globalMutators, mutator);
-	if (idx > -1) {
-		globalMutators.splice(idx, 1);
-	}
+	remove(globalMutators, mutator);
 	namedGlobalMutators[name] = null;
 	try {
 		delete namedGlobalMutators[name];
@@ -146,7 +140,7 @@ removeMutator = function(name) {
 // method to get all possible mutators
 getMutators = function(klass) {
 	var i, l, mutators = globalMutators.slice(0);
-	arrayPush.apply(mutators, klass.mutators);
+	arrayPush.apply(mutators, klass.$$mutator);
 	// hook for namespaces!
 	if (klass.getMutators) {
 		arrayPush.apply(mutators, klass.getMutators() || []);
@@ -160,7 +154,7 @@ getMutators = function(klass) {
 },
 // adds a property to an existing class taking into account parent
 addProperty = function(klass, parent, name, property, mutators) {
-	var foundMutator, parent_prototype, self_prototype;
+	var foundMutator, parentPrototype, selfPrototype;
 	// we don't want to re-add the core javascript properties, it's redundant
 	if (property === objectPrototype[name]) {
 		return;
@@ -188,18 +182,18 @@ addProperty = function(klass, parent, name, property, mutators) {
 	}
 
 	// quick references
-	parent_prototype = parent.prototype[name];
-	self_prototype = klass.prototype;
+	parentPrototype = parent.prototype[name];
+	selfPrototype = klass.prototype;
 	// else this is not a prefixed static property, so we're assigning it to the
 	// prototype
-	objectDefineProperty(self_prototype, name, (isFunction(property) && !property.__isclass_ && isFunction(parent_prototype)) ? wrapParentProperty(parent_prototype, property) : property);
+	objectDefineProperty(selfPrototype, name, (isFunction(property) && !property.$$isclass && isFunction(parentPrototype)) ? wrapParentProperty(parentPrototype, property) : property);
 
 	// wrap all child implementation with the parent wrapper
 	if (isFunction(property)) {
-		each(klass.subclass, function addSubclassPropertyIterator(k) {
+		each(klass.$$subclass, function addSubclassPropertyIterator(k) {
 			// add only if it's not already wrapped
-			if (isFunction(k.prototype[name]) && !k.prototype[name].__original_) {
-				objectDefineProperty(k.prototype, name, wrapParentProperty(self_prototype[name], k.prototype[name]));
+			if (isFunction(k.prototype[name]) && !k.prototype[name].$$original) {
+				objectDefineProperty(k.prototype, name, wrapParentProperty(selfPrototype[name], k.prototype[name]));
 			}
 		});
 	}
@@ -232,16 +226,59 @@ removeProperty = function(klass, name, mutators) {
 	}
 	// we need to delete the property from all children as well as
 	// the current class
-	each(klass.subclass, function removeSubclassPropertyIterator(k) {
+	each(klass.$$subclass, function removeSubclassPropertyIterator(k) {
 		// remove the parent function wrapper for child classes
-		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].__original_)) {
-			objectDefineProperty(k.prototype, name, k.prototype[name].__original_);
+		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].$$original)) {
+			objectDefineProperty(k.prototype, name, k.prototype[name].$$original);
 		}
 	});
 	klass.prototype[name] = null;
 	try {
 		delete klass.prototype[name];
 	} catch (e) {
+	}
+},
+// constructor body for all classes
+initializeKlass = function(instance, klass, args) {
+	var tmp, i, l, mutators;
+	// We're not creating a instantiated object so we want to force a
+	// instantiation or call the invoke function
+	// we need to test for !this when in "use strict" mode
+	// we need to test for !this.init for quick check if this is a instance
+	// or a definition
+	// we need to test for !(this instanceof klass) when the class is a
+	// property of a instance class (ie. namespace)
+	if (!instance || !instance.init || !(instance instanceof klass)) {
+		return klass.invoke.apply(klass, args);
+	}
+	mutators = getMutators(klass);
+	// loop through all the mutators for the onInit hook
+	for (i = 0, l = mutators.length; i < l; i++) {
+		if (!mutators[i].onInit) {
+			continue;
+		}
+		// if the onInit hook returns anything, then it will override the
+		// "new" keyword
+		tmp = mutators[i].onInit.call(mutators[i], instance, klass, args);
+		if (tmp !== undefined) {
+			// however this method can only return objects and not scalar
+			// values
+			if (isScalar(tmp)) {
+				throw new Error("Return values during onInit hook can only be objects.");
+			}
+			return tmp;
+		}
+	}
+	// just in case we want to do anything special like "new" keyword
+	// override (usually don't return anything)
+	tmp = instance.init.apply(instance, args);
+	if (tmp !== undefined) {
+		// we can only return objects because the new keyword forces it to
+		// be an object
+		if (isScalar(tmp)) {
+			throw new Error("Return values for the constructor can only be objects.");
+		}
+		return tmp;
 	}
 };
 
@@ -285,7 +322,7 @@ var create = function() {
 		methods = args.pop();
 		while (--argLength > 0) {
 			tmp = args.shift();
-			if (!tmp.__isclass_ && !isExtendable(tmp)) {
+			if (!tmp.$$isclass && !isExtendable(tmp)) {
 				if (tmp instanceof Mutator || isArray(tmp) && tmp[0] instanceof Mutator) {
 					mutators = toArray(tmp);
 				} else {
@@ -301,7 +338,7 @@ var create = function() {
 	methods = extend({}, methods);
 
 	// extending from an outside object and not passing in a constructor
-	if (!parent.__isclass_ && !methods.init) {
+	if (!parent.$$isclass && !methods.init) {
 		methods.init = parent;
 	}
 
@@ -313,62 +350,28 @@ var create = function() {
 	 * @type Object
 	 */
 	klass = function() {
-		var tmp, i, l, mutators, args;
-		// We're not creating a instantiated object so we want to force a
-		// instantiation or call the invoke function
-		// we need to test for !this when in "use strict" mode
-		// we need to test for !this.init for quick check if this is a instance
-		// or a definition
-		// we need to test for !(this instanceof klass) when the class is a
-		// property of a instance class (ie. namespace)
-		if (!this || !this.init || !(this instanceof klass)) {
-			return klass.invoke.apply(klass, arguments);
-		}
-		mutators = getMutators(klass);
-		args = argsToArray(arguments);
-		// loop through all the mutators for the onInit hook
-		for (i = 0, l = mutators.length; i < l; i++) {
-			if (!mutators[i].onInit) {
-				continue;
-			}
-			// if the onInit hook returns anything, then it will override the
-			// "new" keyword
-			tmp = mutators[i].onInit.call(mutators[i], this, klass, args);
-			if (tmp !== undefined) {
-				// however this method can only return objects and not scalar
-				// values
-				if (isScalar(tmp)) {
-					throw new Error("Return values during onInit hook can only be objects.");
-				}
-				return tmp;
-			}
-		}
-		// just in case we want to do anything special like "new" keyword
-		// override (usually don't return anything)
-		tmp = this.init.apply(this, args);
-		if (tmp !== undefined) {
-			// we can only return objects because the new keyword forces it to
-			// be an object
-			if (isScalar(tmp)) {
-				throw new Error("Return values for the constructor can only be objects.");
-			}
-			return tmp;
-		}
+		return initializeKlass(this, klass, argsToArray(arguments));
+	};
+
+	// override klass.toString to return the body of the constructor method
+	// rather than the generalized constructor body
+	klass.toString = function() {
+		return (methods.init || noop).toString();
 	};
 
 	// ability to create a new instance using an array of arguments, cannot be
 	// overriden
-	delete methods.applicate;
+	delete methods.$$apply;
 	/**
 	 * Create a new instance of the class using arguments passed in as an array
 	 *
 	 * @param {Array} args Array of arguments to construct the object with
 	 * @static
 	 * @for Classify.Class
-	 * @method applicate
+	 * @method $$apply
 	 * @return {Class}
 	 */
-	klass.applicate = function(a) {
+	klass.$$apply = function(a) {
 		var TempClass = function() {
 			return klass.apply(this, a);
 		};
@@ -384,8 +387,8 @@ var create = function() {
 	 * @method invoke
 	 * @return {Class}
 	 */
-	klass.invoke = methods.invoke || (parent.invoke && isFunction(parent.invoke) && !parent.invoke.__original_ ? parent.invoke : null) || store(function() {
-		return klass.applicate(arguments);
+	klass.invoke = methods.invoke || (parent.invoke && isFunction(parent.invoke) && !parent.invoke.$$original ? parent.invoke : null) || store(function() {
+		return klass.$$apply(arguments);
 	}, true);
 	// Remove the invoke method from the prototype chain
 	delete methods.invoke;
@@ -395,40 +398,40 @@ var create = function() {
 	 *
 	 * @static
 	 * @for Classify.Class
-	 * @property superclass
+	 * @property $$superclass
 	 * @type {Class}
 	 */
-	klass.superclass = parent;
+	klass.$$superclass = parent;
 	/**
 	 * Array containing a reference to all the children that inherit from this
 	 * object
 	 *
 	 * @static
 	 * @for Classify.Class
-	 * @property subclass
+	 * @property $$subclass
 	 * @type {Array}
 	 */
-	klass.subclass = [];
+	klass.$$subclass = [];
 	/**
 	 * Array containing all the objects and classes that this object implements
 	 * methods and properties from
 	 *
 	 * @static
 	 * @for Classify.Class
-	 * @property implement
+	 * @property $$implement
 	 * @type {Array}
 	 */
-	klass.implement = (isArray(parent.implement) ? parent.implement : []).concat(implement);
+	klass.$$implement = (isArray(parent.$$implement) ? parent.$$implement : []).concat(implement);
 	/**
 	 * Array containing all the mutators that were defined with this class,
 	 * these mutators DO NOT get inherited
 	 *
 	 * @static
 	 * @for Classify.Class
-	 * @property mutators
+	 * @property $$mutator
 	 * @type {Array}
 	 */
-	klass.mutators = mutators;
+	klass.$$mutator = mutators;
 
 	// call each of the _onPredefine mutators to modify this class
 	each(getMutators(klass), function classMutatorIterator(mutator) {
@@ -469,25 +472,53 @@ var create = function() {
 	};
 
 	// Add this class to the list of subclasses of the parent
-	if (parent.subclass && isArray(parent.subclass)) {
-		parent.subclass.push(klass);
+	if (parent.$$subclass && isArray(parent.$$subclass)) {
+		parent.$$subclass.push(klass);
 	}
 	// Create a magic method that can invoke any of the parent methods
 	/**
-	 * Magic method that can invoke any of the parent methods
+	 * Magic method that can invoke any of the parent methods with a array of arguments
 	 *
 	 * @param {Object} name The name of the parent method to invoke
 	 * @param {Array} args The arguments to pass through to invoke
 	 * @for Classify.Class
-	 * @method invoke
+	 * @method $$apply
 	 * @return {Object}
 	 */
-	methods.invoke = function(name, args) {
-		if (name in parent.prototype && name !== "invoke" && isFunction(parent.prototype[name])) {
-			var tmp = this.invoke, ret;
-			this.invoke = parent.prototype.invoke;
+	methods.$$apply = function(name, args) {
+		if (name !== "$$apply" && name !== "$$call" && name in parent.prototype && isFunction(parent.prototype[name])) {
+			var tmp = this.$$apply, ret;
+			this.$$apply = parent.prototype.$$apply;
 			ret = parent.prototype[name].apply(this, args || []);
-			this.invoke = tmp;
+			if (tmp === undefined) {
+				delete this.$$apply;
+			} else {
+				this.$$apply = tmp;
+			}
+			return ret;
+		}
+		throw new Error("Function \"" + name + "\" of parent class being invoked is undefined.");
+	};
+	/**
+	 * Magic method that can invoke any of the parent methods with any set of arguments
+	 *
+	 * @param {Object} name The name of the parent method to invoke
+	 * @param {Object} arg... Actual arguments to call the method with
+	 * @for Classify.Class
+	 * @method $$call
+	 * @return {Object}
+	 */
+	methods.$$call = function(name) {
+		if (name !== "$$apply" && name !== "$$call" && name in parent.prototype && isFunction(parent.prototype[name])) {
+			var tmp = this.$$call, args = argsToArray(arguments), ret;
+			args.shift();
+			this.$$call = parent.prototype.$$call;
+			ret = parent.prototype[name].apply(this, args || []);
+			if (tmp === undefined) {
+				delete this.$$call;
+			} else {
+				this.$$call = tmp;
+			}
 			return ret;
 		}
 		throw new Error("Function \"" + name + "\" of parent class being invoked is undefined.");
@@ -534,7 +565,7 @@ var create = function() {
 	// Now implement each of the implemented objects before extending
 	if (implement.length !== 0) {
 		each(implement, function(impl) {
-			var props = impl.__isclass_ ? impl.prototype : impl;
+			var props = impl.$$isclass ? impl.prototype : impl;
 			each(keys(props), function implementIterator(name) {
 				if (!hasOwn.call(proto, name) && !hasOwn.call(methods, name)) {
 					// copy all the implemented properties to the methods
@@ -564,23 +595,15 @@ var create = function() {
 	 */
 	proto.constructor = klass;
 	/**
-	 * Reference to the constructor function of this object
-	 *
-	 * @for Classify.Class
-	 * @property self
-	 * @type {Class}
-	 */
-	proto.self = klass;
-	/**
 	 * Flag to determine if this object is created by Classify.create
 	 *
 	 * @static
 	 * @for Classify.Class
-	 * @property __isclass_
+	 * @property $$isclass
 	 * @private
 	 * @type {Boolean}
 	 */
-	klass.__isclass_ = true;
+	klass.$$isclass = true;
 
 	// call each of the onDefine mutators to modify this class
 	each(getMutators(klass), function defineMutatorIterator(mutator) {

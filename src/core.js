@@ -85,7 +85,7 @@ indexOf = Array.prototype.indexOf ? function(array, item) {
 },
 // ability to store the original definition into the new function definition
 store = function(fn, base) {
-	fn.__original_ = base;
+	fn.$$original = base;
 	return fn;
 },
 // simple iteration function
@@ -122,16 +122,6 @@ map = function(o, iterator) {
 	});
 	return temp;
 },
-// simple filter function
-filter = function(arr, item) {
-	var out = [];
-	each(arr, function filterIterator(v) {
-		if (v !== item) {
-			out[out.length] = v;
-		}
-	});
-	return out;
-},
 // simple extension function that takes into account the enumerated keys
 extend = function() {
 	var args = argsToArray(arguments), base = args.shift();
@@ -141,4 +131,13 @@ extend = function() {
 		});
 	});
 	return base;
+},
+// removes the first instance of item from an array
+remove = function(arr, item) {
+	var idx = indexOf(arr, item);
+	if (idx > -1) {
+		arr.splice(idx, 1);
+		return true;
+	}
+	return false;
 };

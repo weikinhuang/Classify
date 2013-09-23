@@ -18,10 +18,10 @@ QUnit.test("static properties", function() {
 			return test.a;
 		},
 		d : function() {
-			return this.self;
+			return this.constructor;
 		},
 		e : function() {
-			return this.self.a;
+			return this.constructor.a;
 		}
 	});
 
@@ -53,10 +53,10 @@ QUnit.test("static properties defined in container", function() {
 			return test.a;
 		},
 		d : function() {
-			return this.self;
+			return this.constructor;
 		},
 		e : function() {
-			return this.self.a;
+			return this.constructor.a;
 		}
 	});
 
@@ -80,7 +80,7 @@ QUnit.test("static properties that are instances of a class", function() {
 	var test = create({
 		__static_b : prop,
 		d : function() {
-			return this.self;
+			return this.constructor;
 		}
 	});
 
@@ -126,17 +126,17 @@ QUnit.test("adding new static properties after class definition", function() {
 			return 3;
 		},
 		h : function() {
-			return this.parent();
+			return this.$$parent();
 		}
 	});
 
 	// attempts to override special properties are forbidden
-	var temp_prop = subclass.superclass;
+	var temp_prop = subclass.$$superclass;
 	subclass.addStaticProperty("superclass", []);
-	QUnit.equal(subclass.superclass, temp_prop, "attempts to override special properties with addStaticProperty are forbidden.");
+	QUnit.equal(subclass.$$superclass, temp_prop, "attempts to override special properties with addStaticProperty are forbidden.");
 
 	subclass.addProperty("__static_superclass", []);
-	QUnit.equal(subclass.superclass, temp_prop, "attempts to override special properties with addProperty are forbidden.");
+	QUnit.equal(subclass.$$superclass, temp_prop, "attempts to override special properties with addProperty are forbidden.");
 });
 
 QUnit.test("removing existing static properties", function() {
@@ -163,7 +163,7 @@ QUnit.test("removing existing static properties", function() {
 
 	// attempt to remove special properties fail
 	var test2 = create(test, {});
-	var temp_prop = test2.superclass;
+	var temp_prop = test2.$$superclass;
 	test2.removeStaticProperty("superclass");
-	QUnit.equal(test2.superclass, temp_prop, "Attempting to remove special properties fail.");
+	QUnit.equal(test2.$$superclass, temp_prop, "Attempting to remove special properties fail.");
 });

@@ -70,7 +70,7 @@ Benchmark.test("core", function(test) {
 
 	var FrenchGuy = create(Person, {
 		setAddress : function(city, street) {
-			this.parent("France", city, street);
+			this.$$parent("France", city, street);
 		}
 	});
 
@@ -81,7 +81,7 @@ Benchmark.test("core", function(test) {
 
 	var ParisLover = create(FrenchGuy, {
 		setAddress : function(street) {
-			this.parent("Paris", street);
+			this.$$parent("Paris", street);
 		}
 	});
 

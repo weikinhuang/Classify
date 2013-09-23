@@ -40,7 +40,7 @@ QUnit.test("class creation", function() {
 			return this;
 		}
 	});
-	QUnit.ok(!!c.__isclass_, "class created is a class object");
+	QUnit.ok(!!c.$$isclass, "class created is a class object");
 	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
 	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
@@ -107,7 +107,7 @@ QUnit.test("class implementation using definition reference", function() {
 		}
 	});
 	QUnit.equal(c.prototype.a, impl.prototype.a, "implementing a class using a definition reference");
-	QUnit.equal(c.implement[0], impl, "implement class reference stored internally");
+	QUnit.equal(c.$$implement[0], impl, "implement class reference stored internally");
 
 	var d = ns.create("D.B", a, [ impl ], {
 		invoke : function() {
@@ -118,7 +118,7 @@ QUnit.test("class implementation using definition reference", function() {
 		}
 	});
 	QUnit.equal(d.prototype.a, impl.prototype.a, "implementing a class using a definition reference");
-	QUnit.equal(d.implement[0], impl, "implement class reference stored internally");
+	QUnit.equal(d.$$implement[0], impl, "implement class reference stored internally");
 	QUnit.ok(new d() instanceof Base, "class creation created by extending the base class");
 	QUnit.ok(new d() instanceof a, "class creation created by extending the base class");
 	QUnit.equal(ns.D.B, d, "class reference is stored directly within namespace object (nested)");
@@ -159,7 +159,7 @@ QUnit.test("local class mutation", function() {
 		}
 	});
 	QUnit.equal(c.prototype.a, impl.prototype.a, "implementing a class using a definition reference");
-	QUnit.equal(c.implement[0], impl, "implement class reference stored internally");
+	QUnit.equal(c.$$implement[0], impl, "implement class reference stored internally");
 	QUnit.equal(c.mut, 1, "onCreate mutator modified the class during creation with implement");
 
 	var d = ns.create("E.C", a, [ impl ], mutator, {
@@ -171,7 +171,7 @@ QUnit.test("local class mutation", function() {
 		}
 	});
 	QUnit.equal(d.prototype.a, impl.prototype.a, "implementing a class using a definition reference");
-	QUnit.equal(d.implement[0], impl, "implement class reference stored internally");
+	QUnit.equal(d.$$implement[0], impl, "implement class reference stored internally");
 	QUnit.ok(new d() instanceof Base, "class creation created by extending the base class");
 	QUnit.ok(new d() instanceof a, "class creation created by extending the base class");
 	QUnit.equal(ns.E.C, d, "class reference is stored directly within namespace object (nested)");
@@ -187,7 +187,7 @@ QUnit.test("local class mutation", function() {
 		}
 	});
 	QUnit.equal(e.prototype.a, impl.prototype.a, "implementing a class using a definition reference");
-	QUnit.equal(e.implement[0], impl, "implement class reference stored internally");
+	QUnit.equal(e.$$implement[0], impl, "implement class reference stored internally");
 	QUnit.ok(new e() instanceof Base, "class creation created by extending the base class");
 	QUnit.ok(new e() instanceof a, "class creation created by extending the base class");
 	QUnit.equal(ns.E.D, e, "class reference is stored directly within namespace object (nested)");
@@ -212,7 +212,7 @@ QUnit.test("class extension using named references", function() {
 			return 2;
 		}
 	});
-	QUnit.equal(d.superclass, c, "extending classes using named references");
+	QUnit.equal(d.$$superclass, c, "extending classes using named references");
 	QUnit.equal(ns.B, d, "named reference is created within the namespace");
 });
 
@@ -232,7 +232,7 @@ QUnit.test("class implementation using named references", function() {
 		}
 	});
 	QUnit.equal(e.prototype.a, c.prototype.a, "implementing a class using a named reference");
-	QUnit.equal(e.implement[0], c, "implement class reference stored internally");
+	QUnit.equal(e.$$implement[0], c, "implement class reference stored internally");
 
 	// implementing classes using a mixed reference
 	var f = {
@@ -247,8 +247,8 @@ QUnit.test("class implementation using named references", function() {
 	});
 	QUnit.equal(g.prototype.a, c.prototype.a, "implementing a class using a named reference");
 	QUnit.equal(g.prototype.d, f.d, "implementing a object with a named reference");
-	QUnit.equal(g.implement[0], c, "implement class reference stored internally");
-	QUnit.equal(g.implement[1], f, "implement object reference stored internally");
+	QUnit.equal(g.$$implement[0], c, "implement class reference stored internally");
+	QUnit.equal(g.$$implement[1], f, "implement object reference stored internally");
 });
 
 QUnit.test("local class mutation with named references", function() {
@@ -289,7 +289,7 @@ QUnit.test("local class mutation with named references", function() {
 		}
 	});
 	QUnit.equal(c.prototype.a, impl.prototype.a, "implementing a class using a definition reference");
-	QUnit.equal(c.implement[0], impl, "implement class reference stored internally");
+	QUnit.equal(c.$$implement[0], impl, "implement class reference stored internally");
 	QUnit.equal(c.mut, 1, "onCreate mutator modified the class during creation with implement");
 
 	var d = ns.create("E.C", "A", [ "B" ], mutator, {
@@ -301,7 +301,7 @@ QUnit.test("local class mutation with named references", function() {
 		}
 	});
 	QUnit.equal(d.prototype.a, impl.prototype.a, "implementing a class using a definition reference");
-	QUnit.equal(d.implement[0], impl, "implement class reference stored internally");
+	QUnit.equal(d.$$implement[0], impl, "implement class reference stored internally");
 	QUnit.ok(new d() instanceof Base, "class creation created by extending the base class");
 	QUnit.ok(new d() instanceof a, "class creation created by extending the base class");
 	QUnit.equal(ns.E.C, d, "class reference is stored directly within namespace object (nested)");
@@ -317,7 +317,7 @@ QUnit.test("local class mutation with named references", function() {
 		}
 	});
 	QUnit.equal(e.prototype.a, impl.prototype.a, "implementing a class using a definition reference");
-	QUnit.equal(e.implement[0], impl, "implement class reference stored internally");
+	QUnit.equal(e.$$implement[0], impl, "implement class reference stored internally");
 	QUnit.ok(new e() instanceof Base, "class creation created by extending the base class");
 	QUnit.ok(new e() instanceof a, "class creation created by extending the base class");
 	QUnit.equal(ns.E.D, e, "class reference is stored directly within namespace object (nested)");
@@ -361,7 +361,7 @@ QUnit.test("using the ns defined class extend function", function() {
 			return this;
 		}
 	});
-	QUnit.equal(i.prototype.a.__original_, c.prototype.a, "implementing a class using a named reference with extend");
+	QUnit.equal(i.prototype.a.$$original, c.prototype.a, "implementing a class using a named reference with extend");
 	QUnit.equal(i.prototype.b, d.prototype.b, "implementing a object with a named reference with implement");
 });
 
@@ -383,9 +383,9 @@ QUnit.test("removing named classes", function() {
 	// destroy a class that is inherited from another class
 	ns.destroy("D");
 	QUnit.equal(typeof ns.D, "undefined", "removing a named class from the namespace");
-	var index = -1, l = ns.A.subclass.length;
+	var index = -1, l = ns.A.$$subclass.length;
 	while (l--) {
-		if (ns.A.subclass[l] === cd) {
+		if (ns.A.$$subclass[l] === cd) {
 			index = l;
 		}
 	}
@@ -545,7 +545,7 @@ QUnit.test("creating namespaces from existing plain objects", function() {
 			return this;
 		}
 	});
-	QUnit.ok(!!c.__isclass_, "class created is a class object");
+	QUnit.ok(!!c.$$isclass, "class created is a class object");
 	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
 	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
@@ -575,7 +575,7 @@ QUnit.test("creating namespaces from existing Classify classes", function() {
 			return this;
 		}
 	});
-	QUnit.ok(!!c.__isclass_, "class created is a class object");
+	QUnit.ok(!!c.$$isclass, "class created is a class object");
 	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
 	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
@@ -605,7 +605,7 @@ QUnit.test("creating namespaces from existing Classify object instances", functi
 			return this;
 		}
 	});
-	QUnit.ok(!!c.__isclass_, "class created is a class object");
+	QUnit.ok(!!c.$$isclass, "class created is a class object");
 	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
 	QUnit.equal(ns.get("A"), c, "class reference is stored in internal reference array");
