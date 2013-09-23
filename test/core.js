@@ -191,6 +191,7 @@ QUnit.test("basic requirements", function() {
 		return v + i;
 	}), [ "0a", "1b", "2c" ], "mapping original array into new array");
 
+	// array filtering
 	var temp_array = [1, 2, 3, 4, 3];
 	QUnit.ok(remove(temp_array, 3), "remove returns true when element is removed");
 	QUnit.deepEqual(temp_array, [1, 2, 4, 3], "remove a single item out of an array by reference");
