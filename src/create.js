@@ -2,7 +2,7 @@
  * @module create
  */
 // regex for keyword properties
-var keywordRegexp = /^(?:superclass|subclass|implement|bindings|extend|prototype|applicate|(?:add|remove)(?:Static|Aliased|Bound)Property)$/,
+var keywordRegexp = /^(?:\$\$\w+|bindings|extend|prototype|(?:add|remove)(?:Static|Aliased|Bound)Property)$/,
 // regex to test for a mutator name to avoid a loop
 mutatorNameTest = /^__/,
 // reference to existing mutators
