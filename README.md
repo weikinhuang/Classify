@@ -118,12 +118,14 @@ var Dog = Classify(Pet, {
 		// using "this.$$apply" can call any method in the parent prototype
 		// with an array of arguments similar to "Function.apply()"
 		// this will call Pet.prototype.eat with the argument biscuit
+		// shortcut for Pet.prototype.eat.apply(this, [ "biscuit" ]);
 		this.$$apply("eat", [ "biscuit" ]);
 	},
 	eatDogFood : function() {
 		// using "this.$$call" can call any method in the parent prototype
 		// with a set of arguments similar to "Function.call()"
 		// this will call Pet.prototype.eat with the argument biscuit
+		// shortcut for Pet.prototype.eat.call(this, "biscuit");
 		this.$$call("eat", "biscuit");
 	}
 });
