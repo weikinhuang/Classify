@@ -74,7 +74,7 @@ addMutator("bind", {
 		each(bindings, function bindingsIterator(prop) {
 			var method = klass.prototype[prop];
 			objectDefineProperty(instance, prop, function() {
-				var ret;
+				var tmp = instance.$$context, ret;
 				/**
 				 * Allow access to the calling context when using a bound method
 				 *
@@ -85,7 +85,11 @@ addMutator("bind", {
 				instance.$$context = this;
 				// then call the original method with the proper context
 				ret = method.apply(instance, arguments);
-				delete instance.$$context;
+				if (tmp === undefined) {
+					delete instance.$$context;
+				} else {
+					instance.$$context = tmp;
+				}
 				return ret;
 			});
 		});
