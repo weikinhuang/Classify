@@ -9,23 +9,23 @@ mutatorNameTest = /^\$\$(?:\w+)\$\$/,
 namedGlobalMutators = {},
 // list of all mutators in the order of definition
 globalMutators = [],
+//create a noop function
+noop = function() {
+},
 // Use native object.create whenever possible
 objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto) {
 //#JSCOVERAGE_IF !Object.create
 	// This method allows for the constructor to not be called when making a new
 	// subclass
-	var SubClass = function() {
-	};
-	SubClass.prototype = proto;
-	return new SubClass();
+	noop.prototype = proto;
+	var tmp = new noop();
+	noop.prototype = null;
+	return tmp;
 //#JSCOVERAGE_ENDIF
 },
 // Hook to use Object.defineProperty if needed
 objectDefineProperty = function(obj, prop, descriptor) {
 	obj[prop] = descriptor;
-},
-// create a noop function
-noop = function() {
 },
 // create the base object that everything extends from
 Base = (function() {

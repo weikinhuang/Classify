@@ -50,6 +50,7 @@ module.exports = function(grunt) {
 				trailing : false,
 				undef : true,
 				unused : true,
+				newcap : false,
 				strict : true,
 				node : true,
 				browser : true,
@@ -156,7 +157,8 @@ module.exports = function(grunt) {
 				concurrency : 3,
 				browsers : [ {
 					browserName : "firefox",
-					platform : "Windows 7"
+					platform : "Windows 8",
+					version : "22"
 				}, {
 					browserName : "firefox",
 					platform : "Windows XP",
