@@ -121,7 +121,14 @@ module.exports = function(grunt) {
 
 	gruntConfig["qunit-node"] = {
 		all : {
-			code : [ "src/core.js", "src/create.js", "src/mutator.static.js", "src/mutator.nowrap.js", "src/mutator.alias.js", "src/mutator.bind.js", "src/namespace.js", "src/export.js" ],
+			code : [ "src/core.js",
+					"src/create.js",
+					"src/mutator.static.js",
+					"src/mutator.nowrap.js",
+					"src/mutator.alias.js",
+					"src/mutator.bind.js",
+					"src/namespace.js",
+					"src/export.js" ],
 			tests : [ "test/core.js",
 					"test/create.js",
 					"test/mutator.js",

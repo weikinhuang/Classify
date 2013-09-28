@@ -37,18 +37,19 @@ isArray = Array.isArray || function(o) {
 //#JSCOVERAGE_ENDIF
 },
 // regex for native function testing
-nativeFunctionRegExp = /^\s*function\s+.+?\(.*?\)\s*\{\s*\[native code\]\s*\}\s*$/,
+nativeFunctionRegExp = new RegExp("^" + String(toString).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/toString|for [^\]]+/g, ".+?") + "$"),
 // ability to check if a function is native
 isNativeFunction = function(o) {
 	return isFunction(o) && nativeFunctionRegExp.test(o.toString());
 },
-// quickly be able to get all the keys of an object
-keys = function(o) {
+// quickly be able to get all the keys of an object, we don't use
+// Object.keys because we also want to extract from the parent prototypes
+keys = isEnumerationBuggy ? function(o) {
+//#JSCOVERAGE_IF !isEnumerationBuggy
 	var k = [], i;
 	for (i in o) {
 		k[k.length] = i;
 	}
-//#JSCOVERAGE_IF
 	if (isEnumerationBuggy) {
 		// only add buggy enumerated values if it's not the Object.prototype's
 		for (i = 0; i < enumerationLength; ++i) {
@@ -58,6 +59,15 @@ keys = function(o) {
 		}
 	}
 	return k;
+//#JSCOVERAGE_ENDIF
+} : function(o) {
+//#JSCOVERAGE_IF !isEnumerationBuggy
+	var k = [], i;
+	for (i in o) {
+		k[k.length] = i;
+	}
+	return k;
+//#JSCOVERAGE_ENDIF
 },
 // force an object to be an array
 toArray = function(o) {
@@ -90,7 +100,8 @@ store = function(fn, base) {
 },
 // simple iteration function
 each = function(o, iterator, context) {
-	// we must account for null, otherwise it will throw the error "Unable to get value of the property 'length': object is null or undefined"
+	// we must account for null, otherwise it will throw the error "Unable to
+	// get value of the property "length": object is null or undefined"
 	if (!o) {
 		return o;
 	}
