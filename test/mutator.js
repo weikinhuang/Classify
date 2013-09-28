@@ -103,27 +103,27 @@ QUnit.test("adding and removing global mutators to the on property add hook", fu
 	});
 
 	var test = create({
-		__test_a : 1
+		$$test$$a : 1
 	});
 	QUnit.equal((new test()).a, 2, "onPropAdd mutator modified a value during property addition");
 
 	var test2 = create({
-		__test_ : {
+		$$test$$ : {
 			b : 2
 		}
 	});
 	QUnit.equal((new test2()).b, 4, "onPropAdd mutator modified a value during property addition when defined in object");
 
-	test2.addProperty("__test_c", 3);
+	test2.addProperty("$$test$$c", 3);
 	QUnit.equal((new test2()).c, 6, "onPropAdd mutator modified a value during property addition after class definition");
 
 	removeMutator("test");
 
 	// after removal, hooks are no longer called
 	var test3 = create({
-		__test_a : 4
+		$$test$$a : 4
 	});
-	QUnit.equal((new test3()).__test_a, 4, "removed onPropAdd mutator is no longer called during creation");
+	QUnit.equal((new test3()).$$test$$a, 4, "removed onPropAdd mutator is no longer called during creation");
 });
 
 QUnit.test("adding and removing global mutators to the on property remove hook", function() {
@@ -141,19 +141,19 @@ QUnit.test("adding and removing global mutators to the on property remove hook",
 	});
 
 	var test = create({
-		__test_a : 1
+		$$test$$a : 1
 	});
 
-	test.removeProperty("__test_a");
+	test.removeProperty("$$test$$a");
 	QUnit.equal(test.m, 1, "onPropRemove mutator modified a value during property removal");
 
 	removeMutator("test");
 
 	// after removal, hooks are no longer called
 	var test3 = create({
-		__test_a : 4
+		$$test$$a : 4
 	});
-	test.removeProperty("__test_a");
+	test.removeProperty("$$test$$a");
 	QUnit.ok(!test3.hasOwnProperty("m"), "removed onPropRemove mutator is no longer called during property removal");
 });
 
@@ -319,18 +319,18 @@ QUnit.test("adding class level mutators to the on property add hook", function()
 	});
 
 	var test = create([ mutator ], {
-		__test_a : 1
+		$$test$$a : 1
 	});
 	QUnit.equal((new test()).a, 2, "onPropAdd mutator modified a value during property addition");
 
 	var test2 = create([ mutator ], {
-		__test_ : {
+		$$test$$ : {
 			b : 2
 		}
 	});
 	QUnit.equal((new test2()).b, 4, "onPropAdd mutator modified a value during property addition when defined in object");
 
-	test2.addProperty("__test_c", 3);
+	test2.addProperty("$$test$$c", 3);
 	QUnit.equal((new test2()).c, 6, "onPropAdd mutator modified a value during property addition after class definition");
 });
 
@@ -349,10 +349,10 @@ QUnit.test("adding class level mutators to the on property remove hook", functio
 	});
 
 	var test = create([ mutator ], {
-		__test_a : 1
+		$$test$$a : 1
 	});
 
-	test.removeProperty("__test_a");
+	test.removeProperty("$$test$$a");
 	QUnit.equal(test.m, 1, "onPropRemove mutator modified a value during property removal");
 });
 

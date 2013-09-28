@@ -263,9 +263,9 @@ namespaceProperties = {
 	 * @param {Function} [mutator.onDefine] The hook to be called when a class
 	 *            is defined after all properties are added
 	 * @param {Function} [mutator.onPropAdd] The hook to be called when a
-	 *            property with the __name_ prefix is added
+	 *            property with the $$name$$ prefix is added
 	 * @param {Function} [mutator.onPropRemove] The hook to be called when a
-	 *            property with the __name_ prefix is removed
+	 *            property with the $$name$$ prefix is removed
 	 * @param {Function} [mutator.onInit] The hook to be called during each
 	 *            object's initialization
 	 * @throws Error

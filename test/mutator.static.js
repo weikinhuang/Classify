@@ -6,11 +6,11 @@ QUnit.test("static properties", function() {
 	// testing class creation with static properties
 	var test = create({
 		a : 1,
-		__static_a : 2,
+		$$static$$a : 2,
 		b : function() {
 			return this.a;
 		},
-		__static_b : function() {
+		$$static$$b : function() {
 			// the internal "this" reference should always point to the class definition in a static context
 			return this.a;
 		},
@@ -38,7 +38,7 @@ QUnit.test("static properties defined in container", function() {
 	QUnit.expect(4);
 	// testing class creation with static properties defined in container
 	var test = create({
-		__static_ : {
+		$$static$$ : {
 			a : 2,
 			b : function() {
 				// the internal "this" reference should always point to the class definition in a static context
@@ -71,14 +71,14 @@ QUnit.test("static properties that are instances of a class", function() {
 	// create a class
 	var prop = create({
 		g : 2,
-		__static_a : 1,
-		__static_f : function() {
+		$$static$$a : 1,
+		$$static$$f : function() {
 			return this.a;
 		}
 	});
 	// testing class creation with static properties
 	var test = create({
-		__static_b : prop,
+		$$static$$b : prop,
 		d : function() {
 			return this.constructor;
 		}
@@ -135,7 +135,7 @@ QUnit.test("adding new static properties after class definition", function() {
 	subclass.addStaticProperty("superclass", []);
 	QUnit.equal(subclass.$$superclass, temp_prop, "attempts to override special properties with addStaticProperty are forbidden.");
 
-	subclass.addProperty("__static_superclass", []);
+	subclass.addProperty("$$static$$superclass", []);
 	QUnit.equal(subclass.$$superclass, temp_prop, "attempts to override special properties with addProperty are forbidden.");
 });
 
@@ -143,10 +143,10 @@ QUnit.test("removing existing static properties", function() {
 	QUnit.expect(3);
 	// testing class for known properties in every defined class
 	var test = create({
-		__static_z : function() {
+		$$static$$z : function() {
 			return 1;
 		},
-		__static_y : 1,
+		$$static$$y : 1,
 		x : 1,
 		a : function() {
 			return 1;

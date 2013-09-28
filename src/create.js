@@ -4,7 +4,7 @@
 // regex for keyword properties
 var keywordRegexp = /^(?:\$\$\w+|bindings|extend|prototype|(?:add|remove)(?:Static|Aliased|Bound)Property)$/,
 // regex to test for a mutator name to avoid a loop
-mutatorNameTest = /^__/,
+mutatorNameTest = /^\$\$(?:\w+)\$\$/,
 // reference to existing mutators
 namedGlobalMutators = {},
 // list of all mutators in the order of definition
@@ -59,8 +59,8 @@ Mutator = function(name, props) {
 	}
 	extend(this, props);
 	this.name = name;
-	this.propTest = new RegExp("^__" + name + "_");
-	this.propPrefix = "__" + name + "_";
+	this.propTest = new RegExp("^\\$\\$" + name + "\\$\\$");
+	this.propPrefix = "$$" + name + "$$";
 },
 // wraps a function so that the "this.$$parent" is bound to the function
 wrapParentProperty = function(parentPrototype, property) {
@@ -97,9 +97,9 @@ wrapParentProperty = function(parentPrototype, property) {
  * @param {Function} [mutator.onDefine] The hook to be called when a class is
  *            defined after all properties are added
  * @param {Function} [mutator.onPropAdd] The hook to be called when a property
- *            with the __name_ prefix is added
+ *            with the $$name$$ prefix is added
  * @param {Function} [mutator.onPropRemove] The hook to be called when a
- *            property with the __name_ prefix is removed
+ *            property with the $$name$$ prefix is removed
  * @param {Function} [mutator.onInit] The hook to be called during each object's
  *            initialization
  * @throws Error

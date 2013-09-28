@@ -3,7 +3,7 @@
  */
 // mutator for adding bound properties to a class
 addMutator("bind", {
-	// the special identifier is "__bind_"
+	// the special identifier is "$$bind$$"
 	onCreate : function(klass, parent) {
 		var mutator = this;
 		// re-assign the bindings so that it produces copies across child classes

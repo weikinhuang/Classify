@@ -62,19 +62,19 @@ var Cat = Classify(Pet, [ feline_traits ], {
 
 #### Static Properties/Methods
 ```javascript
-// Static properties can be defined with the "__static_" prefix
-// or defined in bulk with __static_ : {prop1:1, prop2:2}
+// Static properties can be defined with the "$$static$$" prefix
+// or defined in bulk with $$static$$ : {prop1:1, prop2:2}
 var Bird = Classify(Pet, {
 	breed : "",
 	init : function(breed) {
 		this.$$parent("bird");
 		this.breed = Bird.validateBreed(breed);
 	},
-	__static_BREEDS : {
+	$$static$$BREEDS : {
 		parrot : "Parrot",
 		canary : "Canary"
 	},
-	__static_validateBreed : function(breed) {
+	$$static$$validateBreed : function(breed) {
 		return Bird.BREEDS[breed] || "Unknown";
 	}
 });
@@ -82,13 +82,13 @@ var Bird = Classify(Pet, {
 
 #### Autobinding
 ```javascript
-// Auto bound properties can be defined with the "__bind_" prefix
-// or defined in bulk with __bind_ : {prop1:function(){}, prop2:function(){}}
+// Auto bound properties can be defined with the "$$bind$$" prefix
+// or defined in bulk with $$bind$$ : {prop1:function(){}, prop2:function(){}}
 var Pig = Classify(Pet, {
 	init : function() {
 		this.$$parent("pig");
 	},
-	__bind_speak : function(event) {
+	$$bind$$speak : function(event) {
 		// this can now be called within the class with this.speak()
 		// special property $$context added for the duration of this
 		// method to pass along the calling context, with "this" is

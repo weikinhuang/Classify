@@ -260,8 +260,8 @@ Adds a global class mutator that modifies the defined classes at different point
 1. `name` `{String}`: The name of the mutator reference to add
 2. `mutator` `{Object}`: The mutator definition with optional hooks
 3. `[mutator.onCreate]` `{Function}`: The hook to be called when a class is defined
-4. `[mutator.onPropAdd]` `{Function}`: The hook to be called when a property with the __name_ prefix is added
-5. `[mutator.onPropRemove]` `{Function}`: The hook to be called when a property with the __name_ prefix is removed
+4. `[mutator.onPropAdd]` `{Function}`: The hook to be called when a property with the $$name$$ prefix is added
+5. `[mutator.onPropRemove]` `{Function}`: The hook to be called when a property with the $$name$$ prefix is removed
 6. `[mutator.onInit]` `{Function}`: The hook to be called during each object's initialization
 
 ### <a id="Classify.removeMutator" href="#">`Classify.removeMutator(name)`</a>

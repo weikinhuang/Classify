@@ -192,6 +192,10 @@ module.exports = function(grunt) {
 					platform : "OS X 10.8",
 					browserName : "safari",
 					version : "6"
+				}, {
+					platform : "OS X 10.8",
+					browserName : "iphone",
+					version : "6"
 				} ]
 			}
 		}

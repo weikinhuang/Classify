@@ -5,7 +5,7 @@ QUnit.test("alias properties", function() {
 	QUnit.expect(8);
 	// testing basic alias methods
 	var test = create({
-		__alias_z : "a",
+		$$alias$$z : "a",
 		x : 0,
 		y : 0,
 		a : function() {
@@ -28,8 +28,8 @@ QUnit.test("alias properties", function() {
 
 	// test aliases working against inheritance
 	var subclass = create(test, {
-		__alias_y : "b",
-		__alias_b : "a",
+		$$alias$$y : "b",
+		$$alias$$b : "a",
 		c : function() {
 			return 3;
 		},
@@ -53,7 +53,7 @@ QUnit.test("alias properties", function() {
 
 	// test aliases working against inheritance
 	var test2 = create({
-		__alias_ : {
+		$$alias$$ : {
 			z : "a"
 		},
 		x : 0,
