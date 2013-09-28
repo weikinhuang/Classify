@@ -72,18 +72,7 @@ extend(Classify, exportNames, {
 	 * @type {String}
 	 * @property version
 	 */
-	version : "<%= pkg.version %>",
-
-	/**
-	 * Utility function to provide functionality to quickly add properties to objects
-	 * @param {Object} base The base object to copy properties into
-	 * @param {Object[]} args Set of objects to copy properties from
-	 * @static
-	 * @for Classify
-	 * @method extend
-	 * @return {Object}
-	 */
-	extend : extend
+	version : "<%= pkg.version %>"
 });
 
 /*global define */

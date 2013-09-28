@@ -1,5 +1,6 @@
 /* global isScalar */
 /* global isFunction */
+/* global isNative */
 /* global isArray */
 /* global isExtendable */
 /* global keys */
@@ -13,7 +14,7 @@
 QUnit.module("core");
 
 QUnit.test("basic requirements", function() {
-	QUnit.expect(71);
+	QUnit.expect(77);
 	var test, empty;
 	// test basic properties of the base Object
 	QUnit.ok(Object.prototype, "Object prototype exists");
@@ -42,6 +43,15 @@ QUnit.test("basic requirements", function() {
 	QUnit.ok(!isFunction(/hi/), "regex not a function");
 	QUnit.ok(!isFunction(new fn()), "class is not a function");
 	QUnit.ok(isFunction(fn), "function is a function");
+
+	QUnit.ok(isNative(Object.prototype.toString), "Object toString is native");
+	QUnit.ok(isNative([].join), "Array join is native");
+	QUnit.ok(isNative(/^$/.test), "RegExp test is native");
+	QUnit.ok(!isNative(fn), "named function is not native");
+	QUnit.ok(!isNative(function(){}), "anon function is not native");
+	/* jshint evil: true */
+	QUnit.ok(!isNative(new Function("return 1;")), "constructed function is not native");
+	/* jshint evil: false */
 
 	// test detection of a array
 	QUnit.ok(!isArray(), "undefined is not an array");

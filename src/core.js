@@ -18,19 +18,48 @@ hasOwn = objectPrototype.hasOwnProperty,
 arrayPush = Array.prototype.push,
 // regex to test for scalar value
 scalarRegExp = /^(?:boolean|number|string|undefined)$/,
-// test if a value is scalar in nature
+/**
+ * Utility function to test if a value is scalar in nature
+ * @param {Object} o The object to test
+ * @static
+ * @for Classify
+ * @method isScalar
+ * @return {Boolean}
+ */
 isScalar = function(o) {
 	return o === null || scalarRegExp.test(typeof o);
 },
-// test if object is a function
+/**
+ * Utility function to test if object is a function
+ * @param {Object} o The object to test
+ * @static
+ * @for Classify
+ * @method isFunction
+ * @return {Boolean}
+ */
 isFunction = function(o) {
 	return toString.call(o) === "[object Function]";
 },
-// test if object is extendable
+/**
+ * Utility function to test if object is extendable
+ * @param {Object} o The object to test
+ * @static
+ * @for Classify
+ * @method isExtendable
+ * @return {Boolean}
+ */
 isExtendable = function(o) {
 	return o && o.prototype && isFunction(o);
 },
-// quick test for isArray
+/**
+ * Utility function to test if object is an Array instance
+ * polyfill for Array.isArray
+ * @param {Object} o The object to test
+ * @static
+ * @for Classify
+ * @method isArray
+ * @return {Boolean}
+ */
 isArray = Array.isArray || function(o) {
 //#JSCOVERAGE_IF !Array.isArray
 	return toString.call(o) === "[object Array]";
@@ -38,12 +67,27 @@ isArray = Array.isArray || function(o) {
 },
 // regex for native function testing
 nativeFunctionRegExp = new RegExp("^" + String(toString).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/toString|for [^\]]+/g, ".+?") + "$"),
-// ability to check if a function is native
-isNativeFunction = function(o) {
+/**
+ * Utility function to test if a function is native
+ * @param {Object} o The object to test
+ * @static
+ * @for Classify
+ * @method isNative
+ * @return {Boolean}
+ */
+isNative = function(o) {
 	return isFunction(o) && nativeFunctionRegExp.test(o.toString());
 },
-// quickly be able to get all the keys of an object, we don't use
-// Object.keys because we also want to extract from the parent prototypes
+/**
+ * Utility function to extract all enumerable keys
+ * quickly be able to get all the keys of an object, we don't use
+ * Object.keys because we also want to extract from the parent prototypes
+ * @param {Object} o The object to iterate over
+ * @static
+ * @for Classify
+ * @method keys
+ * @return {Array}
+ */
 keys = isEnumerationBuggy ? function(o) {
 //#JSCOVERAGE_IF !isEnumerationBuggy
 	var k = [], i;
@@ -73,11 +117,29 @@ keys = isEnumerationBuggy ? function(o) {
 toArray = function(o) {
 	return isArray(o) ? o : [ o ];
 },
-// create ability to convert the arguments object to an array
+//
+/**
+ * Convert the `arguments` object into a Array instance
+ * @param {Arguments} o The arguments object
+ * @static
+ * @for Classify
+ * @method argsToArray
+ * @return {Array}
+ */
 argsToArray = function(o) {
 	return Array.prototype.slice.call(o, 0);
 },
 // test if an item is in a array
+/**
+ * Utility function to search for a item's index in an array
+ * polyfill for Array.prototype.indexOf
+ * @param {Array} array The array to search
+ * @param {Object} item The searched item
+ * @static
+ * @for Classify
+ * @method indexOf
+ * @return {Number} Returns -1 if not found
+ */
 indexOf = Array.prototype.indexOf ? function(array, item) {
 //#JSCOVERAGE_IF Array.prototype.indexOf
 	return array.indexOf(item);
@@ -98,6 +160,15 @@ store = function(fn, base) {
 	fn.$$original = base;
 	return fn;
 },
+/**
+ * Utility function to provide object/array iteration
+ * @param {Object} o The object to iterate
+ * @param {Function} iterator Iteration function returns false to exit
+ * @static
+ * @for Classify
+ * @method each
+ * @return {Object}
+ */
 // simple iteration function
 each = function(o, iterator, context) {
 	// we must account for null, otherwise it will throw the error "Unable to
@@ -125,7 +196,15 @@ each = function(o, iterator, context) {
 	}
 	return o;
 },
-// simple mapping function
+/**
+ * Utility function to provide object mapping to an array
+ * @param {Object} o The object to iterate
+ * @param {Function} iterator Iteration function returns mapped value
+ * @static
+ * @for Classify
+ * @method map
+ * @return {Array}
+ */
 map = function(o, iterator) {
 	var temp = [];
 	each(o, function mapIterator(v, i) {
@@ -133,7 +212,16 @@ map = function(o, iterator) {
 	});
 	return temp;
 },
-// simple extension function that takes into account the enumerated keys
+/**
+ * Utility function to provide functionality to quickly add properties to objects
+ * simple extension function that takes into account the enumerated keys
+ * @param {Object} base The base object to copy properties into
+ * @param {Object[]} o Set of objects to copy properties from
+ * @static
+ * @for Classify
+ * @method extend
+ * @return {Object}
+ */
 extend = function() {
 	var args = argsToArray(arguments), base = args.shift();
 	each(args, function extendArgIterator(extens) {
@@ -143,7 +231,15 @@ extend = function() {
 	});
 	return base;
 },
-// removes the first instance of item from an array
+/**
+ * Utility function to removes the first instance of item from an array
+ * @param {Array} arr The array to search
+ * @param {Object} item The item to remove
+ * @static
+ * @for Classify
+ * @method remove
+ * @return {Boolean} TRUE if item removed
+ */
 remove = function(arr, item) {
 	var idx = indexOf(arr, item);
 	if (idx > -1) {
@@ -152,3 +248,20 @@ remove = function(arr, item) {
 	}
 	return false;
 };
+
+//export methods to the main object
+extend(exportNames, {
+	// direct access functions
+	isScalar : isScalar,
+	isFunction : isFunction,
+	isExtendable : isExtendable,
+	isArray : isArray,
+	isNative : isNative,
+	keys : keys,
+	argsToArray : argsToArray,
+	indexOf : indexOf,
+	each : each,
+	map : map,
+	remove : remove,
+	extend : extend
+});

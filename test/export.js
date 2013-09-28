@@ -26,7 +26,7 @@ QUnit.test("check globally accessable Classify object", function() {
 });
 
 QUnit.test("check globally accessable Classify object's utility functions", function() {
-	QUnit.expect(5);
+	QUnit.expect(16);
 	// test utility function to provide functionality to quickly add properties to objects
 	var test = {};
 	var extens = {
@@ -47,6 +47,18 @@ QUnit.test("check globally accessable Classify object's utility functions", func
 
 	QUnit.ok(!!(test2.A && test2.A.B && test2.A.B.C), "provisioned a namespace within a object");
 	QUnit.equal(provided, test2.A.B.C, "the provisioned namespace is returned by provide");
+
+	QUnit.ok(Classify.isScalar, "isScalar is exported as a utility");
+	QUnit.ok(Classify.isFunction, "isFunction is exported as a utility");
+	QUnit.ok(Classify.isFunction, "isFunction is exported as a utility");
+	QUnit.ok(Classify.isArray, "isArray is exported as a utility");
+	QUnit.ok(Classify.isNative, "isNative is exported as a utility");
+	QUnit.ok(Classify.keys, "keys is exported as a utility");
+	QUnit.ok(Classify.argsToArray, "argsToArray is exported as a utility");
+	QUnit.ok(Classify.indexOf, "indexOf is exported as a utility");
+	QUnit.ok(Classify.each, "each is exported as a utility");
+	QUnit.ok(Classify.map, "map is exported as a utility");
+	QUnit.ok(Classify.remove, "remove is exported as a utility");
 });
 
 QUnit.test("invoking global Classify object with string", function() {

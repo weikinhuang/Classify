@@ -13,7 +13,7 @@ globalMutators = [],
 noop = function() {
 },
 // Use native object.create whenever possible
-objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto) {
+objectCreate = isNative(Object.create) ? Object.create : function(proto) {
 //#JSCOVERAGE_IF !Object.create
 	// This method allows for the constructor to not be called when making a new
 	// subclass
