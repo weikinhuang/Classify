@@ -123,7 +123,7 @@ QUnit.test("adding and removing global mutators to the on property add hook", fu
 	var test3 = create({
 		$$test$$a : 4
 	});
-	QUnit.equal((new test3()).$$test$$a, 4, "removed onPropAdd mutator is no longer called during creation");
+	QUnit.equal((new test3()).a, 4, "removed onPropAdd mutator is no longer called during creation");
 });
 
 QUnit.test("adding and removing global mutators to the on property remove hook", function() {
@@ -489,7 +489,7 @@ QUnit.test("defining properties with spanning multiple mutators", function() {
 	var test4 = create({
 		$$test_test2$$a : 4
 	});
-	QUnit.equal((new test4()).$$test_test2$$a, 4, "removed onPropAdd mutators are no longer called during creation");
+	QUnit.equal((new test4()).a, 4, "removed onPropAdd mutators are no longer called during creation");
 });
 
 QUnit.test("empty returns from onPropAdd mutator stops the property from being added", function() {

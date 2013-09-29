@@ -142,7 +142,7 @@ getMutators = function(klass) {
 },
 // adds a property to an existing class taking into account parent
 addProperty = function(klass, parent, name, property, mutators, isRecurse) {
-	var shouldBreak = false, parentPrototype, selfPrototype, mutatatorMatches, cleanedPropName;
+	var shouldBreak = false, parentPrototype, selfPrototype, mutatatorMatches;
 	// we don't want to re-add the core javascript properties, it's redundant
 	if (property === objectPrototype[name]) {
 		return;
@@ -162,17 +162,12 @@ addProperty = function(klass, parent, name, property, mutators, isRecurse) {
 		mutatatorMatches = mutatatorMatches[1].split(mutatorSeparator);
 	}
 	// replace name to provide for cascade
-	cleanedPropName = name.replace(mutatorNameTest, "");
+	name = name.replace(mutatorNameTest, "");
 	// check to see if the property needs to be mutated
 	each(mutators, function mutatorIterator(mutator) {
-		var isFoundMutator = false;
-		if (mutator.onPropAdd && (mutator.greedy || (isFoundMutator = (indexOf(mutatatorMatches, mutator.name) > -1)))) {
-			// @todo: this should happen beforehand...
-			if (isFoundMutator) {
-				name = cleanedPropName;
-			}
+		if (mutator.onPropAdd && (mutator.greedy || indexOf(mutatatorMatches, mutator.name) > -1)) {
 			// use the return value of the mutator as the property to add
-			property = mutator.onPropAdd.call(mutator, klass, parent, cleanedPropName, property);
+			property = mutator.onPropAdd.call(mutator, klass, parent, name, property);
 			// if mutator did not return anything, quit
 			if (property === undefined) {
 				shouldBreak = true;
