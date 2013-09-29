@@ -486,10 +486,10 @@ QUnit.test("defining properties with spanning multiple mutators", function() {
 
 	removeMutator("test2");
 	// after removal, hooks are no longer called
-	var test3 = create({
+	var test4 = create({
 		$$test_test2$$a : 4
 	});
-	QUnit.equal((new test3()).$$test_test2$$a, 4, "removed onPropAdd mutators are no longer called during creation");
+	QUnit.equal((new test4()).$$test_test2$$a, 4, "removed onPropAdd mutators are no longer called during creation");
 });
 
 QUnit.test("empty returns from onPropAdd mutator stops the property from being added", function() {
