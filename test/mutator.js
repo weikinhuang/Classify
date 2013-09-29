@@ -443,3 +443,77 @@ QUnit.test("adding multiple class level mutators", function() {
 	QUnit.equal((new test()).a, 1, "onInit mutator called during class initialization and modified instance value");
 	QUnit.equal((new test()).b, 1, "secondary onInit mutator called during class initialization and modified instance value");
 });
+
+QUnit.test("defining properties with spanning multiple mutators", function() {
+	QUnit.expect(12);
+
+	addMutator("test", {
+		onPropAdd : function(klass, parent, name, property) {
+			QUnit.ok(true, "test.onPropAdd in mutator is called when a property is added");
+			return property * 2;
+		}
+	});
+
+	addMutator("test2", {
+		onPropAdd : function(klass, parent, name, property) {
+			QUnit.ok(true, "test2.onPropAdd in mutator is called when a property is added");
+			return property * 3;
+		}
+	});
+
+	var test = create({
+		$$test_test2$$a : 1
+	});
+	QUnit.equal((new test()).a, 6, "onPropAdd mutators modified a value during property addition");
+
+	var test2 = create({
+		$$test_test2$$ : {
+			b : 2
+		}
+	});
+	QUnit.equal((new test2()).b, 12, "onPropAdd mutators modified a value during property addition when defined in object");
+
+	test2.addProperty("$$test_test2$$c", 3);
+	QUnit.equal((new test2()).c, 18, "onPropAdd mutators modified a value during property addition after class definition");
+
+	removeMutator("test");
+
+	// after removal, hooks are no longer called
+	var test3 = create({
+		$$test_test2$$a : 4
+	});
+	QUnit.equal((new test3()).a, 12, "removed onPropAdd mutator is no longer called during creation");
+
+	removeMutator("test2");
+	// after removal, hooks are no longer called
+	var test3 = create({
+		$$test_test2$$a : 4
+	});
+	QUnit.equal((new test3()).$$test_test2$$a, 4, "removed onPropAdd mutators are no longer called during creation");
+});
+
+QUnit.test("empty returns from onPropAdd mutator stops the property from being added", function() {
+	QUnit.expect(2);
+
+	addMutator("test", {
+		onPropAdd : function(klass, parent, name, property) {
+			QUnit.ok(true, "test.onPropAdd in mutator is called when a property is added");
+			return;
+		}
+	});
+
+	addMutator("test2", {
+		onPropAdd : function(klass, parent, name, property) {
+			QUnit.ok(false, "this should not be called");
+			return property * 3;
+		}
+	});
+
+	var test = create({
+		$$test_test2$$a : true
+	});
+	QUnit.ok(!(new test()).a, "onPropAdd did not add property");
+
+	removeMutator("test");
+	removeMutator("test2");
+});
