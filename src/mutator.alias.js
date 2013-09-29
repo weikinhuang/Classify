@@ -22,8 +22,8 @@ addMutator("alias", {
 	},
 	onPropAdd : function(klass, parent, name, property) {
 		// alias properties are simply function wrappers
-		addProperty(klass, parent, name, function() {
+		return function() {
 			return this[property].apply(this, arguments);
-		});
+		};
 	}
 });

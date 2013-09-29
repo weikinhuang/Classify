@@ -47,7 +47,7 @@ addMutator("bind", {
 			klass.bindings.push(name);
 		}
 		// add the property normally
-		addProperty(klass, parent, name, property);
+		return property;
 	},
 	onPropRemove : function(klass, name) {
 		// remove the bindings if it exists

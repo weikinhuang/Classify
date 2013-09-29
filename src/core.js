@@ -18,6 +18,9 @@ hasOwn = objectPrototype.hasOwnProperty,
 arrayPush = Array.prototype.push,
 // regex to test for scalar value
 scalarRegExp = /^(?:boolean|number|string|undefined)$/,
+//create a noop function
+noop = function() {
+},
 /**
  * Utility function to test if a value is scalar in nature
  * @param {Object} o The object to test
@@ -247,6 +250,17 @@ remove = function(arr, item) {
 		return true;
 	}
 	return false;
+},
+// Use native object.create whenever possible
+objectCreate = isNative(Object.create) ? Object.create : function(proto) {
+//#JSCOVERAGE_IF !Object.create
+	// This method allows for the constructor to not be called when making a new
+	// subclass
+	noop.prototype = proto;
+	var tmp = new noop();
+	noop.prototype = null;
+	return tmp;
+//#JSCOVERAGE_ENDIF
 };
 
 //export methods to the main object
