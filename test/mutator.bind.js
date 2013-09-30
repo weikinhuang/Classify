@@ -10,13 +10,13 @@ QUnit.test("bound properties", function() {
 	// testing class creation with bound properties
 	var test = create({
 		a : 1,
-		__bind_z : 1,
-		__bind_b : function() {
+		$$bind$$z : 1,
+		$$bind$$b : function() {
 			QUnit.ok(this instanceof test, "Bound function's reference to 'this' is of class");
 			// the internal "this" reference should always point to the class definition
 			return this;
 		},
-		__bind_c : function() {
+		$$bind$$c : function() {
 			// the internal "this" reference should always point to the class definition
 			return this.a;
 		}
@@ -29,12 +29,12 @@ QUnit.test("bound properties", function() {
 
 	// testing class creation with bound properties
 	var test2 = create(test, {
-		__bind_c : function() {
+		$$bind$$c : function() {
 			QUnit.ok(this instanceof test2, "Overriden bound function's reference to 'this' is of class");
 			// the internal "this" reference should always point to the class definition
 			return this.a;
 		},
-		__bind_e : function() {
+		$$bind$$e : function() {
 			// the internal "this" reference should always point to the class definition
 			return this;
 		}
@@ -54,14 +54,14 @@ QUnit.test("bound properties context passing", function() {
 	// testing class creation with bound properties
 	var test = create({
 		a : 1,
-		__bind_b : function(a) {
+		$$bind$$b : function(a) {
 			QUnit.strictEqual(this.$$context, temp, "Bound function has special property $$context for caller");
 			QUnit.equal(a, 1, "Bound function's passed in arguments are unchanged");
 		},
-		__bind_c : function() {
+		$$bind$$c : function() {
 			QUnit.ok(this.$$context instanceof test, "Direct call of bound function passes $$context of calling object");
 		},
-		__bind_d : function() {
+		$$bind$$d : function() {
 			QUnit.strictEqual(this.$$context, temp, "Bound function has special property $$context for caller");
 			this.c();
 			QUnit.strictEqual(this.$$context, temp, "Bound function has special property $$context for caller after another bound call");
@@ -79,7 +79,7 @@ QUnit.test("bound properties defined in container", function() {
 	// testing class creation with bound properties
 	var test = create({
 		a : 1,
-		__bind_ : {
+		$$bind$$ : {
 			b : function() {
 				QUnit.ok(this instanceof test, "Bound function's reference to 'this' is of class when defined in a container");
 				// the internal "this" reference should always point to the class definition
@@ -98,7 +98,7 @@ QUnit.test("bound properties defined in container", function() {
 
 	// testing class creation with bound properties
 	var test2 = create(test, {
-		__bind_ : {
+		$$bind$$ : {
 			c : function() {
 				QUnit.ok(this instanceof test2, "Overriden bound function's reference to 'this' is of class when defined in a container");
 				// the internal "this" reference should always point to the class definition
@@ -121,7 +121,7 @@ QUnit.test("bound properties that are instances of a class", function() {
 	// create a class
 	var prop = create({
 		g : 2,
-		__bind_f : function() {
+		$$bind$$f : function() {
 			return this;
 		}
 	});
@@ -129,8 +129,8 @@ QUnit.test("bound properties that are instances of a class", function() {
 
 	// testing class creation with bound properties
 	var test = create({
-		__bind_b : prop,
-		__bind_d : function() {
+		$$bind$$b : prop,
+		$$bind$$d : function() {
 			return this.constructor;
 		}
 	});
@@ -172,13 +172,13 @@ QUnit.test("adding new bound properties after class definition", function() {
 QUnit.test("removing existing bound properties", function() {
 //	QUnit.expect(3);
 	var test = create({
-		__bind_a : function() {
+		$$bind$$a : function() {
 			return this;
 		},
-		__bind_b : function() {
+		$$bind$$b : function() {
 			return this;
 		},
-		__bind_c : function() {
+		$$bind$$c : function() {
 			return this;
 		},
 		d : function() {
@@ -196,7 +196,7 @@ QUnit.test("removing existing bound properties", function() {
 
 	// removing a inherited bound property
 	var test2 = create(test, {
-		__bind_c : function() {
+		$$bind$$c : function() {
 			return this;
 		}
 	});
