@@ -8,4 +8,7 @@ env:
     - secure: "lUIMLWkKvmlZWlqXouXjsY1ldlX2ufOnWBrsj168ZSHdmxZ7GyfZ4q2zetNc\nGs7fqAiEye6Up4uuX74dY5Iztfes00zCQIlpfz68slEFu1DW71AmIlVlsqMv\niynhEKaYYikvr1rGKyH9WyeKV/+HCcTEOKbUeJ3LHZ/iTOptHiM="
 notifications:
   email: false
+before_script:
+  - npm install -g bower
+  - bower install
 script: grunt travis
