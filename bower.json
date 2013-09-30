@@ -1,0 +1,24 @@
+{
+  "name": "classify",
+  "version": "0.12.0",
+  "main": "./dist/classify.min.js",
+  "devDependencies": {
+    "qunit": "~1.12.0",
+    "benchmark" : "~1.0.0"
+  },
+  "ignore": [
+    "**/.*",
+    ".*",
+    "coverage",
+    "docs",
+    "node_modules",
+    "perf",
+    "src",
+    "srcwrap",
+    "test",
+    "vendor",
+    "Gruntfile.js",
+    "package.json",
+    "bower.json"
+  ]
+}

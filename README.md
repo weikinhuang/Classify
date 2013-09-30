@@ -289,15 +289,15 @@ Classify uses the [grunt](https://github.com/cowboy/grunt) build system. Buildin
 
 ```bash
 # Install grunt.
-$ npm install -g grunt-cli
+$ npm install -g grunt-cli bower
 
 # Clone the Classify git repo.
 $ git clone git://github.com/weikinhuang/Classify.git
 $ cd Classify
-$ git submodule update --init
 
 # Install node modules.
 $ npm install
+$ bower install
 
 # Run grunt.
 $ grunt
