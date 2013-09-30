@@ -444,19 +444,19 @@ QUnit.test("adding multiple class level mutators", function() {
 	QUnit.equal((new test()).b, 1, "secondary onInit mutator called during class initialization and modified instance value");
 });
 
-QUnit.test("defining properties with spanning multiple mutators", function() {
+QUnit.test("defining properties spanning multiple mutators", function() {
 	QUnit.expect(12);
 
 	addMutator("test", {
 		onPropAdd : function(klass, parent, name, property) {
-			QUnit.ok(true, "test.onPropAdd in mutator is called when a property is added");
+			QUnit.ok(true, "test.onPropAdd in first mutator is called when a property is added");
 			return property * 2;
 		}
 	});
 
 	addMutator("test2", {
 		onPropAdd : function(klass, parent, name, property) {
-			QUnit.ok(true, "test2.onPropAdd in mutator is called when a property is added");
+			QUnit.ok(true, "test2.onPropAdd in second mutator is called when a property is added");
 			return property * 3;
 		}
 	});
@@ -516,4 +516,72 @@ QUnit.test("empty returns from onPropAdd mutator stops the property from being a
 
 	removeMutator("test");
 	removeMutator("test2");
+});
+
+QUnit.test("empty returns from onPropRemove mutator stops the property from being removed", function() {
+	QUnit.expect(2);
+
+	addMutator("test", {
+		onPropRemove : function(klass, parent, name, property) {
+			QUnit.ok(true, "test.onPropRemove in mutator is called when a property is removed");
+			return;
+		}
+	});
+
+	addMutator("test2", {
+		onPropRemove : function(klass, parent, name, property) {
+			QUnit.ok(false, "this should not be called");
+			return property * 3;
+		}
+	});
+
+	var test = create({
+		$$test_test2$$a : true
+	});
+
+	test.removeProperty("$$test_test2$$a");
+
+	QUnit.ok((new test()).a, "onPropRemove did not remove property");
+
+	removeMutator("test");
+	removeMutator("test2");
+});
+
+QUnit.test("removing properties spanning multiple mutators", function() {
+	QUnit.expect(4);
+
+	addMutator("test", {
+		onPropRemove : function(klass, name) {
+			klass.m = klass.m ? klass.m++ : 1;
+			QUnit.ok(true, "onPropRemove in firstmutator is called when a property is removed");
+			// returning true continues the prop removal chain
+			return true;
+		}
+	});
+
+	addMutator("test2", {
+		onPropRemove : function(klass, name) {
+			klass.g = klass.g ? klass.g++ : 1;
+			QUnit.ok(true, "onPropRemove in second mutator is called when a property is removed");
+			// returning true continues the prop removal chain
+			return true;
+		}
+	});
+
+	var test = create({
+		a : 1
+	});
+
+	test.removeProperty("$$test_test2$$a");
+	QUnit.equal(test.m, 1, "onPropRemove mutator modified a value during property removal");
+
+	removeMutator("test");
+	removeMutator("test2");
+
+	// after removal, hooks are no longer called
+	var test3 = create({
+		a : 4
+	});
+	test.removeProperty("$$test$$a");
+	QUnit.ok(!test3.hasOwnProperty("m"), "removed onPropRemove mutator is no longer called during property removal");
 });
