@@ -50,6 +50,7 @@ module.exports = function(grunt) {
 				trailing : false,
 				undef : true,
 				unused : true,
+				newcap : false,
 				strict : true,
 				node : true,
 				browser : true,
@@ -121,7 +122,14 @@ module.exports = function(grunt) {
 
 	gruntConfig["qunit-node"] = {
 		all : {
-			code : [ "src/core.js", "src/create.js", "src/mutator.static.js", "src/mutator.nowrap.js", "src/mutator.alias.js", "src/mutator.bind.js", "src/namespace.js", "src/export.js" ],
+			code : [ "src/core.js",
+					"src/create.js",
+					"src/mutator.static.js",
+					"src/mutator.nowrap.js",
+					"src/mutator.alias.js",
+					"src/mutator.bind.js",
+					"src/namespace.js",
+					"src/export.js" ],
 			tests : [ "test/core.js",
 					"test/create.js",
 					"test/mutator.js",
@@ -149,7 +157,8 @@ module.exports = function(grunt) {
 				concurrency : 3,
 				browsers : [ {
 					browserName : "firefox",
-					platform : "Windows 7"
+					platform : "Windows 8",
+					version : "22"
 				}, {
 					browserName : "firefox",
 					platform : "Windows XP",
@@ -191,6 +200,10 @@ module.exports = function(grunt) {
 				}, {
 					platform : "OS X 10.8",
 					browserName : "safari",
+					version : "6"
+				}, {
+					platform : "OS X 10.8",
+					browserName : "iphone",
 					version : "6"
 				} ]
 			}

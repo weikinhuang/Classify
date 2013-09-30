@@ -4,28 +4,16 @@
 // regex for keyword properties
 var keywordRegexp = /^(?:\$\$\w+|bindings|extend|prototype|(?:add|remove)(?:Static|Aliased|Bound)Property)$/,
 // regex to test for a mutator name to avoid a loop
-mutatorNameTest = /^__/,
+mutatorNameTest = /^\$\$(\w+)\$\$/,
+// separator for multiple mutator usages
+mutatorSeparator = "_",
 // reference to existing mutators
 namedGlobalMutators = {},
 // list of all mutators in the order of definition
 globalMutators = [],
-// Use native object.create whenever possible
-objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto) {
-//#JSCOVERAGE_IF !Object.create
-	// This method allows for the constructor to not be called when making a new
-	// subclass
-	var SubClass = function() {
-	};
-	SubClass.prototype = proto;
-	return new SubClass();
-//#JSCOVERAGE_ENDIF
-},
 // Hook to use Object.defineProperty if needed
 objectDefineProperty = function(obj, prop, descriptor) {
 	obj[prop] = descriptor;
-},
-// create a noop function
-noop = function() {
 },
 // create the base object that everything extends from
 Base = (function() {
@@ -58,9 +46,34 @@ Mutator = function(name, props) {
 		return new Mutator(name, props);
 	}
 	extend(this, props);
+	/**
+	 * The name of the mutator
+	 *
+	 * @private
+	 * @for Classify.Mutator
+	 * @property name
+	 * @type {String}
+	 */
 	this.name = name;
-	this.propTest = new RegExp("^__" + name + "_");
-	this.propPrefix = "__" + name + "_";
+	/**
+	 * Flag determining if all property modifications should be run through
+	 * this mutator
+	 *
+	 * @private
+	 * @for Classify.Mutator
+	 * @property greedy
+	 * @type {Boolean}
+	 */
+	this.greedy = props.greedy === true;
+	/**
+	 * The property matcher prefix of this mutator
+	 *
+	 * @private
+	 * @for Classify.Mutator
+	 * @property propPrefix
+	 * @type {RegExp}
+	 */
+	this.propPrefix = "$$" + name + "$$";
 },
 // wraps a function so that the "this.$$parent" is bound to the function
 wrapParentProperty = function(parentPrototype, property) {
@@ -90,18 +103,20 @@ wrapParentProperty = function(parentPrototype, property) {
  *
  * @param {String} name The name of the mutator reference to add
  * @param {Object} mutator The mutator definition with optional hooks
- * @param {Function} [mutator._onPredefine] Internal hook to be called as soon as
- *            the constructor is defined
+ * @param {Function} [mutator._onPredefine] Internal hook to be called as soon
+ *            as the constructor is defined
  * @param {Function} [mutator.onCreate] The hook to be called when a class is
  *            defined before any properties are added
  * @param {Function} [mutator.onDefine] The hook to be called when a class is
  *            defined after all properties are added
  * @param {Function} [mutator.onPropAdd] The hook to be called when a property
- *            with the __name_ prefix is added
+ *            with the $$name$$ prefix is added
  * @param {Function} [mutator.onPropRemove] The hook to be called when a
- *            property with the __name_ prefix is removed
+ *            property with the $$name$$ prefix is removed
  * @param {Function} [mutator.onInit] The hook to be called during each object's
  *            initialization
+ * @param {Function} [mutator.greedy] Attribute to declare that all properties
+ *            being added and removed goes through this mutator
  * @throws Error
  * @static
  * @for Classify
@@ -153,32 +168,42 @@ getMutators = function(klass) {
 	return mutators;
 },
 // adds a property to an existing class taking into account parent
-addProperty = function(klass, parent, name, property, mutators) {
-	var foundMutator, parentPrototype, selfPrototype;
+addProperty = function(klass, parent, name, property, mutators, isRecurse) {
+	var shouldBreak = false, parentPrototype, selfPrototype, mutatatorMatches;
 	// we don't want to re-add the core javascript properties, it's redundant
 	if (property === objectPrototype[name]) {
 		return;
 	}
 
-	// check to see if the property needs to be mutated
-	if (mutatorNameTest.test(name)) {
-		foundMutator = false;
-		each(mutators, function mutatorIterator(mutator) {
-			if (mutator.onPropAdd && mutator.propTest.test(name)) {
-				if (name === mutator.propPrefix) {
-					each(property, function addPropertyMutatorIterator(prop, key) {
-						mutator.onPropAdd.call(mutator, klass, parent, key, prop);
-					});
-				} else {
-					mutator.onPropAdd.call(mutator, klass, parent, name.replace(mutator.propTest, ""), property);
-				}
-				foundMutator = true;
-				return false;
-			}
-		});
-		if (foundMutator) {
+	// extract possible explicit mutators
+	mutatatorMatches = mutatorNameTest.exec(name) || [];
+	if (mutatatorMatches[1]) {
+		// if we passed in `$$mutator$$ : { prop : 1, prop : 2 }`
+		if (mutatatorMatches[1] && mutatatorMatches[0] === name && !isRecurse) {
+			each(property, function nestedAddPropertyMutatorIterator(prop, key) {
+				addProperty(klass, parent, mutatatorMatches[0] + key, prop, mutators, true);
+			});
 			return;
 		}
+		// convert explicit mutators to an array
+		mutatatorMatches = mutatatorMatches[1].split(mutatorSeparator);
+	}
+	// replace name to provide for cascade
+	name = name.replace(mutatorNameTest, "");
+	// check to see if the property needs to be mutated
+	each(mutators, function addPropertyMutatorIterator(mutator) {
+		if (mutator.onPropAdd && (mutator.greedy || indexOf(mutatatorMatches, mutator.name) > -1)) {
+			// use the return value of the mutator as the property to add
+			property = mutator.onPropAdd.call(mutator, klass, parent, name, property, mutatatorMatches);
+			// if mutator did not return anything, quit
+			if (property === undefined) {
+				shouldBreak = true;
+				return false;
+			}
+		}
+	});
+	if (shouldBreak) {
+		return;
 	}
 
 	// quick references
@@ -200,38 +225,40 @@ addProperty = function(klass, parent, name, property, mutators) {
 },
 // removes a property from the chain
 removeProperty = function(klass, name, mutators) {
-	var foundMutator = false;
-	if (mutatorNameTest.test(name)) {
-		each(mutators, function removePropertyMutatorIterator(mutator) {
-			if (mutator.onPropRemove && mutator.propTest.test(name)) {
-				mutator.onPropRemove.call(mutator, klass, name.replace(mutator.propTest, ""));
-				foundMutator = true;
+	var shouldBreak = false, mutatatorMatches;
+
+	// extract possible explicit mutators
+	mutatatorMatches = mutatorNameTest.exec(name) || [];
+	if (mutatatorMatches[1]) {
+		// convert explicit mutators to an array
+		mutatatorMatches = mutatatorMatches[1].split(mutatorSeparator);
+	}
+	// replace name to provide for cascade
+	name = name.replace(mutatorNameTest, "");
+	// check to see if the property needs to be mutated
+	each(mutators, function mutatorIterator(mutator) {
+		if (mutator.onPropRemove && (mutator.greedy || indexOf(mutatatorMatches, mutator.name) > -1)) {
+			// if mutator did not return anything, quit
+			if (mutator.onPropRemove.call(mutator, klass, name) === undefined) {
+				shouldBreak = true;
 				return false;
 			}
-		});
-		if (foundMutator) {
-			return;
-		}
-	}
-
-	// if we are not removing a function from the prototype chain, then just
-	// delete it
-	if (!isFunction(klass.prototype[name])) {
-		klass.prototype[name] = null;
-		try {
-			delete klass.prototype[name];
-		} catch (e) {
-		}
-		return;
-	}
-	// we need to delete the property from all children as well as
-	// the current class
-	each(klass.$$subclass, function removeSubclassPropertyIterator(k) {
-		// remove the parent function wrapper for child classes
-		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].$$original)) {
-			objectDefineProperty(k.prototype, name, k.prototype[name].$$original);
 		}
 	});
+	if (shouldBreak) {
+		return;
+	}
+
+	// we need to delete the property from all children as well as
+	// the current class when the prop is a function
+	if (isFunction(klass.prototype[name])) {
+		each(klass.$$subclass, function removeSubclassPropertyIterator(k) {
+			// remove the parent function wrapper for child classes
+			if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].$$original)) {
+				objectDefineProperty(k.prototype, name, k.prototype[name].$$original);
+			}
+		});
+	}
 	klass.prototype[name] = null;
 	try {
 		delete klass.prototype[name];
@@ -477,7 +504,8 @@ var create = function() {
 	}
 	// Create a magic method that can invoke any of the parent methods
 	/**
-	 * Magic method that can invoke any of the parent methods with a array of arguments
+	 * Magic method that can invoke any of the parent methods with a array of
+	 * arguments
 	 *
 	 * @param {Object} name The name of the parent method to invoke
 	 * @param {Array} args The arguments to pass through to invoke
@@ -500,7 +528,8 @@ var create = function() {
 		throw new Error("Function \"" + name + "\" of parent class being invoked is undefined.");
 	};
 	/**
-	 * Magic method that can invoke any of the parent methods with any set of arguments
+	 * Magic method that can invoke any of the parent methods with any set of
+	 * arguments
 	 *
 	 * @param {Object} name The name of the parent method to invoke
 	 * @param {Object} arg... Actual arguments to call the method with
@@ -578,10 +607,9 @@ var create = function() {
 
 	// call each of the onCreate mutators to modify this class
 	each(getMutators(klass), function createMutatorIterator(mutator) {
-		if (!mutator.onCreate) {
-			return;
+		if (mutator.onCreate) {
+			mutator.onCreate.call(mutator, klass, parent);
 		}
-		mutator.onCreate.call(mutator, klass, parent);
 	});
 
 	// Now extend each of those methods and allow for a parent accessor
@@ -607,10 +635,9 @@ var create = function() {
 
 	// call each of the onDefine mutators to modify this class
 	each(getMutators(klass), function defineMutatorIterator(mutator) {
-		if (!mutator.onDefine) {
-			return;
+		if (mutator.onDefine) {
+			mutator.onDefine.call(mutator, klass);
 		}
-		mutator.onDefine.call(mutator, klass);
 	});
 
 	return klass;

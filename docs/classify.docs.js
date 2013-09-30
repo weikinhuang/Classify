@@ -576,9 +576,9 @@ Classify.global = new Classify.Namespace();
  * @param {Function}
  *            [mutator.onCreate] The hook to be called when a class is defined
  * @param {Function}
- *            [mutator.onPropAdd] The hook to be called when a property with the __name_ prefix is added
+ *            [mutator.onPropAdd] The hook to be called when a property with the $$name$$ prefix is added
  * @param {Function}
- *            [mutator.onPropRemove] The hook to be called when a property with the __name_ prefix is removed
+ *            [mutator.onPropRemove] The hook to be called when a property with the $$name$$ prefix is removed
  * @param {Function}
  *            [mutator.onInit] The hook to be called during each object's initialization
  * @throws Error

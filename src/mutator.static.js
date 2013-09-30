@@ -3,7 +3,7 @@
  */
 // mutator for adding static properties to a class
 addMutator("static", {
-	// the special identifier is "__static_"
+	// the special identifier is "$$static$$"
 	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
 		/**

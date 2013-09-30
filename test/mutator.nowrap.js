@@ -5,8 +5,8 @@ QUnit.test("non wrapped properties", function() {
 	QUnit.expect(3);
 	// testing class creation with static properties
 	var test = create({
-		__nowrap_a : 2,
-		__nowrap_b : Array.prototype.push,
+		$$nowrap$$a : 2,
+		$$nowrap$$b : Array.prototype.push,
 		length : 0
 	});
 
@@ -22,7 +22,7 @@ QUnit.test("non wrapped properties defined in container", function() {
 	QUnit.expect(3);
 	// testing class creation with static properties
 	var test = create({
-		__nowrap_ : {
+		$$nowrap$$ : {
 			a : 2,
 			b : Array.prototype.push
 		},
