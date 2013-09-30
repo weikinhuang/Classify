@@ -518,6 +518,29 @@ QUnit.test("empty returns from onPropAdd mutator stops the property from being a
 	removeMutator("test2");
 });
 
+QUnit.test("greedy property forces a mutator to be run on onPropAdd", function() {
+	QUnit.expect(2);
+
+	addMutator("test", {
+		greedy : true,
+		onPropAdd : function(klass, parent, name, property) {
+			// don't bother with special properties
+			if (/^\$\$/.test(name)) {
+				return property;
+			}
+			QUnit.ok(true, "test.onPropAdd in greedy mutator is called when a property is added");
+			return;
+		}
+	});
+
+	var test = create({
+		a : true
+	});
+	QUnit.ok(!(new test()).a, "onPropAdd did not add property");
+
+	removeMutator("test");
+});
+
 QUnit.test("empty returns from onPropRemove mutator stops the property from being removed", function() {
 	QUnit.expect(2);
 
@@ -553,7 +576,7 @@ QUnit.test("removing properties spanning multiple mutators", function() {
 	addMutator("test", {
 		onPropRemove : function(klass, name) {
 			klass.m = klass.m ? klass.m++ : 1;
-			QUnit.ok(true, "onPropRemove in firstmutator is called when a property is removed");
+			QUnit.ok(true, "onPropRemove in first mutator is called when a property is removed");
 			// returning true continues the prop removal chain
 			return true;
 		}
@@ -584,4 +607,25 @@ QUnit.test("removing properties spanning multiple mutators", function() {
 	});
 	test.removeProperty("$$test$$a");
 	QUnit.ok(!test3.hasOwnProperty("m"), "removed onPropRemove mutator is no longer called during property removal");
+});
+
+QUnit.test("greedy property forces a mutator to be run on onPropRemove", function() {
+	QUnit.expect(3);
+
+	addMutator("test", {
+		greedy : true,
+		onPropRemove : function(klass, parent, name, property) {
+			klass.m = klass.m ? klass.m++ : 1;
+			QUnit.ok(true, "onPropRemove in greedy mutator is called when a property is removed");
+		}
+	});
+
+	var test = create({
+		a : true
+	});
+	test.removeProperty("a");
+	QUnit.equal(test.m, 1, "onPropRemove mutator modified a value during property removal");
+	QUnit.ok((new test()).a, "onPropRemove did not remove property");
+
+	removeMutator("test");
 });

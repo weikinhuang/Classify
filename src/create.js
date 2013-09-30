@@ -46,8 +46,33 @@ Mutator = function(name, props) {
 		return new Mutator(name, props);
 	}
 	extend(this, props);
+	/**
+	 * The name of the mutator
+	 *
+	 * @private
+	 * @for Classify.Mutator
+	 * @property name
+	 * @type {String}
+	 */
 	this.name = name;
+	/**
+	 * Flag determining if all property modifications should be run through
+	 * this mutator
+	 *
+	 * @private
+	 * @for Classify.Mutator
+	 * @property greedy
+	 * @type {Boolean}
+	 */
 	this.greedy = props.greedy === true;
+	/**
+	 * The property matcher prefix of this mutator
+	 *
+	 * @private
+	 * @for Classify.Mutator
+	 * @property propPrefix
+	 * @type {RegExp}
+	 */
 	this.propPrefix = "$$" + name + "$$";
 },
 // wraps a function so that the "this.$$parent" is bound to the function
@@ -90,6 +115,8 @@ wrapParentProperty = function(parentPrototype, property) {
  *            property with the $$name$$ prefix is removed
  * @param {Function} [mutator.onInit] The hook to be called during each object's
  *            initialization
+ * @param {Function} [mutator.greedy] Attribute to declare that all properties
+ *            being added and removed goes through this mutator
  * @throws Error
  * @static
  * @for Classify

@@ -5,7 +5,7 @@
 addMutator("bind", {
 	// the special identifier is "$$bind$$"
 	onCreate : function(klass, parent) {
-		var mutator = this;
+		var mutatorPrefix = this.propPrefix;
 		// re-assign the bindings so that it produces copies across child classes
 		/**
 		 * Array containing the list of all the bound properties that is wrapped during object initialization
@@ -25,7 +25,7 @@ addMutator("bind", {
 		 * @return {Class}
 		 */
 		klass.addBoundProperty = function(name, property) {
-			return klass.addProperty(name, property, mutator.propPrefix);
+			return klass.addProperty(name, property, mutatorPrefix);
 		};
 		/**
 		 * Removes a context bound property from the object's base
@@ -36,7 +36,7 @@ addMutator("bind", {
 		 * @return {Class}
 		 */
 		klass.removeBoundProperty = function(name) {
-			return klass.removeProperty(mutator.propPrefix + name);
+			return klass.removeProperty(mutatorPrefix + name);
 		};
 	},
 	onPropAdd : function(klass, parent, name, property) {
