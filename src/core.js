@@ -92,7 +92,7 @@ isNative = function(o) {
  * @return {Array}
  */
 keys = isEnumerationBuggy ? function(o) {
-//#JSCOVERAGE_IF !isEnumerationBuggy
+//#JSCOVERAGE_IF isEnumerationBuggy
 	var k = [], i;
 	for (i in o) {
 		k[k.length] = i;
@@ -120,7 +120,6 @@ keys = isEnumerationBuggy ? function(o) {
 toArray = function(o) {
 	return isArray(o) ? o : [ o ];
 },
-//
 /**
  * Convert the `arguments` object into a Array instance
  * @param {Arguments} o The arguments object
@@ -132,7 +131,6 @@ toArray = function(o) {
 argsToArray = function(o) {
 	return Array.prototype.slice.call(o, 0);
 },
-// test if an item is in a array
 /**
  * Utility function to search for a item's index in an array
  * polyfill for Array.prototype.indexOf
@@ -172,7 +170,6 @@ store = function(fn, base) {
  * @method each
  * @return {Object}
  */
-// simple iteration function
 each = function(o, iterator, context) {
 	// we must account for null, otherwise it will throw the error "Unable to
 	// get value of the property "length": object is null or undefined"
