@@ -153,7 +153,7 @@ addProperty = function(klass, parent, name, property, mutators, isRecurse) {
 	if (mutatatorMatches[1]) {
 		// if we passed in `$$mutator$$ : { prop : 1, prop : 2 }`
 		if (mutatatorMatches[1] && mutatatorMatches[0] === name && !isRecurse) {
-			each(property, function addPropertyMutatorIterator(prop, key) {
+			each(property, function nestedAddPropertyMutatorIterator(prop, key) {
 				addProperty(klass, parent, mutatatorMatches[0] + key, prop, mutators, true);
 			});
 			return;
@@ -164,7 +164,7 @@ addProperty = function(klass, parent, name, property, mutators, isRecurse) {
 	// replace name to provide for cascade
 	name = name.replace(mutatorNameTest, "");
 	// check to see if the property needs to be mutated
-	each(mutators, function mutatorIterator(mutator) {
+	each(mutators, function addPropertyMutatorIterator(mutator) {
 		if (mutator.onPropAdd && (mutator.greedy || indexOf(mutatatorMatches, mutator.name) > -1)) {
 			// use the return value of the mutator as the property to add
 			property = mutator.onPropAdd.call(mutator, klass, parent, name, property);
@@ -198,38 +198,40 @@ addProperty = function(klass, parent, name, property, mutators, isRecurse) {
 },
 // removes a property from the chain
 removeProperty = function(klass, name, mutators) {
-	var foundMutator = false;
-	if (mutatorNameTest.test(name)) {
-		each(mutators, function removePropertyMutatorIterator(mutator) {
-			if (mutator.onPropRemove && name.indexOf(mutator.propPrefix) === 0) {
-				mutator.onPropRemove.call(mutator, klass, name.replace(mutatorNameTest, ""));
-				foundMutator = true;
+	var shouldBreak = false, mutatatorMatches;
+
+	// extract possible explicit mutators
+	mutatatorMatches = mutatorNameTest.exec(name) || [];
+	if (mutatatorMatches[1]) {
+		// convert explicit mutators to an array
+		mutatatorMatches = mutatatorMatches[1].split(mutatorSeparator);
+	}
+	// replace name to provide for cascade
+	name = name.replace(mutatorNameTest, "");
+	// check to see if the property needs to be mutated
+	each(mutators, function mutatorIterator(mutator) {
+		if (mutator.onPropRemove && (mutator.greedy || indexOf(mutatatorMatches, mutator.name) > -1)) {
+			// if mutator did not return anything, quit
+			if (mutator.onPropRemove.call(mutator, klass, name) === undefined) {
+				shouldBreak = true;
 				return false;
 			}
-		});
-		if (foundMutator) {
-			return;
-		}
-	}
-
-	// if we are not removing a function from the prototype chain, then just
-	// delete it
-	if (!isFunction(klass.prototype[name])) {
-		klass.prototype[name] = null;
-		try {
-			delete klass.prototype[name];
-		} catch (e) {
-		}
-		return;
-	}
-	// we need to delete the property from all children as well as
-	// the current class
-	each(klass.$$subclass, function removeSubclassPropertyIterator(k) {
-		// remove the parent function wrapper for child classes
-		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].$$original)) {
-			objectDefineProperty(k.prototype, name, k.prototype[name].$$original);
 		}
 	});
+	if (shouldBreak) {
+		return;
+	}
+
+	// we need to delete the property from all children as well as
+	// the current class when the prop is a function
+	if (isFunction(klass.prototype[name])) {
+		each(klass.$$subclass, function removeSubclassPropertyIterator(k) {
+			// remove the parent function wrapper for child classes
+			if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].$$original)) {
+				objectDefineProperty(k.prototype, name, k.prototype[name].$$original);
+			}
+		});
+	}
 	klass.prototype[name] = null;
 	try {
 		delete klass.prototype[name];
@@ -578,10 +580,9 @@ var create = function() {
 
 	// call each of the onCreate mutators to modify this class
 	each(getMutators(klass), function createMutatorIterator(mutator) {
-		if (!mutator.onCreate) {
-			return;
+		if (mutator.onCreate) {
+			mutator.onCreate.call(mutator, klass, parent);
 		}
-		mutator.onCreate.call(mutator, klass, parent);
 	});
 
 	// Now extend each of those methods and allow for a parent accessor
@@ -607,10 +608,9 @@ var create = function() {
 
 	// call each of the onDefine mutators to modify this class
 	each(getMutators(klass), function defineMutatorIterator(mutator) {
-		if (!mutator.onDefine) {
-			return;
+		if (mutator.onDefine) {
+			mutator.onDefine.call(mutator, klass);
 		}
-		mutator.onDefine.call(mutator, klass);
 	});
 
 	return klass;
