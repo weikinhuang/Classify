@@ -194,7 +194,7 @@ addProperty = function(klass, parent, name, property, mutators, isRecurse) {
 	each(mutators, function addPropertyMutatorIterator(mutator) {
 		if (mutator.onPropAdd && (mutator.greedy || indexOf(mutatatorMatches, mutator.name) > -1)) {
 			// use the return value of the mutator as the property to add
-			property = mutator.onPropAdd.call(mutator, klass, parent, name, property);
+			property = mutator.onPropAdd.call(mutator, klass, parent, name, property, mutatatorMatches);
 			// if mutator did not return anything, quit
 			if (property === undefined) {
 				shouldBreak = true;
