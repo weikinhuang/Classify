@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.12.0
+ * Classify JavaScript Library v0.13.0
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2013, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Mon Sep 23 2013 19:44:41
+ * Date: Mon Sep 30 2013 17:16:23
  */
 (function(root, undefined) {
 	"use strict";
@@ -30,37 +30,85 @@ hasOwn = objectPrototype.hasOwnProperty,
 arrayPush = Array.prototype.push,
 // regex to test for scalar value
 scalarRegExp = /^(?:boolean|number|string|undefined)$/,
-// test if a value is scalar in nature
+//create a noop function
+noop = function() {
+},
+/**
+ * Utility function to test if a value is scalar in nature
+ * @param {Object} o The object to test
+ * @static
+ * @for Classify
+ * @method isScalar
+ * @return {Boolean}
+ */
 isScalar = function(o) {
 	return o === null || scalarRegExp.test(typeof o);
 },
-// test if object is a function
+/**
+ * Utility function to test if object is a function
+ * @param {Object} o The object to test
+ * @static
+ * @for Classify
+ * @method isFunction
+ * @return {Boolean}
+ */
 isFunction = function(o) {
 	return toString.call(o) === "[object Function]";
 },
-// test if object is extendable
+/**
+ * Utility function to test if object is extendable
+ * @param {Object} o The object to test
+ * @static
+ * @for Classify
+ * @method isExtendable
+ * @return {Boolean}
+ */
 isExtendable = function(o) {
 	return o && o.prototype && isFunction(o);
 },
-// quick test for isArray
+/**
+ * Utility function to test if object is an Array instance
+ * polyfill for Array.isArray
+ * @param {Object} o The object to test
+ * @static
+ * @for Classify
+ * @method isArray
+ * @return {Boolean}
+ */
 isArray = Array.isArray || function(o) {
 //#JSCOVERAGE_IF !Array.isArray
 	return toString.call(o) === "[object Array]";
 //#JSCOVERAGE_ENDIF
 },
 // regex for native function testing
-nativeFunctionRegExp = /^\s*function\s+.+?\(.*?\)\s*\{\s*\[native code\]\s*\}\s*$/,
-// ability to check if a function is native
-isNativeFunction = function(o) {
+nativeFunctionRegExp = new RegExp("^" + String(toString).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/toString|for [^\]]+/g, ".+?") + "$"),
+/**
+ * Utility function to test if a function is native
+ * @param {Object} o The object to test
+ * @static
+ * @for Classify
+ * @method isNative
+ * @return {Boolean}
+ */
+isNative = function(o) {
 	return isFunction(o) && nativeFunctionRegExp.test(o.toString());
 },
-// quickly be able to get all the keys of an object
-keys = function(o) {
+/**
+ * Utility function to extract all enumerable keys
+ * quickly be able to get all the keys of an object, we don't use
+ * Object.keys because we also want to extract from the parent prototypes
+ * @param {Object} o The object to iterate over
+ * @static
+ * @for Classify
+ * @method keys
+ * @return {Array}
+ */
+keys = isEnumerationBuggy ? function(o) {
+//#JSCOVERAGE_IF isEnumerationBuggy
 	var k = [], i;
 	for (i in o) {
 		k[k.length] = i;
 	}
-//#JSCOVERAGE_IF
 	if (isEnumerationBuggy) {
 		// only add buggy enumerated values if it's not the Object.prototype's
 		for (i = 0; i < enumerationLength; ++i) {
@@ -70,16 +118,41 @@ keys = function(o) {
 		}
 	}
 	return k;
+//#JSCOVERAGE_ENDIF
+} : function(o) {
+//#JSCOVERAGE_IF !isEnumerationBuggy
+	var k = [], i;
+	for (i in o) {
+		k[k.length] = i;
+	}
+	return k;
+//#JSCOVERAGE_ENDIF
 },
 // force an object to be an array
 toArray = function(o) {
 	return isArray(o) ? o : [ o ];
 },
-// create ability to convert the arguments object to an array
+/**
+ * Convert the `arguments` object into a Array instance
+ * @param {Arguments} o The arguments object
+ * @static
+ * @for Classify
+ * @method argsToArray
+ * @return {Array}
+ */
 argsToArray = function(o) {
 	return Array.prototype.slice.call(o, 0);
 },
-// test if an item is in a array
+/**
+ * Utility function to search for a item's index in an array
+ * polyfill for Array.prototype.indexOf
+ * @param {Array} array The array to search
+ * @param {Object} item The searched item
+ * @static
+ * @for Classify
+ * @method indexOf
+ * @return {Number} Returns -1 if not found
+ */
 indexOf = Array.prototype.indexOf ? function(array, item) {
 //#JSCOVERAGE_IF Array.prototype.indexOf
 	return array.indexOf(item);
@@ -100,9 +173,18 @@ store = function(fn, base) {
 	fn.$$original = base;
 	return fn;
 },
-// simple iteration function
+/**
+ * Utility function to provide object/array iteration
+ * @param {Object} o The object to iterate
+ * @param {Function} iterator Iteration function returns false to exit
+ * @static
+ * @for Classify
+ * @method each
+ * @return {Object}
+ */
 each = function(o, iterator, context) {
-	// we must account for null, otherwise it will throw the error "Unable to get value of the property 'length': object is null or undefined"
+	// we must account for null, otherwise it will throw the error "Unable to
+	// get value of the property "length": object is null or undefined"
 	if (!o) {
 		return o;
 	}
@@ -126,7 +208,15 @@ each = function(o, iterator, context) {
 	}
 	return o;
 },
-// simple mapping function
+/**
+ * Utility function to provide object mapping to an array
+ * @param {Object} o The object to iterate
+ * @param {Function} iterator Iteration function returns mapped value
+ * @static
+ * @for Classify
+ * @method map
+ * @return {Array}
+ */
 map = function(o, iterator) {
 	var temp = [];
 	each(o, function mapIterator(v, i) {
@@ -134,7 +224,16 @@ map = function(o, iterator) {
 	});
 	return temp;
 },
-// simple extension function that takes into account the enumerated keys
+/**
+ * Utility function to provide functionality to quickly add properties to objects
+ * simple extension function that takes into account the enumerated keys
+ * @param {Object} base The base object to copy properties into
+ * @param {Object[]} o Set of objects to copy properties from
+ * @static
+ * @for Classify
+ * @method extend
+ * @return {Object}
+ */
 extend = function() {
 	var args = argsToArray(arguments), base = args.shift();
 	each(args, function extendArgIterator(extens) {
@@ -144,7 +243,15 @@ extend = function() {
 	});
 	return base;
 },
-// removes the first instance of item from an array
+/**
+ * Utility function to removes the first instance of item from an array
+ * @param {Array} arr The array to search
+ * @param {Object} item The item to remove
+ * @static
+ * @for Classify
+ * @method remove
+ * @return {Boolean} TRUE if item removed
+ */
 remove = function(arr, item) {
 	var idx = indexOf(arr, item);
 	if (idx > -1) {
@@ -152,7 +259,35 @@ remove = function(arr, item) {
 		return true;
 	}
 	return false;
+},
+// Use native object.create whenever possible
+objectCreate = isNative(Object.create) ? Object.create : function(proto) {
+//#JSCOVERAGE_IF !Object.create
+	// This method allows for the constructor to not be called when making a new
+	// subclass
+	noop.prototype = proto;
+	var tmp = new noop();
+	noop.prototype = null;
+	return tmp;
+//#JSCOVERAGE_ENDIF
 };
+
+//export methods to the main object
+extend(exportNames, {
+	// direct access functions
+	isScalar : isScalar,
+	isFunction : isFunction,
+	isExtendable : isExtendable,
+	isArray : isArray,
+	isNative : isNative,
+	keys : keys,
+	argsToArray : argsToArray,
+	indexOf : indexOf,
+	each : each,
+	map : map,
+	remove : remove,
+	extend : extend
+});
 
 /**
  * @module create
@@ -160,28 +295,16 @@ remove = function(arr, item) {
 // regex for keyword properties
 var keywordRegexp = /^(?:\$\$\w+|bindings|extend|prototype|(?:add|remove)(?:Static|Aliased|Bound)Property)$/,
 // regex to test for a mutator name to avoid a loop
-mutatorNameTest = /^__/,
+mutatorNameTest = /^\$\$(\w+)\$\$/,
+// separator for multiple mutator usages
+mutatorSeparator = "_",
 // reference to existing mutators
 namedGlobalMutators = {},
 // list of all mutators in the order of definition
 globalMutators = [],
-// Use native object.create whenever possible
-objectCreate = isNativeFunction(Object.create) ? Object.create : function(proto) {
-//#JSCOVERAGE_IF !Object.create
-	// This method allows for the constructor to not be called when making a new
-	// subclass
-	var SubClass = function() {
-	};
-	SubClass.prototype = proto;
-	return new SubClass();
-//#JSCOVERAGE_ENDIF
-},
 // Hook to use Object.defineProperty if needed
 objectDefineProperty = function(obj, prop, descriptor) {
 	obj[prop] = descriptor;
-},
-// create a noop function
-noop = function() {
 },
 // create the base object that everything extends from
 Base = (function() {
@@ -214,9 +337,34 @@ Mutator = function(name, props) {
 		return new Mutator(name, props);
 	}
 	extend(this, props);
+	/**
+	 * The name of the mutator
+	 *
+	 * @private
+	 * @for Classify.Mutator
+	 * @property name
+	 * @type {String}
+	 */
 	this.name = name;
-	this.propTest = new RegExp("^__" + name + "_");
-	this.propPrefix = "__" + name + "_";
+	/**
+	 * Flag determining if all property modifications should be run through
+	 * this mutator
+	 *
+	 * @private
+	 * @for Classify.Mutator
+	 * @property greedy
+	 * @type {Boolean}
+	 */
+	this.greedy = props.greedy === true;
+	/**
+	 * The property matcher prefix of this mutator
+	 *
+	 * @private
+	 * @for Classify.Mutator
+	 * @property propPrefix
+	 * @type {RegExp}
+	 */
+	this.propPrefix = "$$" + name + "$$";
 },
 // wraps a function so that the "this.$$parent" is bound to the function
 wrapParentProperty = function(parentPrototype, property) {
@@ -246,18 +394,20 @@ wrapParentProperty = function(parentPrototype, property) {
  *
  * @param {String} name The name of the mutator reference to add
  * @param {Object} mutator The mutator definition with optional hooks
- * @param {Function} [mutator._onPredefine] Internal hook to be called as soon as
- *            the constructor is defined
+ * @param {Function} [mutator._onPredefine] Internal hook to be called as soon
+ *            as the constructor is defined
  * @param {Function} [mutator.onCreate] The hook to be called when a class is
  *            defined before any properties are added
  * @param {Function} [mutator.onDefine] The hook to be called when a class is
  *            defined after all properties are added
  * @param {Function} [mutator.onPropAdd] The hook to be called when a property
- *            with the __name_ prefix is added
+ *            with the $$name$$ prefix is added
  * @param {Function} [mutator.onPropRemove] The hook to be called when a
- *            property with the __name_ prefix is removed
+ *            property with the $$name$$ prefix is removed
  * @param {Function} [mutator.onInit] The hook to be called during each object's
  *            initialization
+ * @param {Function} [mutator.greedy] Attribute to declare that all properties
+ *            being added and removed goes through this mutator
  * @throws Error
  * @static
  * @for Classify
@@ -309,32 +459,42 @@ getMutators = function(klass) {
 	return mutators;
 },
 // adds a property to an existing class taking into account parent
-addProperty = function(klass, parent, name, property, mutators) {
-	var foundMutator, parentPrototype, selfPrototype;
+addProperty = function(klass, parent, name, property, mutators, isRecurse) {
+	var shouldBreak = false, parentPrototype, selfPrototype, mutatatorMatches;
 	// we don't want to re-add the core javascript properties, it's redundant
 	if (property === objectPrototype[name]) {
 		return;
 	}
 
-	// check to see if the property needs to be mutated
-	if (mutatorNameTest.test(name)) {
-		foundMutator = false;
-		each(mutators, function mutatorIterator(mutator) {
-			if (mutator.onPropAdd && mutator.propTest.test(name)) {
-				if (name === mutator.propPrefix) {
-					each(property, function addPropertyMutatorIterator(prop, key) {
-						mutator.onPropAdd.call(mutator, klass, parent, key, prop);
-					});
-				} else {
-					mutator.onPropAdd.call(mutator, klass, parent, name.replace(mutator.propTest, ""), property);
-				}
-				foundMutator = true;
-				return false;
-			}
-		});
-		if (foundMutator) {
+	// extract possible explicit mutators
+	mutatatorMatches = mutatorNameTest.exec(name) || [];
+	if (mutatatorMatches[1]) {
+		// if we passed in `$$mutator$$ : { prop : 1, prop : 2 }`
+		if (mutatatorMatches[1] && mutatatorMatches[0] === name && !isRecurse) {
+			each(property, function nestedAddPropertyMutatorIterator(prop, key) {
+				addProperty(klass, parent, mutatatorMatches[0] + key, prop, mutators, true);
+			});
 			return;
 		}
+		// convert explicit mutators to an array
+		mutatatorMatches = mutatatorMatches[1].split(mutatorSeparator);
+	}
+	// replace name to provide for cascade
+	name = name.replace(mutatorNameTest, "");
+	// check to see if the property needs to be mutated
+	each(mutators, function addPropertyMutatorIterator(mutator) {
+		if (mutator.onPropAdd && (mutator.greedy || indexOf(mutatatorMatches, mutator.name) > -1)) {
+			// use the return value of the mutator as the property to add
+			property = mutator.onPropAdd.call(mutator, klass, parent, name, property, mutatatorMatches);
+			// if mutator did not return anything, quit
+			if (property === undefined) {
+				shouldBreak = true;
+				return false;
+			}
+		}
+	});
+	if (shouldBreak) {
+		return;
 	}
 
 	// quick references
@@ -356,38 +516,40 @@ addProperty = function(klass, parent, name, property, mutators) {
 },
 // removes a property from the chain
 removeProperty = function(klass, name, mutators) {
-	var foundMutator = false;
-	if (mutatorNameTest.test(name)) {
-		each(mutators, function removePropertyMutatorIterator(mutator) {
-			if (mutator.onPropRemove && mutator.propTest.test(name)) {
-				mutator.onPropRemove.call(mutator, klass, name.replace(mutator.propTest, ""));
-				foundMutator = true;
+	var shouldBreak = false, mutatatorMatches;
+
+	// extract possible explicit mutators
+	mutatatorMatches = mutatorNameTest.exec(name) || [];
+	if (mutatatorMatches[1]) {
+		// convert explicit mutators to an array
+		mutatatorMatches = mutatatorMatches[1].split(mutatorSeparator);
+	}
+	// replace name to provide for cascade
+	name = name.replace(mutatorNameTest, "");
+	// check to see if the property needs to be mutated
+	each(mutators, function mutatorIterator(mutator) {
+		if (mutator.onPropRemove && (mutator.greedy || indexOf(mutatatorMatches, mutator.name) > -1)) {
+			// if mutator did not return anything, quit
+			if (mutator.onPropRemove.call(mutator, klass, name) === undefined) {
+				shouldBreak = true;
 				return false;
 			}
-		});
-		if (foundMutator) {
-			return;
-		}
-	}
-
-	// if we are not removing a function from the prototype chain, then just
-	// delete it
-	if (!isFunction(klass.prototype[name])) {
-		klass.prototype[name] = null;
-		try {
-			delete klass.prototype[name];
-		} catch (e) {
-		}
-		return;
-	}
-	// we need to delete the property from all children as well as
-	// the current class
-	each(klass.$$subclass, function removeSubclassPropertyIterator(k) {
-		// remove the parent function wrapper for child classes
-		if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].$$original)) {
-			objectDefineProperty(k.prototype, name, k.prototype[name].$$original);
 		}
 	});
+	if (shouldBreak) {
+		return;
+	}
+
+	// we need to delete the property from all children as well as
+	// the current class when the prop is a function
+	if (isFunction(klass.prototype[name])) {
+		each(klass.$$subclass, function removeSubclassPropertyIterator(k) {
+			// remove the parent function wrapper for child classes
+			if (k.prototype[name] && isFunction(k.prototype[name]) && isFunction(k.prototype[name].$$original)) {
+				objectDefineProperty(k.prototype, name, k.prototype[name].$$original);
+			}
+		});
+	}
 	klass.prototype[name] = null;
 	try {
 		delete klass.prototype[name];
@@ -633,7 +795,8 @@ var create = function() {
 	}
 	// Create a magic method that can invoke any of the parent methods
 	/**
-	 * Magic method that can invoke any of the parent methods with a array of arguments
+	 * Magic method that can invoke any of the parent methods with a array of
+	 * arguments
 	 *
 	 * @param {Object} name The name of the parent method to invoke
 	 * @param {Array} args The arguments to pass through to invoke
@@ -656,7 +819,8 @@ var create = function() {
 		throw new Error("Function \"" + name + "\" of parent class being invoked is undefined.");
 	};
 	/**
-	 * Magic method that can invoke any of the parent methods with any set of arguments
+	 * Magic method that can invoke any of the parent methods with any set of
+	 * arguments
 	 *
 	 * @param {Object} name The name of the parent method to invoke
 	 * @param {Object} arg... Actual arguments to call the method with
@@ -734,10 +898,9 @@ var create = function() {
 
 	// call each of the onCreate mutators to modify this class
 	each(getMutators(klass), function createMutatorIterator(mutator) {
-		if (!mutator.onCreate) {
-			return;
+		if (mutator.onCreate) {
+			mutator.onCreate.call(mutator, klass, parent);
 		}
-		mutator.onCreate.call(mutator, klass, parent);
 	});
 
 	// Now extend each of those methods and allow for a parent accessor
@@ -763,10 +926,9 @@ var create = function() {
 
 	// call each of the onDefine mutators to modify this class
 	each(getMutators(klass), function defineMutatorIterator(mutator) {
-		if (!mutator.onDefine) {
-			return;
+		if (mutator.onDefine) {
+			mutator.onDefine.call(mutator, klass);
 		}
-		mutator.onDefine.call(mutator, klass);
 	});
 
 	return klass;
@@ -786,7 +948,7 @@ extend(exportNames, {
  */
 // mutator for adding static properties to a class
 addMutator("static", {
-	// the special identifier is "__static_"
+	// the special identifier is "$$static$$"
 	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
 		/**
@@ -844,7 +1006,7 @@ addMutator("static", {
  */
 // mutator for adding unwrapped function properties to a class
 addMutator("nowrap", {
-	// the special identifier is "__nowrap_"
+	// the special identifier is "$$nowrap$$"
 	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
 		/**
@@ -871,7 +1033,7 @@ addMutator("nowrap", {
  */
 // mutator for adding aliased function properties to a class
 addMutator("alias", {
-	// the special identifier is "__alias_"
+	// the special identifier is "$$alias$$"
 	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
 		// shortcut method for adding aliased properties
@@ -890,9 +1052,9 @@ addMutator("alias", {
 	},
 	onPropAdd : function(klass, parent, name, property) {
 		// alias properties are simply function wrappers
-		addProperty(klass, parent, name, function() {
+		return function() {
 			return this[property].apply(this, arguments);
-		});
+		};
 	}
 });
 
@@ -901,9 +1063,9 @@ addMutator("alias", {
  */
 // mutator for adding bound properties to a class
 addMutator("bind", {
-	// the special identifier is "__bind_"
+	// the special identifier is "$$bind$$"
 	onCreate : function(klass, parent) {
-		var mutator = this;
+		var mutatorPrefix = this.propPrefix;
 		// re-assign the bindings so that it produces copies across child classes
 		/**
 		 * Array containing the list of all the bound properties that is wrapped during object initialization
@@ -923,7 +1085,7 @@ addMutator("bind", {
 		 * @return {Class}
 		 */
 		klass.addBoundProperty = function(name, property) {
-			return klass.addProperty(name, property, mutator.propPrefix);
+			return klass.addProperty(name, property, mutatorPrefix);
 		};
 		/**
 		 * Removes a context bound property from the object's base
@@ -934,7 +1096,7 @@ addMutator("bind", {
 		 * @return {Class}
 		 */
 		klass.removeBoundProperty = function(name) {
-			return klass.removeProperty(mutator.propPrefix + name);
+			return klass.removeProperty(mutatorPrefix + name);
 		};
 	},
 	onPropAdd : function(klass, parent, name, property) {
@@ -945,7 +1107,7 @@ addMutator("bind", {
 			klass.bindings.push(name);
 		}
 		// add the property normally
-		addProperty(klass, parent, name, property);
+		return property;
 	},
 	onPropRemove : function(klass, name) {
 		// remove the bindings if it exists
@@ -1259,9 +1421,9 @@ namespaceProperties = {
 	 * @param {Function} [mutator.onDefine] The hook to be called when a class
 	 *            is defined after all properties are added
 	 * @param {Function} [mutator.onPropAdd] The hook to be called when a
-	 *            property with the __name_ prefix is added
+	 *            property with the $$name$$ prefix is added
 	 * @param {Function} [mutator.onPropRemove] The hook to be called when a
-	 *            property with the __name_ prefix is removed
+	 *            property with the $$name$$ prefix is removed
 	 * @param {Function} [mutator.onInit] The hook to be called during each
 	 *            object's initialization
 	 * @throws Error
@@ -1568,18 +1730,7 @@ extend(Classify, exportNames, {
 	 * @type {String}
 	 * @property version
 	 */
-	version : "0.12.0",
-
-	/**
-	 * Utility function to provide functionality to quickly add properties to objects
-	 * @param {Object} base The base object to copy properties into
-	 * @param {Object[]} args Set of objects to copy properties from
-	 * @static
-	 * @for Classify
-	 * @method extend
-	 * @return {Object}
-	 */
-	extend : extend
+	version : "0.13.0"
 });
 
 /*global define */

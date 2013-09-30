@@ -1,6 +1,6 @@
 {
   "name": "classify",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "main": "./dist/classify.min.js",
   "devDependencies": {
     "qunit": "~1.12.0",

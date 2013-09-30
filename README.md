@@ -332,6 +332,23 @@ $ grunt --help
 Changelog
 --------------------------------------
 
+#### v0.13.0
+	BREAKING CHANGE: the mutator prefix is now $$\w+$$
+	BREAKING CHANGE: underscores are no longer allowed in mutator names
+	BREAKING CHANGE: multiple mutators can be specified in the mutator prefix separated by an _
+	BREAKING CHANGE: the mutator prefix is always removed regardless if there is a mutator attached or not
+	greedy mutators can be added to always be run onPropAdd and onPropRemove
+```javascript
+	// prefix change
+	{ __mutator_prop : 1 } => { $$mutator$$ : 1 }
+	// multiple mutators
+	{ $$mutate1_mutate2$$ : 1 }
+	// greedy mutators
+	addMutator({ greedy : true })
+	// prefix removed when attached to an object
+	$$abc$$prop : 1 => prop : 1
+```
+
 #### v0.12.0
 	BREAKING CHANGE: Class.toString now returns the init method body
 	BREAKING CHANGE: Renaming internal properties and certain magic properties.
