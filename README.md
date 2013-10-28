@@ -332,6 +332,13 @@ $ grunt --help
 Changelog
 --------------------------------------
 
+#### v0.13.1
+	BREAKING CHANGE: Renaming more additional internal props for consistiency
+```javascript
+	Namespace.nsname => Namespace.$$nsname
+	Namespace.nsref => Namespace.$$nsref
+```
+
 #### v0.13.0
 	BREAKING CHANGE: the mutator prefix is now $$\w+$$
 	BREAKING CHANGE: underscores are no longer allowed in mutator names

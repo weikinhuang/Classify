@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.13.0
+ * Classify JavaScript Library v0.13.1
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2013, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Mon Sep 30 2013 17:16:23
+ * Date: Mon Oct 28 2013 15:57:40
  */
 (function(root, undefined) {
 	"use strict";
@@ -1272,7 +1272,7 @@ namespaceProperties = {
 		};
 		// Assign the classes to the namespaced references
 		ref[name] = c;
-		self.nsref[fullname] = c;
+		self.$$nsref[fullname] = c;
 		// Return the new class
 		return c;
 	},
@@ -1294,7 +1294,7 @@ namespaceProperties = {
 		// create a quick reference to this
 		self = this, ref = this,
 		// Create a reference to the master classes array
-		deref = this.nsref;
+		deref = this.$$nsref;
 
 		// remove it from this namespace
 		each(namespace, function destroyIterator(ns) {
@@ -1348,7 +1348,7 @@ namespaceProperties = {
 	 * @return {Boolean}
 	 */
 	exists : function(classname) {
-		return !!this.nsref[classname];
+		return !!this.$$nsref[classname];
 	},
 	/**
 	 * Attempt to retrieve a class within this namespace or the global one
@@ -1361,8 +1361,8 @@ namespaceProperties = {
 	get : function(name) {
 		var tmp;
 		// already defined, return it
-		if (this.nsref[name]) {
-			return this.nsref[name];
+		if (this.$$nsref[name]) {
+			return this.$$nsref[name];
 		}
 		// use the autoloader if defined
 		tmp = this.load(name);
@@ -1371,14 +1371,14 @@ namespaceProperties = {
 			return tmp;
 		}
 		// reach into the global namespace
-		if (this.nsname !== globalNamespace) {
+		if (this.$$nsname !== globalNamespace) {
 			return getGlobalNamespace().get(name);
 		}
 		// no class found
 		return null;
 	},
 	load : function(name) {
-		return this.nsref[name] || null;
+		return this.$$nsref[name] || null;
 	},
 	/**
 	 * Sets the internal autoloader by overriding the Namespace.prototype.load
@@ -1406,7 +1406,7 @@ namespaceProperties = {
 	 * @return {String}
 	 */
 	getName : function() {
-		return this.nsname;
+		return this.$$nsname;
 	},
 	/**
 	 * Adds a namespace level class mutator that modifies the defined classes at
@@ -1432,7 +1432,7 @@ namespaceProperties = {
 	 */
 	addMutator : function(name, mutator) {
 		if (this.namedMutators[name] || namedGlobalMutators[name]) {
-			throw new Error("Adding duplicate mutator \"" + name + "\" in namespace " + this.nsname + ".");
+			throw new Error("Adding duplicate mutator \"" + name + "\" in namespace " + this.$$nsname + ".");
 		}
 		var mutatorInstance = new Mutator(name, mutator);
 		this.namedMutators[name] = mutatorInstance;
@@ -1450,7 +1450,7 @@ namespaceProperties = {
 	removeMutator : function(name) {
 		var mutator = this.namedMutators[name];
 		if (!mutator) {
-			throw new Error("Removing unknown mutator from namespace " + this.nsname + ".");
+			throw new Error("Removing unknown mutator from namespace " + this.$$nsname + ".");
 		}
 		remove(this.mutators, mutator);
 		this.namedMutators[name] = null;
@@ -1468,20 +1468,20 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 *
 	 * @private
 	 * @for Classify.Namespace
-	 * @property nsname
+	 * @property $$nsname
 	 * @type {String}
 	 */
-	nsname : null,
+	$$nsname : null,
 	/**
 	 * Hashtable containing references to all the classes created within this
 	 * namespace
 	 *
 	 * @private
 	 * @for Classify.Namespace
-	 * @property nsref
+	 * @property $$nsref
 	 * @type {Object}
 	 */
-	nsref : null,
+	$$nsref : null,
 	/**
 	 * Hashtable containing references to all the defined mutators
 	 *
@@ -1510,8 +1510,8 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 * @method Namespace
 	 */
 	init : function(name) {
-		this.nsname = name;
-		this.nsref = {};
+		this.$$nsname = name;
+		this.$$nsref = {};
 		this.namedMutators = {};
 		this.mutators = [];
 	},
@@ -1523,7 +1523,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 * @return {String}
 	 */
 	toString : function() {
-		return "[namespace " + this.nsname + "]";
+		return "[namespace " + this.$$nsname + "]";
 	}
 }));
 
@@ -1548,8 +1548,8 @@ Namespace.from = function(name, obj) {
 		};
 	});
 	return extend(obj, namespaceProps, {
-		nsname : name,
-		nsref : {},
+		$$nsname : name,
+		$$nsref : {},
 		namedMutators : {},
 		mutators : []
 	});
@@ -1589,7 +1589,7 @@ getNamespace = function(namespace) {
 destroyNamespace = function(namespace) {
 	// if namespace passed in, get the name out of it
 	if (namespace instanceof Namespace) {
-		namespace = namespace.nsname;
+		namespace = namespace.$$nsname;
 	}
 	// can't destroy the global namespace
 	if (namespace === globalNamespace) {
@@ -1730,7 +1730,7 @@ extend(Classify, exportNames, {
 	 * @type {String}
 	 * @property version
 	 */
-	version : "0.13.0"
+	version : "0.13.1"
 });
 
 /*global define */
