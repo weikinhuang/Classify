@@ -137,7 +137,7 @@ var Dog = Classify(Pet, {
 var namespace = Classify("Life");
 // OR
 var namespace = Classify.Namespace.from("Life", {} /* any object can be a coerced into a namespace */);
-// note that his cannot be accessed with 'Classify("Life");'
+// note that this cannot be accessed with 'Classify("Life");'
 // if global access is needed use 'Classify.Namespace.from("Life", {}, true);'
 ```
 
