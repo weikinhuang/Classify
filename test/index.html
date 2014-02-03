@@ -8,7 +8,12 @@
 	<!-- Includes -->
 
 	<script src="../vendor/qunit/qunit/qunit.js"></script>
-	
+	<script>
+	// this is for grunt-saucelabs
+	QUnit.done(function(results){
+		window.global_test_results = results;
+	});
+	</script>
 	<script>
 		var root = this;
 	</script>
