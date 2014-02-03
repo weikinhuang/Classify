@@ -7,8 +7,7 @@ use interface function. Classify also provides "bound" properties that passes th
 the first argument, and "static" properties for static properties and methods on the object definition.
 
 Classify is tested in IE 6+, Firefox 2+, Safari 3+, Chrome 3+, and Opera 10+, NodeJs.
-
-[![Selenium Test Status](https://saucelabs.com/browser-matrix/classifyjs.svg)](https://saucelabs.com/u/classifyjs)
+[![Selenium Test Status](https://saucelabs.com/buildstatus/classifyjs)](https://saucelabs.com/u/classifyjs)
 
 Usage
 --------------------------------------
