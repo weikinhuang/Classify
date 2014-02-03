@@ -306,6 +306,16 @@ namespaceProperties = {
 // Namespacing class to create and handle namespaces
 var Namespace = create(extend({}, namespaceProperties, {
 	/**
+	 * Flag to determine if this object is functionally a namespace
+	 *
+	 * @static
+	 * @for Classify.Namespace
+	 * @property $$$$isnamespace
+	 * @private
+	 * @type {Boolean}
+	 */
+	$$isnamespace : true,
+	/**
 	 * The name of the namespace
 	 *
 	 * @private
@@ -374,27 +384,41 @@ var Namespace = create(extend({}, namespaceProperties, {
  *
  * @param {String} name The name of the namespace to construct with
  * @param {Object} obj The target object to extend with Namespace abilities
+ * @param {Boolean} [internalize=false] Set the namespace into the internal
+ *            named cache
  * @for Classify.Namespace
  * @method from
  * @static
  * @return {Object}
  */
-Namespace.from = function(name, obj) {
-	if (obj instanceof Namespace) {
+Namespace.from = function(name, obj, internalize) {
+	if (!obj) {
+		throw new Error("Attempting to create a namespace with invalid value.");
+	}
+	if (obj.$$isnamespace) {
 		throw new Error("Attempting to create a namespace from an existing namespace.");
 	}
-	var namespaceProps = {};
+	var namespaceProps = {},
+		namespace;
 	each(namespaceProperties, function namespaceFromIterator(prop, key) {
 		namespaceProps[key] = function() {
 			return prop.apply(obj, arguments);
 		};
 	});
-	return extend(obj, namespaceProps, {
+	namespace = extend(obj, namespaceProps, {
+		$$isnamespace : true,
 		$$nsname : name,
 		$$nsref : {},
 		namedMutators : {},
 		mutators : []
 	});
+	if (internalize) {
+		if (name === globalNamespace) {
+			throw new Error("Attempting to set the internal global namespace.");
+		}
+		namespaces[name] = namespace;
+	}
+	return namespace;
 };
 
 /**
@@ -408,7 +432,7 @@ Namespace.from = function(name, obj) {
  */
 getNamespace = function(namespace) {
 	// if passed in object is already a namespace, just return it
-	if (namespace instanceof Namespace) {
+	if (namespace && namespace.$$isnamespace) {
 		return namespace;
 	}
 	// if we passed in nothing then we want the global namespace
@@ -430,7 +454,7 @@ getNamespace = function(namespace) {
  */
 destroyNamespace = function(namespace) {
 	// if namespace passed in, get the name out of it
-	if (namespace instanceof Namespace) {
+	if (namespace && namespace.$$isnamespace) {
 		namespace = namespace.$$nsname;
 	}
 	// can't destroy the global namespace
