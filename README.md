@@ -8,6 +8,8 @@ the first argument, and "static" properties for static properties and methods on
 
 Classify is tested in IE 6+, Firefox 2+, Safari 3+, Chrome 3+, and Opera 10+, NodeJs.
 
+[![Selenium Test Status](https://saucelabs.com/browser-matrix/classifyjs.svg)](https://saucelabs.com/u/classifyjs)
+
 Usage
 --------------------------------------
 
