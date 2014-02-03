@@ -145,7 +145,7 @@ QUnit.test("invocation and constructors", function() {
 			return false;
 		}
 	});
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		new test();
 	}, Error, "overiding constructor return with scalar value throws a error.");
 });
@@ -352,7 +352,7 @@ QUnit.test("Calling parent methods with the $$call magic method", function() {
 	QUnit.equal((new subclass()).d(), 3, "Calling $$call from within class invokes parent method.");
 	QUnit.equal((new subclass()).$$call("b"), 2, "Calling $$call from outside class invokes parent method.");
 
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		(new subclass()).$$call("z");
 	}, Error, "Attempts to $$call parent property that is not a function throws a error.");
 });
@@ -387,7 +387,7 @@ QUnit.test("Calling parent methods with the $$apply magic method", function() {
 	QUnit.equal((new subclass()).d(), 3, "Calling $$apply from within class invokes parent method.");
 	QUnit.equal((new subclass()).$$apply("b"), 2, "Calling $$apply from outside class invokes parent method.");
 
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		(new subclass()).$$apply("z");
 	}, Error, "Attempts to $$apply parent property that is not a function throws a error.");
 });

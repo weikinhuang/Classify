@@ -32,20 +32,22 @@
   ],
   "main": "dist/classify",
   "devDependencies": {
-    "grunt": ">=0.4.1",
-    "grunt-cli": ">=0.1.7",
-    "grunt-compare-size": ">=0.4.0-rc.3",
+    "grunt": ">=0.4.2",
+    "grunt-cli": ">=0.1.13",
+    "grunt-compare-size": ">=0.4.0",
     "grunt-contrib-concat": ">=0.3.0",
-    "grunt-contrib-connect": ">=0.5.0",
-    "grunt-contrib-jshint": ">=0.6.4",
-    "grunt-contrib-qunit": ">=0.2.2",
-    "grunt-contrib-uglify": ">=0.2.4",
+    "grunt-contrib-connect": ">=0.6.0",
+    "grunt-contrib-jshint": ">=0.8.0",
+    "grunt-contrib-qunit": ">=0.4.0",
+    "grunt-contrib-uglify": ">=0.3.2",
     "grunt-contrib-yuidoc": ">=0.4.0",
     "grunt-contrib-watch": ">=0.5.0",
     "grunt-qunit-cov": ">=0.3.4",
-    "grunt-saucelabs": ">=4.0.4",
+    "grunt-saucelabs": ">=5.0.0",
     "gzip-js": "*",
-    "bower": "~1.2.7"
+    "bower": "~1.2.8",
+    "getobject": "~0.1.0",
+    "exit": "~0.1.2"
   },
   "scripts": {
     "test": "grunt all --verbose"

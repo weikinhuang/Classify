@@ -51,11 +51,8 @@ function load(src) {
 	});
 }
 
-// load up qunit
-load("vendor/qunit/qunit/qunit.js");
-
 // have a global reference to QUnit within the sandbox
-context.QUnit = context.exports;
+context.QUnit = require(path.join(options.dir, "vendor/qunit/qunit/qunit.js"));
 context.exports = {};
 delete context.window;
 
@@ -133,3 +130,6 @@ load(options.data.code);
 
 // load up the test files
 load(options.data.tests);
+
+// start the qunit tests...
+context.QUnit.load();

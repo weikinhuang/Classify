@@ -147,7 +147,7 @@ QUnit.test("constructing global Classify object", function() {
 	QUnit.ok(new Classify("Export3", "E", [ 1 ]) instanceof test, "instantiated Classify object with parameters is an instance of the instantiated class");
 	QUnit.ok(!(new Classify("Export3", "E", [ 1 ]) instanceof Classify), "instantiated Classify object with parameters is not an instance of the instantiated Classify");
 
-	QUnit.raises(function(){
+	QUnit.throws(function(){
 		var test2 = new Classify();
 	}, Error, "Calling Classify with no arguments throws an error.");
 });

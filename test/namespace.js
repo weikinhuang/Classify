@@ -329,7 +329,7 @@ QUnit.test("extending unknown classes", function() {
 	QUnit.expect(1);
 	var ns = getNamespace("Namespace3D");
 	// attempt to extend a non defined class
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		ns.create("Z", "Y", {});
 	}, Error, "attempt to extend a undefined class throws an error");
 });
@@ -457,7 +457,7 @@ QUnit.test("class autoloading", function() {
 	QUnit.equal(ns.get("A"), ca, "retrieving an already existing class");
 
 	// attempt to set autoloader to a non function
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		ns.setAutoloader([]);
 	}, Error, "attempt to set non function autoloader throws an error");
 });
@@ -469,20 +469,20 @@ QUnit.test("adding and removing namespace mutators", function() {
 	ns.addMutator("test", {});
 
 	// adding duplicate mutators will throw an error
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		ns.addMutator("test", {});
 	}, Error, "Attempts to add an existing mutator throws a error.");
 
 	// add global mutator
 	addMutator("testa", {});
 	// adding duplicate global mutators will throw an error
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		ns.addMutator("testa", {});
 	}, Error, "Attempts to add an existing global mutator on namespace throws a error.");
 	removeMutator("testa");
 
 	ns.removeMutator("test");
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		ns.removeMutator("test");
 	}, Error, "Attempts to remove an non existing mutator throws a error.");
 });
@@ -532,7 +532,7 @@ QUnit.test("global namespace inheritance", function() {
 });
 
 QUnit.test("creating namespaces from existing plain objects", function() {
-	QUnit.expect(7);
+	QUnit.expect(8);
 
 	var ns = Namespace.from("Plain", {});
 
@@ -545,6 +545,7 @@ QUnit.test("creating namespaces from existing plain objects", function() {
 			return this;
 		}
 	});
+	QUnit.ok(!!ns.$$isnamespace, "namespace created is a namespace object");
 	QUnit.ok(!!c.$$isclass, "class created is a class object");
 	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
@@ -556,7 +557,7 @@ QUnit.test("creating namespaces from existing plain objects", function() {
 });
 
 QUnit.test("creating namespaces from existing Classify classes", function() {
-	QUnit.expect(7);
+	QUnit.expect(8);
 
 	var a = create({
 		a : 1,
@@ -575,6 +576,7 @@ QUnit.test("creating namespaces from existing Classify classes", function() {
 			return this;
 		}
 	});
+	QUnit.ok(!!ns.$$isnamespace, "namespace created is a namespace object");
 	QUnit.ok(!!c.$$isclass, "class created is a class object");
 	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
@@ -586,7 +588,7 @@ QUnit.test("creating namespaces from existing Classify classes", function() {
 });
 
 QUnit.test("creating namespaces from existing Classify object instances", function() {
-	QUnit.expect(7);
+	QUnit.expect(8);
 
 	var a = create({
 		a : 1,
@@ -605,6 +607,7 @@ QUnit.test("creating namespaces from existing Classify object instances", functi
 			return this;
 		}
 	});
+	QUnit.ok(!!ns.$$isnamespace, "namespace created is a namespace object");
 	QUnit.ok(!!c.$$isclass, "class created is a class object");
 	QUnit.ok(new c() instanceof Base, "class creation created by extending the base class");
 	QUnit.equal(ns.A(), "invoke", "class reference within namespace object can still be invoked");
@@ -615,16 +618,28 @@ QUnit.test("creating namespaces from existing Classify object instances", functi
 	QUnit.equal(c + "", "[object A]", "namespaced class has overriden toString method");
 });
 
-
 QUnit.test("creating namespaces from existing Classify object instances", function() {
 	QUnit.expect(1);
 
 	var ns = new Namespace("Somenamespace");
 
 	// adding duplicate global mutators will throw an error
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		Namespace.from("Plain", ns);
 	}, Error, "Attempts to create a namespace from an namespace throws a error.");
+});
+
+QUnit.test("creating internalized namespaces with Namespace.from", function() {
+	QUnit.expect(4);
+
+	var ns = Namespace.from("Plain", {}, true);
+
+	QUnit.ok(!!ns.$$isnamespace, "namespace created is a namespace object");
+	QUnit.equal(getNamespace("Plain"), ns, "Passing a internalized namespace name to getNamespace returns namespace.");
+	QUnit.equal(getNamespace(ns), ns, "Passing a instance of internalized namespace to getNamespace returns object as is.");
+
+	destroyNamespace("Plain");
+	QUnit.equal(testNamespace("Plain"), null, "Internalized namespace removed when destroyNamespace is called.");
 });
 
 QUnit.test("testing namespaces", function() {
