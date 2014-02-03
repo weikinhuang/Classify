@@ -1,4 +1,4 @@
-[Classify.js](http://classifyjs.com) [![Build Status](https://secure.travis-ci.org/weikinhuang/Classify.png?branch=master)](http://travis-ci.org/weikinhuang/Classify)
+[Classify.js](http://classifyjs.com) [![Build Status](https://api.travis-ci.org/weikinhuang/Classify.png?branch=master)](http://travis-ci.org/weikinhuang/Classify)
 ==================================================
 
 Classify.js is a library that allows for cross platform and cross browser Object Oriented Javascript
