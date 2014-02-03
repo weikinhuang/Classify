@@ -336,6 +336,9 @@ $ grunt --help
 Changelog
 --------------------------------------
 
+#### v0.14.0
+	Ability to set internal references for namespaces created with `Namespace.from()`
+
 #### v0.13.1
 	BREAKING CHANGE: Renaming more additional internal props for consistiency
 ```javascript
