@@ -329,7 +329,7 @@ QUnit.test("extending unknown classes", function() {
 	QUnit.expect(1);
 	var ns = getNamespace("Namespace3D");
 	// attempt to extend a non defined class
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		ns.create("Z", "Y", {});
 	}, Error, "attempt to extend a undefined class throws an error");
 });
@@ -457,7 +457,7 @@ QUnit.test("class autoloading", function() {
 	QUnit.equal(ns.get("A"), ca, "retrieving an already existing class");
 
 	// attempt to set autoloader to a non function
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		ns.setAutoloader([]);
 	}, Error, "attempt to set non function autoloader throws an error");
 });
@@ -469,20 +469,20 @@ QUnit.test("adding and removing namespace mutators", function() {
 	ns.addMutator("test", {});
 
 	// adding duplicate mutators will throw an error
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		ns.addMutator("test", {});
 	}, Error, "Attempts to add an existing mutator throws a error.");
 
 	// add global mutator
 	addMutator("testa", {});
 	// adding duplicate global mutators will throw an error
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		ns.addMutator("testa", {});
 	}, Error, "Attempts to add an existing global mutator on namespace throws a error.");
 	removeMutator("testa");
 
 	ns.removeMutator("test");
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		ns.removeMutator("test");
 	}, Error, "Attempts to remove an non existing mutator throws a error.");
 });
@@ -622,7 +622,7 @@ QUnit.test("creating namespaces from existing Classify object instances", functi
 	var ns = new Namespace("Somenamespace");
 
 	// adding duplicate global mutators will throw an error
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		Namespace.from("Plain", ns);
 	}, Error, "Attempts to create a namespace from an namespace throws a error.");
 });

@@ -10,12 +10,12 @@ QUnit.test("adding and removing global mutators", function() {
 	addMutator("test", {});
 
 	// adding duplicate mutators will throw an error
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		addMutator("test", {});
 	}, Error, "Attempts to add an existing mutator throws a error.");
 
 	removeMutator("test");
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		removeMutator("test");
 	}, Error, "Attempts to remove an non existing mutator throws a error.");
 });
@@ -222,7 +222,7 @@ QUnit.test("adding and removing global mutators to the on initialize hook", func
 	});
 
 	var test5 = create({});
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		new test5();
 	}, Error, "onInit mutator override new keyword during instantiation with scalar value throws a error.");
 
@@ -410,7 +410,7 @@ QUnit.test("adding class level mutators to the on initialize hook", function() {
 	});
 
 	var test5 = create([ mutator4 ], {});
-	QUnit.raises(function() {
+	QUnit.throws(function() {
 		new test5();
 	}, Error, "onInit mutator override new keyword during instantiation with scalar value throws a error.");
 });
