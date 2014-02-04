@@ -40,7 +40,6 @@ Base = (function() {
  * @alias Mutator
  * @param {String} name The name of the mutator
  * @param {Object} props hash of properties to merge into the prototype
- * @method Mutator
  */
 Mutator = function(name, props) {
 	if (!(this instanceof Mutator)) {

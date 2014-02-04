@@ -48,7 +48,7 @@ namespaceProperties = {
 	 * @param {Classify.Mutator[]} [mutators] Optional third parameter defines
 	 *            mutations for this class
 	 * @param {Object} definition The description of the class to be created
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method create
 	 * @return {Class}
 	 */
@@ -122,7 +122,7 @@ namespaceProperties = {
 	 * Removes a defined class from this namespace and it's children classes
 	 *
 	 * @param {String} classname Name of class to remove from this namespace
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method destroy
 	 * @return {Namespace}
 	 */
@@ -185,7 +185,7 @@ namespaceProperties = {
 	 *
 	 * @param {String} classname Name of class to check if it has already been
 	 *            defined
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method exists
 	 * @return {Boolean}
 	 */
@@ -196,7 +196,7 @@ namespaceProperties = {
 	 * Attempt to retrieve a class within this namespace or the global one
 	 *
 	 * @param {String} name The name of the class to retrieve
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method get
 	 * @return {Class}
 	 */
@@ -219,6 +219,15 @@ namespaceProperties = {
 		// no class found
 		return null;
 	},
+	/**
+	 * Loader function to retrieve a {Classify.Class}
+	 *
+	 * @param {String} name The name of the class to load
+	 * @memberOf Classify.Namespace#
+	 * @method load
+	 * @deprecated
+	 * @returns {Classify.Class}
+	 */
 	load : function(name) {
 		return this.$$nsref[name] || null;
 	},
@@ -228,7 +237,7 @@ namespaceProperties = {
 	 *
 	 * @param {Function} callback The function to call when a class that doesn't
 	 *            exist needs to be loaded
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method setAutoloader
 	 * @return {Namespace}
 	 */
@@ -243,7 +252,7 @@ namespaceProperties = {
 	/**
 	 * Gets the name of this namespace
 	 *
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method getName
 	 * @return {String}
 	 */
@@ -269,7 +278,7 @@ namespaceProperties = {
 	 * @param {Function} [mutator.onInit] The hook to be called during each
 	 *            object's initialization
 	 * @throws Error
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method addMutator
 	 */
 	addMutator : function(name, mutator) {
@@ -286,7 +295,7 @@ namespaceProperties = {
 	 *
 	 * @param {String} name The name of the mutator to be removed
 	 * @throws Error
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method removeMutator
 	 */
 	removeMutator : function(name) {
@@ -303,14 +312,21 @@ namespaceProperties = {
 	}
 };
 
-// Namespacing class to create and handle namespaces
+/**
+ * Namespacing class to create and handle namespaces
+ *
+ * @constructor
+ * @memberOf Classify
+ * @alias Namespace
+ * @augments {Classify.Class}
+ * @param {String} name The name of the namespace to construct with
+ */
 var Namespace = create(extend({}, namespaceProperties, {
 	/**
 	 * Flag to determine if this object is functionally a namespace
 	 *
-	 * @static
-	 * @for Classify.Namespace
-	 * @property $$$$isnamespace
+	 * @memberOf Classify.Namespace#
+	 * @property $$isnamespace
 	 * @private
 	 * @type {Boolean}
 	 */
@@ -319,7 +335,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 * The name of the namespace
 	 *
 	 * @private
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @property $$nsname
 	 * @type {String}
 	 */
@@ -329,7 +345,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 * namespace
 	 *
 	 * @private
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @property $$nsref
 	 * @type {Object}
 	 */
@@ -338,7 +354,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 * Hashtable containing references to all the defined mutators
 	 *
 	 * @private
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @property namedMutators
 	 * @type {Object}
 	 */
@@ -347,7 +363,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 * Array of all mutators in the namespace
 	 *
 	 * @private
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @property mutators
 	 * @type {Array}
 	 */
@@ -355,11 +371,10 @@ var Namespace = create(extend({}, namespaceProperties, {
 	/**
 	 * Namespace container that hold a tree of classes
 	 *
-	 * @constructor
-	 * @for Classify.Namespace
+	 * @constructs
 	 * @extends {Class}
 	 * @param {String} name The name of the namespace to construct with
-	 * @method Namespace
+	 * @name Namespace
 	 */
 	init : function(name) {
 		this.$$nsname = name;
@@ -370,7 +385,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	/**
 	 * Gets the translated toString name of this object "[namespace Name]"
 	 *
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method toString
 	 * @return {String}
 	 */
@@ -386,9 +401,8 @@ var Namespace = create(extend({}, namespaceProperties, {
  * @param {Object} obj The target object to extend with Namespace abilities
  * @param {Boolean} [internalize=false] Set the namespace into the internal
  *            named cache
- * @for Classify.Namespace
+ * @memberOf Classify.Namespace
  * @method from
- * @static
  * @return {Object}
  */
 Namespace.from = function(name, obj, internalize) {
@@ -425,8 +439,7 @@ Namespace.from = function(name, obj, internalize) {
  * Retrieves a namespace and creates if it it doesn't already exist
  *
  * @param {String} namespace Dot separated namespace string
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method getNamespace
  * @return {Namespace}
  */
@@ -448,8 +461,7 @@ getNamespace = function(namespace) {
  * Destroy an existing namespace
  *
  * @param {String} namespace Dot separated namespace string
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method destroyNamespace
  */
 destroyNamespace = function(namespace) {
@@ -470,8 +482,7 @@ destroyNamespace = function(namespace) {
  * "Ns1.ns2.ns3.ns4"
  *
  * @param {String} namespace Dot separated namespace string
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method testNamespace
  * @return {Namespace}
  */
@@ -488,8 +499,7 @@ testNamespace = function(namespace) {
 /**
  * Retieves the globally named namespace
  *
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method getGlobalNamespace
  * @return {Namespace}
  */
@@ -509,8 +519,7 @@ extend(exportNames, {
 	/**
 	 * The globally named namespace
 	 *
-	 * @static
-	 * @for Classify
+	 * @memberOf Classify
 	 * @property global
 	 * @type {Namespace}
 	 */

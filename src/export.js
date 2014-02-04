@@ -66,9 +66,8 @@ Classify = create({
 extend(Classify, exportNames, {
 	/**
 	 * The version number of this file
-	 * @static
 	 * @final
-	 * @for Classify
+	 * @memberOf Classify
 	 * @type {String}
 	 * @property version
 	 */
@@ -90,9 +89,8 @@ if (typeof module !== "undefined" && module.exports) {
 	module.exports = Classify;
 	/**
 	 * Circular reference to itself
-	 * @static
 	 * @property Classify
-	 * @for Classify
+	 * @memberOf Classify
 	 * @type {Function}
 	 */
 	Classify.Classify = Classify;
@@ -106,9 +104,8 @@ if (typeof module !== "undefined" && module.exports) {
 	/**
 	 * Run Classify.js in "noConflict" mode, returning the "Classify" variable to its
 	 * previous value. Returns a reference to the Classify object.
-	 * @static
 	 * @method noConflict
-	 * @for Classify
+	 * @memberOf Classify
 	 * @return {Classify}
 	 * @example
 	 *     (function(Classify) {
