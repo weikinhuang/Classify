@@ -23,9 +23,9 @@ Base = (function() {
 	 * True constructor method for this object, will be called when object is
 	 * called with the "new" keyword
 	 *
-	 * @for Classify.Class
+	 * @memberOf Classify.Class#
 	 * @method init
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	fn.prototype.init = noop;
 	fn.prototype.constructor = fn;
@@ -36,7 +36,8 @@ Base = (function() {
  * Internal "Mutator" class that handles hooks for class object manipulation
  *
  * @constructor
- * @for Classify.Mutator
+ * @memberOf Classify
+ * @alias Mutator
  * @param {String} name The name of the mutator
  * @param {Object} props hash of properties to merge into the prototype
  * @method Mutator
@@ -50,8 +51,8 @@ Mutator = function(name, props) {
 	 * The name of the mutator
 	 *
 	 * @private
-	 * @for Classify.Mutator
-	 * @property name
+	 * @memberOf Classify.Mutator#
+	 * @member name
 	 * @type {String}
 	 */
 	this.name = name;
@@ -60,8 +61,8 @@ Mutator = function(name, props) {
 	 * this mutator
 	 *
 	 * @private
-	 * @for Classify.Mutator
-	 * @property greedy
+	 * @memberOf Classify.Mutator#
+	 * @member greedy
 	 * @type {Boolean}
 	 */
 	this.greedy = props.greedy === true;
@@ -69,9 +70,9 @@ Mutator = function(name, props) {
 	 * The property matcher prefix of this mutator
 	 *
 	 * @private
-	 * @for Classify.Mutator
-	 * @property propPrefix
-	 * @type {RegExp}
+	 * @memberOf Classify.Mutator#
+	 * @member propPrefix
+	 * @type {String}
 	 */
 	this.propPrefix = "$$" + name + "$$";
 },
@@ -82,7 +83,7 @@ wrapParentProperty = function(parentPrototype, property) {
 		 * Internal reference property for methods that override a parent
 		 * method, allow for access to the parent version of the function.
 		 *
-		 * @for Classify.Class
+		 * @memberOf Classify.Class#
 		 * @method $$parent
 		 * @return {Object}
 		 */
@@ -118,8 +119,7 @@ wrapParentProperty = function(parentPrototype, property) {
  * @param {Function} [mutator.greedy] Attribute to declare that all properties
  *            being added and removed goes through this mutator
  * @throws Error
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method addMutator
  */
 addMutator = function(name, mutator) {
@@ -136,8 +136,7 @@ addMutator = function(name, mutator) {
  *
  * @param {String} name The name of the mutator to be removed
  * @throws Error
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method removeMutator
  */
 removeMutator = function(name) {
@@ -313,17 +312,16 @@ initializeKlass = function(instance, klass, args) {
 /**
  * Creates a new Classify class
  *
- * @param {Class} [parent] Optional first parameter defines what object to
+ * @param {Classify.Class} [parent] Optional first parameter defines what object to
  *            inherit from
  * @param {Object[]} [implement] Optional second parameter defines where to
  *            implement traits from
  * @param {Classify.Mutator[]} [mutators] Optional third parameter defines
  *            mutations for this class
  * @param {Object} definition The description of the class to be created
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method create
- * @return {Class}
+ * @return {Classify.Class}
  */
 var create = function() {
 	var parent = Base,
@@ -373,8 +371,8 @@ var create = function() {
 	 * Placeholder for class descriptors created with the create method
 	 *
 	 * @constructor
-	 * @for Classify
-	 * @type Object
+	 * @memberOf Classify
+	 * @name Class
 	 */
 	klass = function() {
 		return initializeKlass(this, klass, argsToArray(arguments));
@@ -393,10 +391,9 @@ var create = function() {
 	 * Create a new instance of the class using arguments passed in as an array
 	 *
 	 * @param {Array} args Array of arguments to construct the object with
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @method $$apply
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	klass.$$apply = function(a) {
 		var TempClass = function() {
@@ -409,10 +406,9 @@ var create = function() {
 	 * Default invocation function when the defined class is called without the
 	 * "new" keyword. The default behavior is to return a new instance of itself
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @method invoke
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	klass.invoke = methods.invoke || (parent.invoke && isFunction(parent.invoke) && !parent.invoke.$$original ? parent.invoke : null) || store(function() {
 		return klass.$$apply(arguments);
@@ -423,18 +419,16 @@ var create = function() {
 	/**
 	 * Reference to the parent that this object extends from
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property $$superclass
-	 * @type {Class}
+	 * @type {Classify.Class}
 	 */
 	klass.$$superclass = parent;
 	/**
 	 * Array containing a reference to all the children that inherit from this
 	 * object
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property $$subclass
 	 * @type {Array}
 	 */
@@ -443,8 +437,7 @@ var create = function() {
 	 * Array containing all the objects and classes that this object implements
 	 * methods and properties from
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property $$implement
 	 * @type {Array}
 	 */
@@ -453,8 +446,7 @@ var create = function() {
 	 * Array containing all the mutators that were defined with this class,
 	 * these mutators DO NOT get inherited
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property $$mutator
 	 * @type {Array}
 	 */
@@ -476,23 +468,28 @@ var create = function() {
 	/**
 	 * Creates a new class that is a child of the current class
 	 *
-	 * @param {Object[]} [implement] Optional parameter defines where to
+	 * @param {Object[]} [implement] Optional second parameter defines where to
 	 *            implement traits from
+	 * @param {Classify.Mutator[]} [mutators] Optional third parameter defines
+	 *            mutations for this class
 	 * @param {Object} definition The description of the class to be created
-	 * @static
-	 * @for Classify.Class
+	 * @see {@link Classify.create}
+	 * @memberOf Classify.Class
 	 * @method extend
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	/**
 	 * Creates a new class that is a child of the current class
 	 *
-	 * @param {Object[]} [implement] Optional parameter defines where to
+	 * @param {Object[]} [implement] Optional second parameter defines where to
 	 *            implement traits from
+	 * @param {Classify.Mutator[]} [mutators] Optional third parameter defines
+	 *            mutations for this class
 	 * @param {Object} definition The description of the class to be created
-	 * @for Classify.Class
+	 * @see {@link Classify.create}
+	 * @memberOf Classify.Class#
 	 * @method extend
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	klass.extend = proto.extend = function() {
 		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
@@ -509,7 +506,7 @@ var create = function() {
 	 *
 	 * @param {Object} name The name of the parent method to invoke
 	 * @param {Array} args The arguments to pass through to invoke
-	 * @for Classify.Class
+	 * @memberOf Classify.Class#
 	 * @method $$apply
 	 * @return {Object}
 	 */
@@ -533,7 +530,7 @@ var create = function() {
 	 *
 	 * @param {Object} name The name of the parent method to invoke
 	 * @param {Object} arg... Actual arguments to call the method with
-	 * @for Classify.Class
+	 * @memberOf Classify.Class#
 	 * @method $$call
 	 * @return {Object}
 	 */
@@ -559,10 +556,9 @@ var create = function() {
 	 *            passed in then it will iterate through it to add properties
 	 * @param {Object} [property] The property to add to the class
 	 * @param {String} [prefix=""] Prefix of the property name if any
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @method addProperty
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	klass.addProperty = function(name, property, prefix) {
 		var mutators = getMutators(klass);
@@ -581,10 +577,9 @@ var create = function() {
 	 * Removes a property from the object's prototype or base
 	 *
 	 * @param {String} name The name of the property to remove
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @method removeProperty
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	klass.removeProperty = function(name) {
 		removeProperty(klass, name, getMutators(klass));
@@ -617,16 +612,15 @@ var create = function() {
 	/**
 	 * Reference to the constructor function of this object
 	 *
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property constructor
-	 * @type {Class}
+	 * @type {Classify.Class}
 	 */
 	proto.constructor = klass;
 	/**
 	 * Flag to determine if this object is created by Classify.create
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property $$isclass
 	 * @private
 	 * @type {Boolean}

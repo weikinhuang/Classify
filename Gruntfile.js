@@ -246,6 +246,15 @@ module.exports = function(grunt) {
 		}
 	};
 
+	gruntConfig.jsdoc = {
+		dist : {
+			src: ["src/*.js", "test/*.js"],
+			options: {
+				destination: "docs/jsdoc/"
+			}
+		}
+	};
+
 	gruntConfig.watch = {
 		files : [ "src/*.js", "test/*.js", "test/*.html", "Gruntfile.js" ],
 		tasks : "dev"
@@ -260,7 +269,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-contrib-qunit");
 	grunt.loadNpmTasks("grunt-contrib-uglify");
 	grunt.loadNpmTasks("grunt-contrib-watch");
-	grunt.loadNpmTasks("grunt-contrib-yuidoc");
+	grunt.loadNpmTasks("grunt-jsdoc");
 	grunt.loadNpmTasks("grunt-qunit-cov");
 	grunt.loadNpmTasks("grunt-saucelabs");
 
@@ -401,7 +410,7 @@ module.exports = function(grunt) {
 	grunt.registerTask("lint", [ "concat", "jshint" ]);
 	grunt.registerTask("test:local", unit_test_tasks);
 	grunt.registerTask("test", unit_test_all_tasks);
-	grunt.registerTask("doc", [ "yuidoc" ]);
+	grunt.registerTask("doc", [ "jsdoc" ]);
 	grunt.registerTask("coverage", [ "connect", "qunit", "qunit-cov" ]);
 	grunt.registerTask("dev", [ "lint" ].concat(unit_test_tasks).concat([ "uglify", "compare_size" ]));
 };
