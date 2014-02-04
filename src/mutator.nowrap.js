@@ -10,10 +10,9 @@ addMutator("nowrap", {
 		 * Adds a property to the object's prototype that is not wrapped in the parent method wrapper
 		 * @param {String} name The name of the new property
 		 * @param {String} property The name of the property to add
-		 * @static
-		 * @for Classify.Class
+		 * @memberOf Classify.Class
 		 * @method addUnwrappedProperty
-		 * @return {Class}
+		 * @return {Classify.Class}
 		 */
 		klass.addUnwrappedProperty = function(name, property) {
 			return klass.addProperty(name, property, mutatorPrefix);

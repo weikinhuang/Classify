@@ -10,10 +10,9 @@ addMutator("static", {
 		 * Adds a static property to the object's base
 		 * @param {String} name The name of the property to add
 		 * @param {Object} property The property to store into the object's base
-		 * @static
-		 * @for Classify.Class
+		 * @memberOf Classify.Class
 		 * @method addStaticProperty
-		 * @return {Class}
+		 * @return {Classify.Class}
 		 */
 		klass.addStaticProperty = function(name, property) {
 			return klass.addProperty(name, property, mutatorPrefix);
@@ -21,10 +20,9 @@ addMutator("static", {
 		/**
 		 * Removes a static property from the object's base
 		 * @param {String} name The name of the property to remove
-		 * @static
-		 * @for Classify.Class
+		 * @memberOf Classify.Class
 		 * @method removeStaticProperty
-		 * @return {Class}
+		 * @return {Classify.Class}
 		 */
 		klass.removeStaticProperty = function(name) {
 			return klass.removeProperty(mutatorPrefix + name);
