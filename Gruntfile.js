@@ -233,19 +233,6 @@ module.exports = function(grunt) {
 		}
 	};
 
-	gruntConfig.yuidoc = {
-		compile : {
-			name : "<%= pkg.name %>",
-			description : "<%= pkg.description %>",
-			version : "<%= pkg.version %>",
-			url : "<%= pkg.homepage %>",
-			options : {
-				paths : "src/",
-				outdir : "docs/yuidoc/"
-			}
-		}
-	};
-
 	gruntConfig.jsdoc = {
 		dist : {
 			src: ["src/*.js", "test/*.js"],

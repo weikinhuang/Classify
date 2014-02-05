@@ -3,7 +3,14 @@
  */
 // quick reference to the seperator string
 var namespaceSeparator = "/",
-// Create a wrapped reference to the Classify object.
+/**
+ * The wrapped reference to the Classify object.
+ *
+ * @constructor
+ * @augments {Classify.Class}
+ * @name Classify
+ * @see {@link Classify.create}
+ */
 Classify = create({
 	invoke : function() {
 		var args = argsToArray(arguments), length = args.length, ns, tmp;
@@ -43,7 +50,9 @@ Classify = create({
 	},
 	/**
 	 * The Main interface function that returns namespaces and creates objects
-	 * @class Classify
+	 *
+	 * @constructs
+	 * @name Classify
 	 * @return {Classify.Class}
 	 */
 	init : function() {

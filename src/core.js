@@ -206,7 +206,7 @@ map = function(o, iterator) {
  * Utility function to provide functionality to quickly add properties to objects
  * simple extension function that takes into account the enumerated keys
  * @param {Object} base The base object to copy properties into
- * @param {Object[]} o Set of objects to copy properties from
+ * @param {...Object[]} o Set of objects to copy properties from
  * @memberOf Classify
  * @method extend
  * @return {Object}
