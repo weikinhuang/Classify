@@ -3,6 +3,7 @@
  */
 // mutator for adding bound properties to a class
 addMutator("bind", {
+	priority : 1000,
 	// the special identifier is "$$bind$$"
 	onCreate : function(klass, parent) {
 		var mutatorPrefix = this.propPrefix;

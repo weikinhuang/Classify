@@ -3,6 +3,7 @@
  */
 // mutator for adding unwrapped function properties to a class
 addMutator("nowrap", {
+	priority : 1000,
 	// the special identifier is "$$nowrap$$"
 	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
