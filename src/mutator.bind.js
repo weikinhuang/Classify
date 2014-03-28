@@ -9,8 +9,7 @@ addMutator("bind", {
 		// re-assign the bindings so that it produces copies across child classes
 		/**
 		 * Array containing the list of all the bound properties that is wrapped during object initialization
-		 * @static
-		 * @for Classify.Class
+		 * @memberOf Classify.Class
 		 * @property bindings
 		 * @type {Array}
 		 */
@@ -19,10 +18,9 @@ addMutator("bind", {
 		 * Adds a context bound property to the object's prototype
 		 * @param {String} name The name of the property to add
 		 * @param {Function} property The property to always bind the object's context with
-		 * @static
-		 * @for Classify.Class
+		 * @memberOf Classify.Class
 		 * @method addBoundProperty
-		 * @return {Class}
+		 * @return {Classify.Class}
 		 */
 		klass.addBoundProperty = function(name, property) {
 			return klass.addProperty(name, property, mutatorPrefix);
@@ -30,10 +28,9 @@ addMutator("bind", {
 		/**
 		 * Removes a context bound property from the object's base
 		 * @param {String} name The name of the property to remove
-		 * @static
-		 * @for Classify.Class
+		 * @memberOf Classify.Class
 		 * @method removeBoundProperty
-		 * @return {Class}
+		 * @return {Classify.Class}
 		 */
 		klass.removeBoundProperty = function(name) {
 			return klass.removeProperty(mutatorPrefix + name);
@@ -78,7 +75,7 @@ addMutator("bind", {
 				/**
 				 * Allow access to the calling context when using a bound method
 				 *
-				 * @for Classify.Class
+				 * @memberOf Classify.Class#
 				 * @property $$context
 				 * @type {Object}
 				 */

@@ -3,7 +3,14 @@
  */
 // quick reference to the seperator string
 var namespaceSeparator = "/",
-// Create a wrapped reference to the Classify object.
+/**
+ * The wrapped reference to the Classify object.
+ *
+ * @constructor
+ * @augments {Classify.Class}
+ * @name Classify
+ * @see {@link Classify.create}
+ */
 Classify = create({
 	invoke : function() {
 		var args = argsToArray(arguments), length = args.length, ns, tmp;
@@ -43,7 +50,9 @@ Classify = create({
 	},
 	/**
 	 * The Main interface function that returns namespaces and creates objects
-	 * @class Classify
+	 *
+	 * @constructs
+	 * @name Classify
 	 * @return {Classify.Class}
 	 */
 	init : function() {
@@ -66,9 +75,8 @@ Classify = create({
 extend(Classify, exportNames, {
 	/**
 	 * The version number of this file
-	 * @static
 	 * @final
-	 * @for Classify
+	 * @memberOf Classify
 	 * @type {String}
 	 * @property version
 	 */
@@ -90,9 +98,8 @@ if (typeof module !== "undefined" && module.exports) {
 	module.exports = Classify;
 	/**
 	 * Circular reference to itself
-	 * @static
 	 * @property Classify
-	 * @for Classify
+	 * @memberOf Classify
 	 * @type {Function}
 	 */
 	Classify.Classify = Classify;
@@ -106,9 +113,8 @@ if (typeof module !== "undefined" && module.exports) {
 	/**
 	 * Run Classify.js in "noConflict" mode, returning the "Classify" variable to its
 	 * previous value. Returns a reference to the Classify object.
-	 * @static
 	 * @method noConflict
-	 * @for Classify
+	 * @memberOf Classify
 	 * @return {Classify}
 	 * @example
 	 *     (function(Classify) {

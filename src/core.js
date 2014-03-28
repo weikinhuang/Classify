@@ -24,8 +24,7 @@ noop = function() {
 /**
  * Utility function to test if a value is scalar in nature
  * @param {Object} o The object to test
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method isScalar
  * @return {Boolean}
  */
@@ -35,8 +34,7 @@ isScalar = function(o) {
 /**
  * Utility function to test if object is a function
  * @param {Object} o The object to test
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method isFunction
  * @return {Boolean}
  */
@@ -46,8 +44,7 @@ isFunction = function(o) {
 /**
  * Utility function to test if object is extendable
  * @param {Object} o The object to test
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method isExtendable
  * @return {Boolean}
  */
@@ -58,8 +55,7 @@ isExtendable = function(o) {
  * Utility function to test if object is an Array instance
  * polyfill for Array.isArray
  * @param {Object} o The object to test
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method isArray
  * @return {Boolean}
  */
@@ -73,8 +69,7 @@ nativeFunctionRegExp = new RegExp("^" + String(toString).replace(/[.*+?^${}()|[\
 /**
  * Utility function to test if a function is native
  * @param {Object} o The object to test
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method isNative
  * @return {Boolean}
  */
@@ -86,8 +81,7 @@ isNative = function(o) {
  * quickly be able to get all the keys of an object, we don't use
  * Object.keys because we also want to extract from the parent prototypes
  * @param {Object} o The object to iterate over
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method keys
  * @return {Array}
  */
@@ -123,8 +117,7 @@ toArray = function(o) {
 /**
  * Convert the `arguments` object into a Array instance
  * @param {Arguments} o The arguments object
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method argsToArray
  * @return {Array}
  */
@@ -136,8 +129,7 @@ argsToArray = function(o) {
  * polyfill for Array.prototype.indexOf
  * @param {Array} array The array to search
  * @param {Object} item The searched item
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method indexOf
  * @return {Number} Returns -1 if not found
  */
@@ -165,8 +157,7 @@ store = function(fn, base) {
  * Utility function to provide object/array iteration
  * @param {Object} o The object to iterate
  * @param {Function} iterator Iteration function returns false to exit
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method each
  * @return {Object}
  */
@@ -200,8 +191,7 @@ each = function(o, iterator, context) {
  * Utility function to provide object mapping to an array
  * @param {Object} o The object to iterate
  * @param {Function} iterator Iteration function returns mapped value
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method map
  * @return {Array}
  */
@@ -216,9 +206,8 @@ map = function(o, iterator) {
  * Utility function to provide functionality to quickly add properties to objects
  * simple extension function that takes into account the enumerated keys
  * @param {Object} base The base object to copy properties into
- * @param {Object[]} o Set of objects to copy properties from
- * @static
- * @for Classify
+ * @param {...Object[]} o Set of objects to copy properties from
+ * @memberOf Classify
  * @method extend
  * @return {Object}
  */
@@ -235,8 +224,7 @@ extend = function() {
  * Utility function to removes the first instance of item from an array
  * @param {Array} arr The array to search
  * @param {Object} item The item to remove
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method remove
  * @return {Boolean} TRUE if item removed
  */
