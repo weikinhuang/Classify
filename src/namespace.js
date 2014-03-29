@@ -39,8 +39,8 @@ namespaceProperties = {
 	/**
 	 * Creates a new class within this namespace
 	 *
-	 * @param {String} name The name of the created class within the namespace
-	 * @param {String|Class} [parent] Optional second parameter defines what
+	 * @param {string} name The name of the created class within the namespace
+	 * @param {string|Class} [parent] Optional second parameter defines what
 	 *            object to inherit from, can be a string referencing a class
 	 *            within any namespace
 	 * @param {Object[]} [implement] Optional third parameter defines where to
@@ -121,7 +121,7 @@ namespaceProperties = {
 	/**
 	 * Removes a defined class from this namespace and it's children classes
 	 *
-	 * @param {String} classname Name of class to remove from this namespace
+	 * @param {string} classname Name of class to remove from this namespace
 	 * @memberOf Classify.Namespace#
 	 * @method destroy
 	 * @return {Namespace}
@@ -183,11 +183,11 @@ namespaceProperties = {
 	/**
 	 * Checks if a class exists within this namespace
 	 *
-	 * @param {String} classname Name of class to check if it has already been
+	 * @param {string} classname Name of class to check if it has already been
 	 *            defined
 	 * @memberOf Classify.Namespace#
 	 * @method exists
-	 * @return {Boolean}
+	 * @return {boolean}
 	 */
 	exists : function(classname) {
 		return !!this.$$nsref[classname];
@@ -195,7 +195,7 @@ namespaceProperties = {
 	/**
 	 * Attempt to retrieve a class within this namespace or the global one
 	 *
-	 * @param {String} name The name of the class to retrieve
+	 * @param {string} name The name of the class to retrieve
 	 * @memberOf Classify.Namespace#
 	 * @method get
 	 * @return {Class}
@@ -222,7 +222,7 @@ namespaceProperties = {
 	/**
 	 * Loader function to retrieve a {Classify.Class}
 	 *
-	 * @param {String} name The name of the class to load
+	 * @param {string} name The name of the class to load
 	 * @memberOf Classify.Namespace#
 	 * @method load
 	 * @deprecated
@@ -254,7 +254,7 @@ namespaceProperties = {
 	 *
 	 * @memberOf Classify.Namespace#
 	 * @method getName
-	 * @return {String}
+	 * @return {string}
 	 */
 	getName : function() {
 		return this.$$nsname;
@@ -263,7 +263,7 @@ namespaceProperties = {
 	 * Adds a namespace level class mutator that modifies the defined classes at
 	 * different points with hooks
 	 *
-	 * @param {String} name The name of the mutator reference to add
+	 * @param {string} name The name of the mutator reference to add
 	 * @param {Object} mutator The mutator definition with optional hooks
 	 * @param {Function} [mutator._onPredefine] Internal hook to be called as
 	 *            soon as the constructor is defined
@@ -293,7 +293,7 @@ namespaceProperties = {
 	 * Removes a namespace level class mutator that modifies the defined classes
 	 * at different points
 	 *
-	 * @param {String} name The name of the mutator to be removed
+	 * @param {string} name The name of the mutator to be removed
 	 * @throws Error
 	 * @memberOf Classify.Namespace#
 	 * @method removeMutator
@@ -319,7 +319,7 @@ namespaceProperties = {
  * @memberOf Classify
  * @alias Namespace
  * @augments {Classify.Class}
- * @param {String} name The name of the namespace to construct with
+ * @param {string} name The name of the namespace to construct with
  */
 var Namespace = create(extend({}, namespaceProperties, {
 	/**
@@ -328,7 +328,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 * @memberOf Classify.Namespace#
 	 * @property $$isnamespace
 	 * @private
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	$$isnamespace : true,
 	/**
@@ -337,7 +337,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 * @private
 	 * @memberOf Classify.Namespace#
 	 * @property $$nsname
-	 * @type {String}
+	 * @type {string}
 	 */
 	$$nsname : null,
 	/**
@@ -373,7 +373,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 *
 	 * @constructs
 	 * @extends {Class}
-	 * @param {String} name The name of the namespace to construct with
+	 * @param {string} name The name of the namespace to construct with
 	 * @name Namespace
 	 */
 	init : function(name) {
@@ -387,7 +387,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 *
 	 * @memberOf Classify.Namespace#
 	 * @method toString
-	 * @return {String}
+	 * @return {string}
 	 */
 	toString : function() {
 		return "[namespace " + this.$$nsname + "]";
@@ -397,9 +397,9 @@ var Namespace = create(extend({}, namespaceProperties, {
 /**
  * Transforms a object to a {Classify.Namespace} capable object
  *
- * @param {String} name The name of the namespace to construct with
+ * @param {string} name The name of the namespace to construct with
  * @param {Object} obj The target object to extend with Namespace abilities
- * @param {Boolean} [internalize=false] Set the namespace into the internal
+ * @param {boolean} [internalize=false] Set the namespace into the internal
  *            named cache
  * @memberOf Classify.Namespace
  * @method from
@@ -438,7 +438,7 @@ Namespace.from = function(name, obj, internalize) {
 /**
  * Retrieves a namespace and creates if it it doesn't already exist
  *
- * @param {String} namespace Dot separated namespace string
+ * @param {string} namespace Dot separated namespace string
  * @memberOf Classify
  * @method getNamespace
  * @return {Namespace}
@@ -460,7 +460,7 @@ getNamespace = function(namespace) {
 /**
  * Destroy an existing namespace
  *
- * @param {String} namespace Dot separated namespace string
+ * @param {string} namespace Dot separated namespace string
  * @memberOf Classify
  * @method destroyNamespace
  */
@@ -481,7 +481,7 @@ destroyNamespace = function(namespace) {
  * Retrieves the first namespace that matches the namespace chain
  * "Ns1.ns2.ns3.ns4"
  *
- * @param {String} namespace Dot separated namespace string
+ * @param {string} namespace Dot separated namespace string
  * @memberOf Classify
  * @method testNamespace
  * @return {Namespace}

@@ -9,8 +9,8 @@ addMutator("nowrap", {
 		var mutatorPrefix = this.propPrefix;
 		/**
 		 * Adds a property to the object's prototype that is not wrapped in the parent method wrapper
-		 * @param {String} name The name of the new property
-		 * @param {String} property The name of the property to add
+		 * @param {string} name The name of the new property
+		 * @param {string} property The name of the property to add
 		 * @memberOf Classify.Class
 		 * @method addUnwrappedProperty
 		 * @return {Classify.Class}

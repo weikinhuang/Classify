@@ -18,7 +18,10 @@ hasOwn = objectPrototype.hasOwnProperty,
 arrayPush = Array.prototype.push,
 // regex to test for scalar value
 scalarRegExp = /^(?:boolean|number|string|undefined)$/,
-//create a noop function
+/**
+ * create a noop function
+ * @constructor
+ */
 noop = function() {
 },
 /**
@@ -26,7 +29,7 @@ noop = function() {
  * @param {Object} o The object to test
  * @memberOf Classify
  * @method isScalar
- * @return {Boolean}
+ * @return {boolean}
  */
 isScalar = function(o) {
 	return o === null || scalarRegExp.test(typeof o);
@@ -36,7 +39,7 @@ isScalar = function(o) {
  * @param {Object} o The object to test
  * @memberOf Classify
  * @method isFunction
- * @return {Boolean}
+ * @return {boolean}
  */
 isFunction = function(o) {
 	return toString.call(o) === "[object Function]";
@@ -46,7 +49,7 @@ isFunction = function(o) {
  * @param {Object} o The object to test
  * @memberOf Classify
  * @method isExtendable
- * @return {Boolean}
+ * @return {boolean}
  */
 isExtendable = function(o) {
 	return o && o.prototype && isFunction(o);
@@ -57,7 +60,7 @@ isExtendable = function(o) {
  * @param {Object} o The object to test
  * @memberOf Classify
  * @method isArray
- * @return {Boolean}
+ * @return {boolean}
  */
 isArray = Array.isArray || function(o) {
 //#JSCOVERAGE_IF !Array.isArray
@@ -71,7 +74,7 @@ nativeFunctionRegExp = new RegExp("^" + String(toString).replace(/[.*+?^${}()|[\
  * @param {Object} o The object to test
  * @memberOf Classify
  * @method isNative
- * @return {Boolean}
+ * @return {boolean}
  */
 isNative = function(o) {
 	return isFunction(o) && nativeFunctionRegExp.test(o.toString());
@@ -131,7 +134,7 @@ argsToArray = function(o) {
  * @param {Object} item The searched item
  * @memberOf Classify
  * @method indexOf
- * @return {Number} Returns -1 if not found
+ * @return {number} Returns -1 if not found
  */
 indexOf = Array.prototype.indexOf ? function(array, item) {
 //#JSCOVERAGE_IF Array.prototype.indexOf
@@ -226,7 +229,7 @@ extend = function() {
  * @param {Object} item The item to remove
  * @memberOf Classify
  * @method remove
- * @return {Boolean} TRUE if item removed
+ * @return {boolean} TRUE if item removed
  */
 remove = function(arr, item) {
 	var idx = indexOf(arr, item);

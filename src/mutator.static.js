@@ -9,7 +9,7 @@ addMutator("static", {
 		var mutatorPrefix = this.propPrefix;
 		/**
 		 * Adds a static property to the object's base
-		 * @param {String} name The name of the property to add
+		 * @param {string} name The name of the property to add
 		 * @param {Object} property The property to store into the object's base
 		 * @memberOf Classify.Class
 		 * @method addStaticProperty
@@ -20,7 +20,7 @@ addMutator("static", {
 		};
 		/**
 		 * Removes a static property from the object's base
-		 * @param {String} name The name of the property to remove
+		 * @param {string} name The name of the property to remove
 		 * @memberOf Classify.Class
 		 * @method removeStaticProperty
 		 * @return {Classify.Class}

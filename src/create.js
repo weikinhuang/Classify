@@ -432,10 +432,10 @@ var create = function() {
 	/**
 	 * Adds a new property to the object's prototype of base
 	 *
-	 * @param {String|Object} name The property name to add or if object is
+	 * @param {string|Object} name The property name to add or if object is
 	 *            passed in then it will iterate through it to add properties
 	 * @param {Object} [property] The property to add to the class
-	 * @param {String} [prefix=""] Prefix of the property name if any
+	 * @param {string} [prefix=""] Prefix of the property name if any
 	 * @memberOf Classify.Class
 	 * @method addProperty
 	 * @return {Classify.Class}
@@ -456,7 +456,7 @@ var create = function() {
 	/**
 	 * Removes a property from the object's prototype or base
 	 *
-	 * @param {String} name The name of the property to remove
+	 * @param {string} name The name of the property to remove
 	 * @memberOf Classify.Class
 	 * @method removeProperty
 	 * @return {Classify.Class}
@@ -503,7 +503,7 @@ var create = function() {
 	 * @memberOf Classify.Class
 	 * @property $$isclass
 	 * @private
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	klass.$$isclass = true;
 

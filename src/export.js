@@ -77,7 +77,7 @@ extend(Classify, exportNames, {
 	 * The version number of this file
 	 * @final
 	 * @memberOf Classify
-	 * @type {String}
+	 * @type {string}
 	 * @property version
 	 */
 	version : "<%= pkg.version %>"

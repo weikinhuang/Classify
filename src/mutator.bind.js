@@ -17,7 +17,7 @@ addMutator("bind", {
 		klass.bindings = (parent.bindings || []).slice(0);
 		/**
 		 * Adds a context bound property to the object's prototype
-		 * @param {String} name The name of the property to add
+		 * @param {string} name The name of the property to add
 		 * @param {Function} property The property to always bind the object's context with
 		 * @memberOf Classify.Class
 		 * @method addBoundProperty
@@ -28,7 +28,7 @@ addMutator("bind", {
 		};
 		/**
 		 * Removes a context bound property from the object's base
-		 * @param {String} name The name of the property to remove
+		 * @param {string} name The name of the property to remove
 		 * @memberOf Classify.Class
 		 * @method removeBoundProperty
 		 * @return {Classify.Class}

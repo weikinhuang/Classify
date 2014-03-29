@@ -15,7 +15,7 @@ globalMutators = [],
  * @constructor
  * @memberOf Classify
  * @alias Mutator
- * @param {String} name The name of the mutator
+ * @param {string} name The name of the mutator
  * @param {Object} props hash of properties to merge into the prototype
  */
 Mutator = function(name, props) {
@@ -29,7 +29,7 @@ Mutator = function(name, props) {
 	 * @private
 	 * @memberOf Classify.Mutator#
 	 * @member priority
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.priority = 100;
 
@@ -41,7 +41,7 @@ Mutator = function(name, props) {
 	 * @private
 	 * @memberOf Classify.Mutator#
 	 * @member name
-	 * @type {String}
+	 * @type {string}
 	 */
 	this.name = name;
 	/**
@@ -51,7 +51,7 @@ Mutator = function(name, props) {
 	 * @private
 	 * @memberOf Classify.Mutator#
 	 * @member greedy
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.greedy = props.greedy === true;
 	/**
@@ -60,7 +60,7 @@ Mutator = function(name, props) {
 	 * @private
 	 * @memberOf Classify.Mutator#
 	 * @member propPrefix
-	 * @type {String}
+	 * @type {string}
 	 */
 	this.propPrefix = "$$" + name + "$$";
 },
@@ -68,7 +68,7 @@ Mutator = function(name, props) {
  * Adds a global class mutator that modifies the defined classes at different
  * points with hooks
  *
- * @param {String} name The name of the mutator reference to add
+ * @param {string} name The name of the mutator reference to add
  * @param {Object} mutator The mutator definition with optional hooks
  * @param {Function} [mutator._onPredefine] Internal hook to be called as soon
  *            as the constructor is defined
@@ -82,9 +82,9 @@ Mutator = function(name, props) {
  *            property with the $$name$$ prefix is removed
  * @param {Function} [mutator.onInit] The hook to be called during each object's
  *            initialization
- * @param {Boolean} [mutator.greedy] Attribute to declare that all properties
+ * @param {boolean} [mutator.greedy] Attribute to declare that all properties
  *            being added and removed goes through this mutator
- * @param {Number} [mutator.priority] Attribute to declare execution priority
+ * @param {number} [mutator.priority=100] Attribute to declare execution priority
  *            higher numbers gets run first
  * @throws Error
  * @memberOf Classify
@@ -102,7 +102,7 @@ addMutator = function(name, mutator) {
  * Removes a global class mutator that modifies the defined classes at different
  * points
  *
- * @param {String} name The name of the mutator to be removed
+ * @param {string} name The name of the mutator to be removed
  * @throws Error
  * @memberOf Classify
  * @method removeMutator

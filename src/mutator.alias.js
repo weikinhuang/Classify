@@ -10,8 +10,8 @@ addMutator("alias", {
 		// shortcut method for adding aliased properties
 		/**
 		 * Adds a aliased property to the object's prototype based on a existing prototype method
-		 * @param {String} name The name of the alias for the new property
-		 * @param {String} property The name of the property alias
+		 * @param {string} name The name of the alias for the new property
+		 * @param {string} property The name of the property alias
 		 * @memberOf Classify.Class
 		 * @method addAliasedProperty
 		 * @return {Classify.Class}
