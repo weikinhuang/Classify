@@ -22,7 +22,19 @@ Mutator = function(name, props) {
 	if (!(this instanceof Mutator)) {
 		return new Mutator(name, props);
 	}
+
+	/**
+	 * The execution priority of this mutator
+	 *
+	 * @private
+	 * @memberOf Classify.Mutator#
+	 * @member priority
+	 * @type {Number}
+	 */
+	this.priority = 100;
+
 	extend(this, props);
+
 	/**
 	 * The name of the mutator
 	 *
@@ -118,6 +130,9 @@ getMutators = function(klass) {
 			throw new Error("Mutator objects can only be instances of \"Mutator\", please use createMutator.");
 		}
 	}
+	mutators.sort(function(a, b) {
+		return a.priority === b.priority ? 0 : (a.priority > b.priority ? -1 : 1);
+	});
 	return mutators;
 };
 

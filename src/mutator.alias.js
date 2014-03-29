@@ -3,6 +3,7 @@
  */
 // mutator for adding aliased function properties to a class
 addMutator("alias", {
+	priority : 1000,
 	// the special identifier is "$$alias$$"
 	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
