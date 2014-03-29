@@ -24,6 +24,7 @@ module.exports = function(grunt) {
 			src : [ "srcwrap/intro.js",
 					"src/core.js",
 					"src/create.js",
+					"src/mutator.js",
 					"src/mutator.static.js",
 					"src/mutator.nowrap.js",
 					"src/mutator.alias.js",
@@ -124,6 +125,7 @@ module.exports = function(grunt) {
 		all : {
 			code : [ "src/core.js",
 					"src/create.js",
+					"src/mutator.js",
 					"src/mutator.static.js",
 					"src/mutator.nowrap.js",
 					"src/mutator.alias.js",
