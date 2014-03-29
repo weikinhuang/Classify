@@ -11,4 +11,4 @@ notifications:
 before_script:
   - npm install -g bower
   - bower install
-script: grunt travis
+script: node_modules/.bin/grunt travis
