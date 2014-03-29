@@ -82,8 +82,10 @@ Mutator = function(name, props) {
  *            property with the $$name$$ prefix is removed
  * @param {Function} [mutator.onInit] The hook to be called during each object's
  *            initialization
- * @param {Function} [mutator.greedy] Attribute to declare that all properties
+ * @param {Boolean} [mutator.greedy] Attribute to declare that all properties
  *            being added and removed goes through this mutator
+ * @param {Number} [mutator.priority] Attribute to declare execution priority
+ *            higher numbers gets run first
  * @throws Error
  * @memberOf Classify
  * @method addMutator
