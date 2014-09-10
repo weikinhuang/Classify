@@ -1,4 +1,6 @@
 /* global create */
+/* global addMutator */
+/* global removeMutator */
 QUnit.module("mutator.static");
 
 QUnit.test("static properties", function() {
@@ -87,6 +89,30 @@ QUnit.test("static properties that are instances of a class", function() {
 	QUnit.equal(test.b, prop, "Static property of a class is an unwrapped class");
 	QUnit.equal(test.b.f(), 1, "Static property of an internal class is defined properly");
 	QUnit.equal((new test.b()).g, 2, "Instantiating static class defined within another class");
+});
+
+QUnit.test("static properties are terminal and have high priority", function() {
+	QUnit.expect(2);
+
+	addMutator("test", {
+		onPropAdd : function(klass, parent, name, property) {
+			throw new Error("I should not be called");
+		}
+	});
+
+	// create a class
+	var prop = create({
+		g : 2,
+		$$test_static$$a : 1,
+		$$static_test$$f : function() {
+			return this.a;
+		}
+	});
+
+	QUnit.equal(prop.a, 1, "Static property of a class is an unwrapped class");
+	QUnit.equal(prop.f(), 1, "Static property of an internal class is defined properly");
+
+	removeMutator("test");
 });
 
 
