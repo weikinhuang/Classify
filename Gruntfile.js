@@ -162,8 +162,7 @@ module.exports = function(grunt) {
 				concurrency : 3,
 				browsers : [ {
 					browserName : "firefox",
-					platform : "Windows 8",
-					version : "22"
+					platform : "Windows 8"
 				}, {
 					browserName : "firefox",
 					platform : "Windows XP",
@@ -211,9 +210,17 @@ module.exports = function(grunt) {
 					browserName : "safari",
 					version : "6"
 				}, {
-					platform : "OS X 10.8",
+					platform : "OS X 10.9",
+					browserName : "safari",
+					version : "7"
+				}, /*{
+					platform : "Linux",
+					browserName : "android",
+					version : "4.4"
+				},*/ {
+					platform : "OS X 10.9",
 					browserName : "iphone",
-					version : "6"
+					version : "7.1"
 				} ]
 			}
 		}
