@@ -102,9 +102,12 @@ module.exports = function(grunt) {
 			},
 			options : {
 				banner : "/*! ClassifyJs v<%= pkg.version %> | (c) 2011-<%= grunt.template.today(\"yyyy\") %>, Wei Kin Huang | <%= pkg.homepage %> | MIT license | <%= grunt.template.today(\"yyyy-mm-dd\") %> */;",
-				sourceMap : "dist/classify.min.map",
-				sourceMappingURL : "classify.min.map",
+				sourceMap : "dist/classify.min.js.map",
+				sourceMappingURL : "classify.min.js.map",
 				sourceMapPrefix : 1,
+				compress: {
+					drop_console: true
+				},
 				beautify : {
 					ascii_only : true
 				},

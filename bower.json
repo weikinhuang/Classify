@@ -3,7 +3,7 @@
   "version": "0.14.0",
   "main": "./dist/classify.min.js",
   "devDependencies": {
-    "qunit": "~1.14.0",
+    "qunit": "~1.15.0",
     "benchmark" : "~1.0.0"
   },
   "ignore": [

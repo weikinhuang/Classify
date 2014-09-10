@@ -63,7 +63,7 @@ context.QUnit.config.autorun = true;
 
 // add event listeners to the qunit test events
 context.QUnit.log(function(data) {
-	data.test = this.config.current.testName;
+	data.test = data.name;
 	data.module = currentmodule;
 	process.send({
 		event : "assertionDone",
@@ -73,7 +73,7 @@ context.QUnit.log(function(data) {
 context.QUnit.testStart(function(data) {
 	// use last module name if no module name defined
 	currentmodule = data.module || currentmodule;
-	data.test = this.config.current.testName;
+	data.test = data.name;
 	data.module = currentmodule;
 	process.send({
 		event : "testStart",
