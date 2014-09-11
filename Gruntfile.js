@@ -431,8 +431,7 @@ module.exports = function(grunt) {
 					}
 					// Log results.
 					if (status.failed > 0) {
-						grunt.warn(status.failed + "/" + status.total + " assertions failed (" + status.duration
-								+ "ms)");
+						grunt.warn(status.failed + "/" + status.total + " assertions failed (" + status.duration + "ms)");
 						done(false);
 					} else if (status.total === 0) {
 						grunt.warn("0/0 assertions ran (" + status.duration + "ms)");

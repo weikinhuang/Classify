@@ -1,11 +1,11 @@
 /*!
- * Classify JavaScript Library v0.14.0
+ * Classify JavaScript Library v0.14.1
  * http://www.closedinterval.com/
  *
  * Copyright 2011-2014, Wei Kin Huang
  * Classify is freely distributable under the MIT license.
  *
- * Date: Mon Feb 03 2014 18:07:33
+ * Date: Thu Sep 11 2014 11:05:32
  */
 (function(root, undefined) {
 	"use strict";
@@ -30,16 +30,18 @@ hasOwn = objectPrototype.hasOwnProperty,
 arrayPush = Array.prototype.push,
 // regex to test for scalar value
 scalarRegExp = /^(?:boolean|number|string|undefined)$/,
-//create a noop function
+/**
+ * create a noop function
+ * @constructor
+ */
 noop = function() {
 },
 /**
  * Utility function to test if a value is scalar in nature
  * @param {Object} o The object to test
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method isScalar
- * @return {Boolean}
+ * @return {boolean}
  */
 isScalar = function(o) {
 	return o === null || scalarRegExp.test(typeof o);
@@ -47,10 +49,9 @@ isScalar = function(o) {
 /**
  * Utility function to test if object is a function
  * @param {Object} o The object to test
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method isFunction
- * @return {Boolean}
+ * @return {boolean}
  */
 isFunction = function(o) {
 	return toString.call(o) === "[object Function]";
@@ -58,10 +59,9 @@ isFunction = function(o) {
 /**
  * Utility function to test if object is extendable
  * @param {Object} o The object to test
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method isExtendable
- * @return {Boolean}
+ * @return {boolean}
  */
 isExtendable = function(o) {
 	return o && o.prototype && isFunction(o);
@@ -70,10 +70,9 @@ isExtendable = function(o) {
  * Utility function to test if object is an Array instance
  * polyfill for Array.isArray
  * @param {Object} o The object to test
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method isArray
- * @return {Boolean}
+ * @return {boolean}
  */
 isArray = Array.isArray || function(o) {
 //#JSCOVERAGE_IF !Array.isArray
@@ -85,10 +84,9 @@ nativeFunctionRegExp = new RegExp("^" + String(toString).replace(/[.*+?^${}()|[\
 /**
  * Utility function to test if a function is native
  * @param {Object} o The object to test
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method isNative
- * @return {Boolean}
+ * @return {boolean}
  */
 isNative = function(o) {
 	return isFunction(o) && nativeFunctionRegExp.test(o.toString());
@@ -98,8 +96,7 @@ isNative = function(o) {
  * quickly be able to get all the keys of an object, we don't use
  * Object.keys because we also want to extract from the parent prototypes
  * @param {Object} o The object to iterate over
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method keys
  * @return {Array}
  */
@@ -135,8 +132,7 @@ toArray = function(o) {
 /**
  * Convert the `arguments` object into a Array instance
  * @param {Arguments} o The arguments object
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method argsToArray
  * @return {Array}
  */
@@ -148,10 +144,9 @@ argsToArray = function(o) {
  * polyfill for Array.prototype.indexOf
  * @param {Array} array The array to search
  * @param {Object} item The searched item
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method indexOf
- * @return {Number} Returns -1 if not found
+ * @return {number} Returns -1 if not found
  */
 indexOf = Array.prototype.indexOf ? function(array, item) {
 //#JSCOVERAGE_IF Array.prototype.indexOf
@@ -177,8 +172,7 @@ store = function(fn, base) {
  * Utility function to provide object/array iteration
  * @param {Object} o The object to iterate
  * @param {Function} iterator Iteration function returns false to exit
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method each
  * @return {Object}
  */
@@ -212,8 +206,7 @@ each = function(o, iterator, context) {
  * Utility function to provide object mapping to an array
  * @param {Object} o The object to iterate
  * @param {Function} iterator Iteration function returns mapped value
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method map
  * @return {Array}
  */
@@ -228,9 +221,8 @@ map = function(o, iterator) {
  * Utility function to provide functionality to quickly add properties to objects
  * simple extension function that takes into account the enumerated keys
  * @param {Object} base The base object to copy properties into
- * @param {Object[]} o Set of objects to copy properties from
- * @static
- * @for Classify
+ * @param {...Object[]} o Set of objects to copy properties from
+ * @memberOf Classify
  * @method extend
  * @return {Object}
  */
@@ -247,10 +239,9 @@ extend = function() {
  * Utility function to removes the first instance of item from an array
  * @param {Array} arr The array to search
  * @param {Object} item The item to remove
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method remove
- * @return {Boolean} TRUE if item removed
+ * @return {boolean} TRUE if item removed
  */
 remove = function(arr, item) {
 	var idx = indexOf(arr, item);
@@ -294,14 +285,6 @@ extend(exportNames, {
  */
 // regex for keyword properties
 var keywordRegexp = /^(?:\$\$\w+|bindings|extend|prototype|(?:add|remove)(?:Static|Aliased|Bound)Property)$/,
-// regex to test for a mutator name to avoid a loop
-mutatorNameTest = /^\$\$(\w+)\$\$/,
-// separator for multiple mutator usages
-mutatorSeparator = "_",
-// reference to existing mutators
-namedGlobalMutators = {},
-// list of all mutators in the order of definition
-globalMutators = [],
 // Hook to use Object.defineProperty if needed
 objectDefineProperty = function(obj, prop, descriptor) {
 	obj[prop] = descriptor;
@@ -314,58 +297,15 @@ Base = (function() {
 	 * True constructor method for this object, will be called when object is
 	 * called with the "new" keyword
 	 *
-	 * @for Classify.Class
+	 * @memberOf Classify.Class#
 	 * @method init
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	fn.prototype.init = noop;
 	fn.prototype.constructor = fn;
 	fn.$$isclass = true;
 	return fn;
 })(),
-/**
- * Internal "Mutator" class that handles hooks for class object manipulation
- *
- * @constructor
- * @for Classify.Mutator
- * @param {String} name The name of the mutator
- * @param {Object} props hash of properties to merge into the prototype
- * @method Mutator
- */
-Mutator = function(name, props) {
-	if (!(this instanceof Mutator)) {
-		return new Mutator(name, props);
-	}
-	extend(this, props);
-	/**
-	 * The name of the mutator
-	 *
-	 * @private
-	 * @for Classify.Mutator
-	 * @property name
-	 * @type {String}
-	 */
-	this.name = name;
-	/**
-	 * Flag determining if all property modifications should be run through
-	 * this mutator
-	 *
-	 * @private
-	 * @for Classify.Mutator
-	 * @property greedy
-	 * @type {Boolean}
-	 */
-	this.greedy = props.greedy === true;
-	/**
-	 * The property matcher prefix of this mutator
-	 *
-	 * @private
-	 * @for Classify.Mutator
-	 * @property propPrefix
-	 * @type {RegExp}
-	 */
-	this.propPrefix = "$$" + name + "$$";
-},
 // wraps a function so that the "this.$$parent" is bound to the function
 wrapParentProperty = function(parentPrototype, property) {
 	return store(function() {
@@ -373,7 +313,7 @@ wrapParentProperty = function(parentPrototype, property) {
 		 * Internal reference property for methods that override a parent
 		 * method, allow for access to the parent version of the function.
 		 *
-		 * @for Classify.Class
+		 * @memberOf Classify.Class#
 		 * @method $$parent
 		 * @return {Object}
 		 */
@@ -387,76 +327,6 @@ wrapParentProperty = function(parentPrototype, property) {
 		}
 		return ret;
 	}, property);
-},
-/**
- * Adds a global class mutator that modifies the defined classes at different
- * points with hooks
- *
- * @param {String} name The name of the mutator reference to add
- * @param {Object} mutator The mutator definition with optional hooks
- * @param {Function} [mutator._onPredefine] Internal hook to be called as soon
- *            as the constructor is defined
- * @param {Function} [mutator.onCreate] The hook to be called when a class is
- *            defined before any properties are added
- * @param {Function} [mutator.onDefine] The hook to be called when a class is
- *            defined after all properties are added
- * @param {Function} [mutator.onPropAdd] The hook to be called when a property
- *            with the $$name$$ prefix is added
- * @param {Function} [mutator.onPropRemove] The hook to be called when a
- *            property with the $$name$$ prefix is removed
- * @param {Function} [mutator.onInit] The hook to be called during each object's
- *            initialization
- * @param {Function} [mutator.greedy] Attribute to declare that all properties
- *            being added and removed goes through this mutator
- * @throws Error
- * @static
- * @for Classify
- * @method addMutator
- */
-addMutator = function(name, mutator) {
-	if (namedGlobalMutators[name]) {
-		throw new Error("Adding duplicate mutator \"" + name + "\".");
-	}
-	var mutatorInstance = new Mutator(name, mutator);
-	namedGlobalMutators[name] = mutatorInstance;
-	globalMutators.push(mutatorInstance);
-},
-/**
- * Removes a global class mutator that modifies the defined classes at different
- * points
- *
- * @param {String} name The name of the mutator to be removed
- * @throws Error
- * @static
- * @for Classify
- * @method removeMutator
- */
-removeMutator = function(name) {
-	var mutator = namedGlobalMutators[name];
-	if (!mutator) {
-		throw new Error("Removing unknown mutator.");
-	}
-	remove(globalMutators, mutator);
-	namedGlobalMutators[name] = null;
-	try {
-		delete namedGlobalMutators[name];
-	} catch (e) {
-	}
-},
-// method to get all possible mutators
-getMutators = function(klass) {
-	var i, l, mutators = globalMutators.slice(0);
-	arrayPush.apply(mutators, klass.$$mutator);
-	// hook for namespaces!
-	if (klass.getMutators) {
-		arrayPush.apply(mutators, klass.getMutators() || []);
-	}
-	for (i = 0, l = mutators; i < l; i++) {
-		if (!(mutators[i] instanceof Mutator)) {
-			throw new Error("Mutator objects can only be instances of \"Mutator\", please use createMutator.");
-		}
-	}
-	return mutators;
 },
 // adds a property to an existing class taking into account parent
 addProperty = function(klass, parent, name, property, mutators, isRecurse) {
@@ -604,17 +474,16 @@ initializeKlass = function(instance, klass, args) {
 /**
  * Creates a new Classify class
  *
- * @param {Class} [parent] Optional first parameter defines what object to
+ * @param {Classify.Class} [parent] Optional first parameter defines what object to
  *            inherit from
  * @param {Object[]} [implement] Optional second parameter defines where to
  *            implement traits from
  * @param {Classify.Mutator[]} [mutators] Optional third parameter defines
  *            mutations for this class
  * @param {Object} definition The description of the class to be created
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method create
- * @return {Class}
+ * @return {Classify.Class}
  */
 var create = function() {
 	var parent = Base,
@@ -664,8 +533,8 @@ var create = function() {
 	 * Placeholder for class descriptors created with the create method
 	 *
 	 * @constructor
-	 * @for Classify
-	 * @type Object
+	 * @memberOf Classify
+	 * @name Class
 	 */
 	klass = function() {
 		return initializeKlass(this, klass, argsToArray(arguments));
@@ -684,10 +553,9 @@ var create = function() {
 	 * Create a new instance of the class using arguments passed in as an array
 	 *
 	 * @param {Array} args Array of arguments to construct the object with
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @method $$apply
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	klass.$$apply = function(a) {
 		var TempClass = function() {
@@ -700,10 +568,9 @@ var create = function() {
 	 * Default invocation function when the defined class is called without the
 	 * "new" keyword. The default behavior is to return a new instance of itself
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @method invoke
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	klass.invoke = methods.invoke || (parent.invoke && isFunction(parent.invoke) && !parent.invoke.$$original ? parent.invoke : null) || store(function() {
 		return klass.$$apply(arguments);
@@ -714,18 +581,16 @@ var create = function() {
 	/**
 	 * Reference to the parent that this object extends from
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property $$superclass
-	 * @type {Class}
+	 * @type {Classify.Class}
 	 */
 	klass.$$superclass = parent;
 	/**
 	 * Array containing a reference to all the children that inherit from this
 	 * object
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property $$subclass
 	 * @type {Array}
 	 */
@@ -734,8 +599,7 @@ var create = function() {
 	 * Array containing all the objects and classes that this object implements
 	 * methods and properties from
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property $$implement
 	 * @type {Array}
 	 */
@@ -744,8 +608,7 @@ var create = function() {
 	 * Array containing all the mutators that were defined with this class,
 	 * these mutators DO NOT get inherited
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property $$mutator
 	 * @type {Array}
 	 */
@@ -767,23 +630,28 @@ var create = function() {
 	/**
 	 * Creates a new class that is a child of the current class
 	 *
-	 * @param {Object[]} [implement] Optional parameter defines where to
+	 * @param {Object[]} [implement] Optional second parameter defines where to
 	 *            implement traits from
+	 * @param {Classify.Mutator[]} [mutators] Optional third parameter defines
+	 *            mutations for this class
 	 * @param {Object} definition The description of the class to be created
-	 * @static
-	 * @for Classify.Class
+	 * @see {@link Classify.create}
+	 * @memberOf Classify.Class
 	 * @method extend
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	/**
 	 * Creates a new class that is a child of the current class
 	 *
-	 * @param {Object[]} [implement] Optional parameter defines where to
+	 * @param {Object[]} [implement] Optional second parameter defines where to
 	 *            implement traits from
+	 * @param {Classify.Mutator[]} [mutators] Optional third parameter defines
+	 *            mutations for this class
 	 * @param {Object} definition The description of the class to be created
-	 * @for Classify.Class
+	 * @see {@link Classify.create}
+	 * @memberOf Classify.Class#
 	 * @method extend
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	klass.extend = proto.extend = function() {
 		return create.apply(null, [ klass ].concat(argsToArray(arguments)));
@@ -800,7 +668,7 @@ var create = function() {
 	 *
 	 * @param {Object} name The name of the parent method to invoke
 	 * @param {Array} args The arguments to pass through to invoke
-	 * @for Classify.Class
+	 * @memberOf Classify.Class#
 	 * @method $$apply
 	 * @return {Object}
 	 */
@@ -824,7 +692,7 @@ var create = function() {
 	 *
 	 * @param {Object} name The name of the parent method to invoke
 	 * @param {Object} arg... Actual arguments to call the method with
-	 * @for Classify.Class
+	 * @memberOf Classify.Class#
 	 * @method $$call
 	 * @return {Object}
 	 */
@@ -846,14 +714,13 @@ var create = function() {
 	/**
 	 * Adds a new property to the object's prototype of base
 	 *
-	 * @param {String|Object} name The property name to add or if object is
+	 * @param {string|Object} name The property name to add or if object is
 	 *            passed in then it will iterate through it to add properties
 	 * @param {Object} [property] The property to add to the class
-	 * @param {String} [prefix=""] Prefix of the property name if any
-	 * @static
-	 * @for Classify.Class
+	 * @param {string} [prefix=""] Prefix of the property name if any
+	 * @memberOf Classify.Class
 	 * @method addProperty
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	klass.addProperty = function(name, property, prefix) {
 		var mutators = getMutators(klass);
@@ -871,11 +738,10 @@ var create = function() {
 	/**
 	 * Removes a property from the object's prototype or base
 	 *
-	 * @param {String} name The name of the property to remove
-	 * @static
-	 * @for Classify.Class
+	 * @param {string} name The name of the property to remove
+	 * @memberOf Classify.Class
 	 * @method removeProperty
-	 * @return {Class}
+	 * @return {Classify.Class}
 	 */
 	klass.removeProperty = function(name) {
 		removeProperty(klass, name, getMutators(klass));
@@ -908,19 +774,18 @@ var create = function() {
 	/**
 	 * Reference to the constructor function of this object
 	 *
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property constructor
-	 * @type {Class}
+	 * @type {Classify.Class}
 	 */
 	proto.constructor = klass;
 	/**
 	 * Flag to determine if this object is created by Classify.create
 	 *
-	 * @static
-	 * @for Classify.Class
+	 * @memberOf Classify.Class
 	 * @property $$isclass
 	 * @private
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	klass.$$isclass = true;
 
@@ -937,7 +802,152 @@ var create = function() {
 // export methods to the main object
 extend(exportNames, {
 	// direct access functions
-	create : create,
+	create : create
+});
+
+/**
+ * @module mutator
+ */
+// regex to test for a mutator name to avoid a loop
+var mutatorNameTest = /^\$\$(\w+)\$\$/,
+// separator for multiple mutator usages
+mutatorSeparator = "_",
+// reference to existing mutators
+namedGlobalMutators = {},
+// list of all mutators in the order of definition
+globalMutators = [],
+/**
+ * Internal "Mutator" class that handles hooks for class object manipulation
+ *
+ * @constructor
+ * @memberOf Classify
+ * @alias Mutator
+ * @param {string} name The name of the mutator
+ * @param {Object} props hash of properties to merge into the prototype
+ */
+Mutator = function(name, props) {
+	if (!(this instanceof Mutator)) {
+		return new Mutator(name, props);
+	}
+
+	/**
+	 * The execution priority of this mutator
+	 *
+	 * @private
+	 * @memberOf Classify.Mutator#
+	 * @member priority
+	 * @type {number}
+	 */
+	this.priority = 100;
+
+	extend(this, props);
+
+	/**
+	 * The name of the mutator
+	 *
+	 * @private
+	 * @memberOf Classify.Mutator#
+	 * @member name
+	 * @type {string}
+	 */
+	this.name = name;
+	/**
+	 * Flag determining if all property modifications should be run through
+	 * this mutator
+	 *
+	 * @private
+	 * @memberOf Classify.Mutator#
+	 * @member greedy
+	 * @type {boolean}
+	 */
+	this.greedy = props.greedy === true;
+	/**
+	 * The property matcher prefix of this mutator
+	 *
+	 * @private
+	 * @memberOf Classify.Mutator#
+	 * @member propPrefix
+	 * @type {string}
+	 */
+	this.propPrefix = "$$" + name + "$$";
+},
+/**
+ * Adds a global class mutator that modifies the defined classes at different
+ * points with hooks
+ *
+ * @param {string} name The name of the mutator reference to add
+ * @param {Object} mutator The mutator definition with optional hooks
+ * @param {Function} [mutator._onPredefine] Internal hook to be called as soon
+ *            as the constructor is defined
+ * @param {Function} [mutator.onCreate] The hook to be called when a class is
+ *            defined before any properties are added
+ * @param {Function} [mutator.onDefine] The hook to be called when a class is
+ *            defined after all properties are added
+ * @param {Function} [mutator.onPropAdd] The hook to be called when a property
+ *            with the $$name$$ prefix is added
+ * @param {Function} [mutator.onPropRemove] The hook to be called when a
+ *            property with the $$name$$ prefix is removed
+ * @param {Function} [mutator.onInit] The hook to be called during each object's
+ *            initialization
+ * @param {boolean} [mutator.greedy] Attribute to declare that all properties
+ *            being added and removed goes through this mutator
+ * @param {number} [mutator.priority=100] Attribute to declare execution priority
+ *            higher numbers gets run first
+ * @throws Error
+ * @memberOf Classify
+ * @method addMutator
+ */
+addMutator = function(name, mutator) {
+	if (namedGlobalMutators[name]) {
+		throw new Error("Adding duplicate mutator \"" + name + "\".");
+	}
+	var mutatorInstance = new Mutator(name, mutator);
+	namedGlobalMutators[name] = mutatorInstance;
+	globalMutators.push(mutatorInstance);
+},
+/**
+ * Removes a global class mutator that modifies the defined classes at different
+ * points
+ *
+ * @param {string} name The name of the mutator to be removed
+ * @throws Error
+ * @memberOf Classify
+ * @method removeMutator
+ */
+removeMutator = function(name) {
+	var mutator = namedGlobalMutators[name];
+	if (!mutator) {
+		throw new Error("Removing unknown mutator.");
+	}
+	remove(globalMutators, mutator);
+	namedGlobalMutators[name] = null;
+	try {
+		delete namedGlobalMutators[name];
+	} catch (e) {
+	}
+},
+// method to get all possible mutators
+getMutators = function(klass) {
+	var i, l, mutators = globalMutators.slice(0);
+	arrayPush.apply(mutators, klass.$$mutator);
+	// hook for namespaces!
+	if (klass.getMutators) {
+		arrayPush.apply(mutators, klass.getMutators() || []);
+	}
+	for (i = 0, l = mutators; i < l; i++) {
+		if (!(mutators[i] instanceof Mutator)) {
+			throw new Error("Mutator objects can only be instances of \"Mutator\", please use createMutator.");
+		}
+	}
+	mutators.sort(function(a, b) {
+		return a.priority === b.priority ? 0 : (a.priority > b.priority ? -1 : 1);
+	});
+	return mutators;
+};
+
+// export methods to the main object
+extend(exportNames, {
+	// direct access functions
 	Mutator : Mutator,
 	addMutator : addMutator,
 	removeMutator : removeMutator
@@ -948,28 +958,27 @@ extend(exportNames, {
  */
 // mutator for adding static properties to a class
 addMutator("static", {
+	priority : 2000,
 	// the special identifier is "$$static$$"
 	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
 		/**
 		 * Adds a static property to the object's base
-		 * @param {String} name The name of the property to add
+		 * @param {string} name The name of the property to add
 		 * @param {Object} property The property to store into the object's base
-		 * @static
-		 * @for Classify.Class
+		 * @memberOf Classify.Class
 		 * @method addStaticProperty
-		 * @return {Class}
+		 * @return {Classify.Class}
 		 */
 		klass.addStaticProperty = function(name, property) {
 			return klass.addProperty(name, property, mutatorPrefix);
 		};
 		/**
 		 * Removes a static property from the object's base
-		 * @param {String} name The name of the property to remove
-		 * @static
-		 * @for Classify.Class
+		 * @param {string} name The name of the property to remove
+		 * @memberOf Classify.Class
 		 * @method removeStaticProperty
-		 * @return {Class}
+		 * @return {Classify.Class}
 		 */
 		klass.removeStaticProperty = function(name) {
 			return klass.removeProperty(mutatorPrefix + name);
@@ -1006,17 +1015,17 @@ addMutator("static", {
  */
 // mutator for adding unwrapped function properties to a class
 addMutator("nowrap", {
+	priority : 1000,
 	// the special identifier is "$$nowrap$$"
 	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
 		/**
 		 * Adds a property to the object's prototype that is not wrapped in the parent method wrapper
-		 * @param {String} name The name of the new property
-		 * @param {String} property The name of the property to add
-		 * @static
-		 * @for Classify.Class
+		 * @param {string} name The name of the new property
+		 * @param {string} property The name of the property to add
+		 * @memberOf Classify.Class
 		 * @method addUnwrappedProperty
-		 * @return {Class}
+		 * @return {Classify.Class}
 		 */
 		klass.addUnwrappedProperty = function(name, property) {
 			return klass.addProperty(name, property, mutatorPrefix);
@@ -1033,18 +1042,18 @@ addMutator("nowrap", {
  */
 // mutator for adding aliased function properties to a class
 addMutator("alias", {
+	priority : 1000,
 	// the special identifier is "$$alias$$"
 	onCreate : function(klass) {
 		var mutatorPrefix = this.propPrefix;
 		// shortcut method for adding aliased properties
 		/**
 		 * Adds a aliased property to the object's prototype based on a existing prototype method
-		 * @param {String} name The name of the alias for the new property
-		 * @param {String} property The name of the property alias
-		 * @static
-		 * @for Classify.Class
+		 * @param {string} name The name of the alias for the new property
+		 * @param {string} property The name of the property alias
+		 * @memberOf Classify.Class
 		 * @method addAliasedProperty
-		 * @return {Class}
+		 * @return {Classify.Class}
 		 */
 		klass.addAliasedProperty = function(name, property) {
 			return klass.addProperty(name, property, mutatorPrefix);
@@ -1063,37 +1072,35 @@ addMutator("alias", {
  */
 // mutator for adding bound properties to a class
 addMutator("bind", {
+	priority : 1000,
 	// the special identifier is "$$bind$$"
 	onCreate : function(klass, parent) {
 		var mutatorPrefix = this.propPrefix;
 		// re-assign the bindings so that it produces copies across child classes
 		/**
 		 * Array containing the list of all the bound properties that is wrapped during object initialization
-		 * @static
-		 * @for Classify.Class
+		 * @memberOf Classify.Class
 		 * @property bindings
 		 * @type {Array}
 		 */
 		klass.bindings = (parent.bindings || []).slice(0);
 		/**
 		 * Adds a context bound property to the object's prototype
-		 * @param {String} name The name of the property to add
+		 * @param {string} name The name of the property to add
 		 * @param {Function} property The property to always bind the object's context with
-		 * @static
-		 * @for Classify.Class
+		 * @memberOf Classify.Class
 		 * @method addBoundProperty
-		 * @return {Class}
+		 * @return {Classify.Class}
 		 */
 		klass.addBoundProperty = function(name, property) {
 			return klass.addProperty(name, property, mutatorPrefix);
 		};
 		/**
 		 * Removes a context bound property from the object's base
-		 * @param {String} name The name of the property to remove
-		 * @static
-		 * @for Classify.Class
+		 * @param {string} name The name of the property to remove
+		 * @memberOf Classify.Class
 		 * @method removeBoundProperty
-		 * @return {Class}
+		 * @return {Classify.Class}
 		 */
 		klass.removeBoundProperty = function(name) {
 			return klass.removeProperty(mutatorPrefix + name);
@@ -1138,7 +1145,7 @@ addMutator("bind", {
 				/**
 				 * Allow access to the calling context when using a bound method
 				 *
-				 * @for Classify.Class
+				 * @memberOf Classify.Class#
 				 * @property $$context
 				 * @type {Object}
 				 */
@@ -1197,8 +1204,8 @@ namespaceProperties = {
 	/**
 	 * Creates a new class within this namespace
 	 *
-	 * @param {String} name The name of the created class within the namespace
-	 * @param {String|Class} [parent] Optional second parameter defines what
+	 * @param {string} name The name of the created class within the namespace
+	 * @param {string|Class} [parent] Optional second parameter defines what
 	 *            object to inherit from, can be a string referencing a class
 	 *            within any namespace
 	 * @param {Object[]} [implement] Optional third parameter defines where to
@@ -1206,7 +1213,7 @@ namespaceProperties = {
 	 * @param {Classify.Mutator[]} [mutators] Optional third parameter defines
 	 *            mutations for this class
 	 * @param {Object} definition The description of the class to be created
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method create
 	 * @return {Class}
 	 */
@@ -1279,8 +1286,8 @@ namespaceProperties = {
 	/**
 	 * Removes a defined class from this namespace and it's children classes
 	 *
-	 * @param {String} classname Name of class to remove from this namespace
-	 * @for Classify.Namespace
+	 * @param {string} classname Name of class to remove from this namespace
+	 * @memberOf Classify.Namespace#
 	 * @method destroy
 	 * @return {Namespace}
 	 */
@@ -1341,11 +1348,11 @@ namespaceProperties = {
 	/**
 	 * Checks if a class exists within this namespace
 	 *
-	 * @param {String} classname Name of class to check if it has already been
+	 * @param {string} classname Name of class to check if it has already been
 	 *            defined
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method exists
-	 * @return {Boolean}
+	 * @return {boolean}
 	 */
 	exists : function(classname) {
 		return !!this.$$nsref[classname];
@@ -1353,8 +1360,8 @@ namespaceProperties = {
 	/**
 	 * Attempt to retrieve a class within this namespace or the global one
 	 *
-	 * @param {String} name The name of the class to retrieve
-	 * @for Classify.Namespace
+	 * @param {string} name The name of the class to retrieve
+	 * @memberOf Classify.Namespace#
 	 * @method get
 	 * @return {Class}
 	 */
@@ -1377,6 +1384,15 @@ namespaceProperties = {
 		// no class found
 		return null;
 	},
+	/**
+	 * Loader function to retrieve a {Classify.Class}
+	 *
+	 * @param {string} name The name of the class to load
+	 * @memberOf Classify.Namespace#
+	 * @method load
+	 * @deprecated
+	 * @returns {Classify.Class}
+	 */
 	load : function(name) {
 		return this.$$nsref[name] || null;
 	},
@@ -1386,7 +1402,7 @@ namespaceProperties = {
 	 *
 	 * @param {Function} callback The function to call when a class that doesn't
 	 *            exist needs to be loaded
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method setAutoloader
 	 * @return {Namespace}
 	 */
@@ -1401,9 +1417,9 @@ namespaceProperties = {
 	/**
 	 * Gets the name of this namespace
 	 *
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method getName
-	 * @return {String}
+	 * @return {string}
 	 */
 	getName : function() {
 		return this.$$nsname;
@@ -1412,7 +1428,7 @@ namespaceProperties = {
 	 * Adds a namespace level class mutator that modifies the defined classes at
 	 * different points with hooks
 	 *
-	 * @param {String} name The name of the mutator reference to add
+	 * @param {string} name The name of the mutator reference to add
 	 * @param {Object} mutator The mutator definition with optional hooks
 	 * @param {Function} [mutator._onPredefine] Internal hook to be called as
 	 *            soon as the constructor is defined
@@ -1427,7 +1443,7 @@ namespaceProperties = {
 	 * @param {Function} [mutator.onInit] The hook to be called during each
 	 *            object's initialization
 	 * @throws Error
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method addMutator
 	 */
 	addMutator : function(name, mutator) {
@@ -1442,9 +1458,9 @@ namespaceProperties = {
 	 * Removes a namespace level class mutator that modifies the defined classes
 	 * at different points
 	 *
-	 * @param {String} name The name of the mutator to be removed
+	 * @param {string} name The name of the mutator to be removed
 	 * @throws Error
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method removeMutator
 	 */
 	removeMutator : function(name) {
@@ -1461,25 +1477,32 @@ namespaceProperties = {
 	}
 };
 
-// Namespacing class to create and handle namespaces
+/**
+ * Namespacing class to create and handle namespaces
+ *
+ * @constructor
+ * @memberOf Classify
+ * @alias Namespace
+ * @augments {Classify.Class}
+ * @param {string} name The name of the namespace to construct with
+ */
 var Namespace = create(extend({}, namespaceProperties, {
 	/**
 	 * Flag to determine if this object is functionally a namespace
 	 *
-	 * @static
-	 * @for Classify.Namespace
-	 * @property $$$$isnamespace
+	 * @memberOf Classify.Namespace#
+	 * @property $$isnamespace
 	 * @private
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	$$isnamespace : true,
 	/**
 	 * The name of the namespace
 	 *
 	 * @private
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @property $$nsname
-	 * @type {String}
+	 * @type {string}
 	 */
 	$$nsname : null,
 	/**
@@ -1487,7 +1510,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 * namespace
 	 *
 	 * @private
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @property $$nsref
 	 * @type {Object}
 	 */
@@ -1496,7 +1519,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 * Hashtable containing references to all the defined mutators
 	 *
 	 * @private
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @property namedMutators
 	 * @type {Object}
 	 */
@@ -1505,7 +1528,7 @@ var Namespace = create(extend({}, namespaceProperties, {
 	 * Array of all mutators in the namespace
 	 *
 	 * @private
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @property mutators
 	 * @type {Array}
 	 */
@@ -1513,11 +1536,10 @@ var Namespace = create(extend({}, namespaceProperties, {
 	/**
 	 * Namespace container that hold a tree of classes
 	 *
-	 * @constructor
-	 * @for Classify.Namespace
+	 * @constructs
 	 * @extends {Class}
-	 * @param {String} name The name of the namespace to construct with
-	 * @method Namespace
+	 * @param {string} name The name of the namespace to construct with
+	 * @name Namespace
 	 */
 	init : function(name) {
 		this.$$nsname = name;
@@ -1528,9 +1550,9 @@ var Namespace = create(extend({}, namespaceProperties, {
 	/**
 	 * Gets the translated toString name of this object "[namespace Name]"
 	 *
-	 * @for Classify.Namespace
+	 * @memberOf Classify.Namespace#
 	 * @method toString
-	 * @return {String}
+	 * @return {string}
 	 */
 	toString : function() {
 		return "[namespace " + this.$$nsname + "]";
@@ -1540,13 +1562,12 @@ var Namespace = create(extend({}, namespaceProperties, {
 /**
  * Transforms a object to a {Classify.Namespace} capable object
  *
- * @param {String} name The name of the namespace to construct with
+ * @param {string} name The name of the namespace to construct with
  * @param {Object} obj The target object to extend with Namespace abilities
- * @param {Boolean} [internalize=false] Set the namespace into the internal
+ * @param {boolean} [internalize=false] Set the namespace into the internal
  *            named cache
- * @for Classify.Namespace
+ * @memberOf Classify.Namespace
  * @method from
- * @static
  * @return {Object}
  */
 Namespace.from = function(name, obj, internalize) {
@@ -1582,9 +1603,8 @@ Namespace.from = function(name, obj, internalize) {
 /**
  * Retrieves a namespace and creates if it it doesn't already exist
  *
- * @param {String} namespace Dot separated namespace string
- * @static
- * @for Classify
+ * @param {string} namespace Dot separated namespace string
+ * @memberOf Classify
  * @method getNamespace
  * @return {Namespace}
  */
@@ -1605,9 +1625,8 @@ getNamespace = function(namespace) {
 /**
  * Destroy an existing namespace
  *
- * @param {String} namespace Dot separated namespace string
- * @static
- * @for Classify
+ * @param {string} namespace Dot separated namespace string
+ * @memberOf Classify
  * @method destroyNamespace
  */
 destroyNamespace = function(namespace) {
@@ -1627,9 +1646,8 @@ destroyNamespace = function(namespace) {
  * Retrieves the first namespace that matches the namespace chain
  * "Ns1.ns2.ns3.ns4"
  *
- * @param {String} namespace Dot separated namespace string
- * @static
- * @for Classify
+ * @param {string} namespace Dot separated namespace string
+ * @memberOf Classify
  * @method testNamespace
  * @return {Namespace}
  */
@@ -1646,8 +1664,7 @@ testNamespace = function(namespace) {
 /**
  * Retieves the globally named namespace
  *
- * @static
- * @for Classify
+ * @memberOf Classify
  * @method getGlobalNamespace
  * @return {Namespace}
  */
@@ -1667,8 +1684,7 @@ extend(exportNames, {
 	/**
 	 * The globally named namespace
 	 *
-	 * @static
-	 * @for Classify
+	 * @memberOf Classify
 	 * @property global
 	 * @type {Namespace}
 	 */
@@ -1685,7 +1701,14 @@ extend(exportNames, {
  */
 // quick reference to the seperator string
 var namespaceSeparator = "/",
-// Create a wrapped reference to the Classify object.
+/**
+ * The wrapped reference to the Classify object.
+ *
+ * @constructor
+ * @augments {Classify.Class}
+ * @name Classify
+ * @see {@link Classify.create}
+ */
 Classify = create({
 	invoke : function() {
 		var args = argsToArray(arguments), length = args.length, ns, tmp;
@@ -1725,7 +1748,9 @@ Classify = create({
 	},
 	/**
 	 * The Main interface function that returns namespaces and creates objects
-	 * @class Classify
+	 *
+	 * @constructs
+	 * @name Classify
 	 * @return {Classify.Class}
 	 */
 	init : function() {
@@ -1748,13 +1773,12 @@ Classify = create({
 extend(Classify, exportNames, {
 	/**
 	 * The version number of this file
-	 * @static
 	 * @final
-	 * @for Classify
-	 * @type {String}
+	 * @memberOf Classify
+	 * @type {string}
 	 * @property version
 	 */
-	version : "0.14.0"
+	version : "0.14.1"
 });
 
 /*global define */
@@ -1772,9 +1796,8 @@ if (typeof module !== "undefined" && module.exports) {
 	module.exports = Classify;
 	/**
 	 * Circular reference to itself
-	 * @static
 	 * @property Classify
-	 * @for Classify
+	 * @memberOf Classify
 	 * @type {Function}
 	 */
 	Classify.Classify = Classify;
@@ -1788,9 +1811,8 @@ if (typeof module !== "undefined" && module.exports) {
 	/**
 	 * Run Classify.js in "noConflict" mode, returning the "Classify" variable to its
 	 * previous value. Returns a reference to the Classify object.
-	 * @static
 	 * @method noConflict
-	 * @for Classify
+	 * @memberOf Classify
 	 * @return {Classify}
 	 * @example
 	 *     (function(Classify) {

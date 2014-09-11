@@ -1,3 +1,6 @@
+#### v0.14.1
+	Adding `priority` property to mutators to allow for mutator processing order
+
 #### v0.14.0
 	Ability to set internal references for namespaces created with `Namespace.from()`
 
