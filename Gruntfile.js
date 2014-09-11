@@ -9,7 +9,10 @@ module.exports = function(grunt) {
 	gruntConfig.pkg = grunt.file.readJSON("package.json");
 
 	gruntConfig.compare_size = {
-		files : [ "dist/classify.js", "dist/classify.min.js" ],
+		files : [
+			"dist/classify.js",
+			"dist/classify.min.js"
+		],
 		options : {
 			compress : {
 				gz : function(file_contents) {
@@ -21,17 +24,19 @@ module.exports = function(grunt) {
 
 	gruntConfig.concat = {
 		dist : {
-			src : [ "srcwrap/intro.js",
-					"src/core.js",
-					"src/create.js",
-					"src/mutator.js",
-					"src/mutator.static.js",
-					"src/mutator.nowrap.js",
-					"src/mutator.alias.js",
-					"src/mutator.bind.js",
-					"src/namespace.js",
-					"src/export.js",
-					"srcwrap/outro.js" ],
+			src : [
+				"srcwrap/intro.js",
+				"src/core.js",
+				"src/create.js",
+				"src/mutator.js",
+				"src/mutator.static.js",
+				"src/mutator.nowrap.js",
+				"src/mutator.alias.js",
+				"src/mutator.bind.js",
+				"src/namespace.js",
+				"src/export.js",
+				"srcwrap/outro.js"
+			],
 			dest : "dist/classify.js"
 		},
 		options : {
@@ -42,7 +47,9 @@ module.exports = function(grunt) {
 
 	gruntConfig.jshint = {
 		dist : {
-			src : [ "dist/classify.js" ],
+			src : [
+				"dist/classify.js"
+			],
 			options : {
 				latedef : true,
 				noempty : true,
@@ -61,7 +68,9 @@ module.exports = function(grunt) {
 			}
 		},
 		test : {
-			src : [ "test/*.js" ],
+			src : [
+				"test/*.js"
+			],
 			options : {
 				latedef : true,
 				noempty : true,
@@ -73,11 +82,17 @@ module.exports = function(grunt) {
 				browser : true,
 				quotmark : "double",
 				maxcomplexity : 7,
-				predef : [ "QUnit", "Classify" ]
+				predef : [
+					"QUnit",
+					"Classify"
+				]
 			}
 		},
 		build : {
-			src : [ "Gruntfile.js", "test/bridge/qunit-node-bridge.js" ],
+			src : [
+				"Gruntfile.js",
+				"test/bridge/qunit-node-bridge.js"
+			],
 			options : {
 				latedef : true,
 				noempty : true,
@@ -98,15 +113,21 @@ module.exports = function(grunt) {
 	gruntConfig.uglify = {
 		all : {
 			files : {
-				"dist/classify.min.js" : [ "dist/classify.js" ]
+				"dist/classify.min.js" : [
+					"dist/classify.js"
+				]
 			},
 			options : {
 				banner : "/*! ClassifyJs v<%= pkg.version %> | (c) 2011-<%= grunt.template.today(\"yyyy\") %>, Wei Kin Huang | <%= pkg.homepage %> | MIT license | <%= grunt.template.today(\"yyyy-mm-dd\") %> */;",
 				sourceMap : "dist/classify.min.js.map",
 				sourceMappingURL : "classify.min.js.map",
 				sourceMapPrefix : 1,
-				compress: {
-					drop_console: true
+				compress : {
+					drop_console : true,
+					global_defs : {
+						DEBUG : false
+					},
+					dead_code : true
 				},
 				beautify : {
 					ascii_only : true
@@ -119,31 +140,37 @@ module.exports = function(grunt) {
 	gruntConfig.qunit = {
 		all : {
 			options : {
-				urls : [ "http://localhost:8080/test/index.html" ]
+				urls : [
+					"http://localhost:8080/test/index.html"
+				]
 			}
 		}
 	};
 
 	gruntConfig["qunit-node"] = {
 		all : {
-			code : [ "src/core.js",
-					"src/create.js",
-					"src/mutator.js",
-					"src/mutator.static.js",
-					"src/mutator.nowrap.js",
-					"src/mutator.alias.js",
-					"src/mutator.bind.js",
-					"src/namespace.js",
-					"src/export.js" ],
-			tests : [ "test/core.js",
-					"test/create.js",
-					"test/mutator.js",
-					"test/mutator.static.js",
-					"test/mutator.nowrap.js",
-					"test/mutator.alias.js",
-					"test/mutator.bind.js",
-					"test/namespace.js",
-					"test/export.js" ],
+			code : [
+				"src/core.js",
+				"src/create.js",
+				"src/mutator.js",
+				"src/mutator.static.js",
+				"src/mutator.nowrap.js",
+				"src/mutator.alias.js",
+				"src/mutator.bind.js",
+				"src/namespace.js",
+				"src/export.js"
+			],
+			tests : [
+				"test/core.js",
+				"test/create.js",
+				"test/mutator.js",
+				"test/mutator.static.js",
+				"test/mutator.nowrap.js",
+				"test/mutator.alias.js",
+				"test/mutator.bind.js",
+				"test/namespace.js",
+				"test/export.js"
+			],
 			setUp : function() {
 				this.root = this;
 			}
@@ -155,73 +182,90 @@ module.exports = function(grunt) {
 			options : {
 				// username: "",
 				// key: "",
-				urls : [ "http://127.0.0.1:8080/test/index.html" ],
+				urls : [
+					"http://127.0.0.1:8080/test/index.html"
+				],
 				tunnelTimeout : 120,
 				testTimeout : 300000,
 				build : process.env.TRAVIS_JOB_ID,
 				concurrency : 3,
-				browsers : [ {
-					browserName : "firefox",
-					platform : "Windows 8"
-				}, {
-					browserName : "firefox",
-					platform : "Windows XP",
-					version : "4"
-				}, {
-					browserName : "chrome",
-					platform : "Windows 7"
-				}, {
-					browserName : "chrome",
-					platform : "Linux"
-				}, {
-					browserName : "internet explorer",
-					platform : "Windows 8.1",
-					version : "11"
-				}, {
-					browserName : "internet explorer",
-					platform : "Windows 8",
-					version : "10"
-				}, {
-					browserName : "internet explorer",
-					platform : "Windows 7",
-					version : "9"
-				}, {
-					browserName : "internet explorer",
-					platform : "Windows XP",
-					version : "8"
-				}, {
-					browserName : "internet explorer",
-					platform : "Windows XP",
-					version : "7"
-				}, {
-					browserName : "opera",
-					platform : "Windows 7",
-					version : "12"
-				}, {
-					browserName : "opera",
-					platform : "Windows 7",
-					version : "11"
-				}, {
-					platform : "OS X 10.6",
-					browserName : "safari",
-					version : "5"
-				}, {
-					platform : "OS X 10.8",
-					browserName : "safari",
-					version : "6"
-				}, {
-					platform : "OS X 10.9",
-					browserName : "safari",
-					version : "7"
-				}, /*{
-					platform : "Linux",
-					browserName : "android",
-					version : "4.4"
-				},*/ {
-					platform : "OS X 10.9",
-					browserName : "iphone",
-					version : "7.1"
-				} ]
+				browsers : [
+					{
+						browserName : "firefox",
+						platform : "Windows 8"
+					},
+					{
+						browserName : "firefox",
+						platform : "Windows XP",
+						version : "4"
+					},
+					{
+						browserName : "chrome",
+						platform : "Windows 7"
+					},
+					{
+						browserName : "chrome",
+						platform : "Linux"
+					},
+					{
+						browserName : "internet explorer",
+						platform : "Windows 8.1",
+						version : "11"
+					},
+					{
+						browserName : "internet explorer",
+						platform : "Windows 8",
+						version : "10"
+					},
+					{
+						browserName : "internet explorer",
+						platform : "Windows 7",
+						version : "9"
+					},
+					{
+						browserName : "internet explorer",
+						platform : "Windows XP",
+						version : "8"
+					},
+					{
+						browserName : "internet explorer",
+						platform : "Windows XP",
+						version : "7"
+					},
+					{
+						browserName : "opera",
+						platform : "Windows 7",
+						version : "12"
+					},
+					{
+						browserName : "opera",
+						platform : "Windows 7",
+						version : "11"
+					},
+					{
+						platform : "OS X 10.6",
+						browserName : "safari",
+						version : "5"
+					},
+					{
+						platform : "OS X 10.8",
+						browserName : "safari",
+						version : "6"
+					},
+					{
+						platform : "OS X 10.9",
+						browserName : "safari",
+						version : "7"
+					}, /*
+						 * { platform : "Linux", browserName : "android",
+						 * version : "4.4" },
+						 */
+					{
+						platform : "OS X 10.9",
+						browserName : "iphone",
+						version : "7.1"
+					}
+				]
 			}
 		}
 	};
@@ -239,23 +283,35 @@ module.exports = function(grunt) {
 		test : {
 			minimum : 0.95,
 			srcDir : "src",
-			depDirs : [ "test" ],
+			depDirs : [
+				"test"
+			],
 			outDir : "coverage",
-			testFiles : [ "test/*.html" ]
+			testFiles : [
+				"test/*.html"
+			]
 		}
 	};
 
 	gruntConfig.jsdoc = {
 		dist : {
-			src: ["src/*.js", "test/*.js"],
-			options: {
-				destination: "docs/jsdoc/"
+			src : [
+				"src/*.js",
+				"test/*.js"
+			],
+			options : {
+				destination : "docs/jsdoc/"
 			}
 		}
 	};
 
 	gruntConfig.watch = {
-		files : [ "src/*.js", "test/*.js", "test/*.html", "Gruntfile.js" ],
+		files : [
+			"src/*.js",
+			"test/*.js",
+			"test/*.html",
+			"Gruntfile.js"
+		],
 		tasks : "dev"
 	};
 
@@ -314,11 +370,13 @@ module.exports = function(grunt) {
 			}
 		};
 
-		child = require("child_process").fork(path.join(__dirname, "test/bridge/qunit-node-bridge.js"), [ JSON.stringify({
-			data : this.data,
-			dir : __dirname,
-			setUp : (this.data.setUp || "").toString()
-		}) ], {
+		child = require("child_process").fork(path.join(__dirname, "test/bridge/qunit-node-bridge.js"), [
+			JSON.stringify({
+				data : this.data,
+				dir : __dirname,
+				setUp : (this.data.setUp || "").toString()
+			})
+		], {
 			env : process.env
 		});
 
@@ -373,7 +431,8 @@ module.exports = function(grunt) {
 					}
 					// Log results.
 					if (status.failed > 0) {
-						grunt.warn(status.failed + "/" + status.total + " assertions failed (" + status.duration + "ms)");
+						grunt.warn(status.failed + "/" + status.total + " assertions failed (" + status.duration
+								+ "ms)");
 						done(false);
 					} else if (status.total === 0) {
 						grunt.warn("0/0 assertions ran (" + status.duration + "ms)");
@@ -391,9 +450,17 @@ module.exports = function(grunt) {
 	});
 
 	// Default grunt
-	grunt.registerTask("default", [ "concat", "jshint", "uglify" ]);
+	grunt.registerTask("default", [
+		"concat",
+		"jshint",
+		"uglify"
+	]);
 
-	var unit_test_tasks = [ "connect", "qunit", "qunit-node" ];
+	var unit_test_tasks = [
+		"connect",
+		"qunit",
+		"qunit-node"
+	];
 	var unit_test_all_tasks = unit_test_tasks.slice(0);
 
 	// only the latest version of travis should do saucelabs testings or locally
@@ -403,13 +470,44 @@ module.exports = function(grunt) {
 	}
 
 	// Other tasks
-	grunt.registerTask("all", [ "concat", "jshint" ].concat(unit_test_all_tasks).concat([ "uglify", "compare_size" ]));
-	grunt.registerTask("all:local", [ "concat", "jshint" ].concat(unit_test_tasks).concat([ "uglify", "compare_size" ]));
-	grunt.registerTask("travis", [ "concat", "jshint" ].concat(unit_test_all_tasks).concat([ "uglify" ]));
-	grunt.registerTask("lint", [ "concat", "jshint" ]);
+	grunt.registerTask("all", [
+		"concat",
+		"jshint"
+	].concat(unit_test_all_tasks).concat([
+		"uglify",
+		"compare_size"
+	]));
+	grunt.registerTask("all:local", [
+		"concat",
+		"jshint"
+	].concat(unit_test_tasks).concat([
+		"uglify",
+		"compare_size"
+	]));
+	grunt.registerTask("travis", [
+		"concat",
+		"jshint"
+	].concat(unit_test_all_tasks).concat([
+		"uglify"
+	]));
+	grunt.registerTask("lint", [
+		"concat",
+		"jshint"
+	]);
 	grunt.registerTask("test:local", unit_test_tasks);
 	grunt.registerTask("test", unit_test_all_tasks);
-	grunt.registerTask("doc", [ "jsdoc" ]);
-	grunt.registerTask("coverage", [ "connect", "qunit", "qunit-cov" ]);
-	grunt.registerTask("dev", [ "lint" ].concat(unit_test_tasks).concat([ "uglify", "compare_size" ]));
+	grunt.registerTask("doc", [
+		"jsdoc"
+	]);
+	grunt.registerTask("coverage", [
+		"connect",
+		"qunit",
+		"qunit-cov"
+	]);
+	grunt.registerTask("dev", [
+		"lint"
+	].concat(unit_test_tasks).concat([
+		"uglify",
+		"compare_size"
+	]));
 };
